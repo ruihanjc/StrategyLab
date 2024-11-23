@@ -1,0 +1,19 @@
+backtesting/
+
+
+#DB Files
+*.mdb
+*.ldb
+*.mdf
+*.ndf
+
+# ArcticDB files
+arcticdb/
+**/arcticdb/
+
+# Environment
+.env
+.venv
+env/
+venv/
+ENV/
