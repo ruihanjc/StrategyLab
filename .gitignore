@@ -7,9 +7,8 @@ backtesting/
 *.mdf
 *.ndf
 
-# ArcticDB files
+# Database files
 arcticdb/
-**/arcticdb/
 
 # Environment
 .env

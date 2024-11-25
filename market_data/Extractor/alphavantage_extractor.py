@@ -41,6 +41,6 @@ class AlphaVantageExtractor(BaseExtractor):
 
         return self.create_dataframe(records)
 
-    def get_eod_data(self, ticker):
+    def get_eod_data(self, ticker, start, end):
         url = f"{self.alphavantage_base_url}function=TIME_SERIES_DAILY&symbol={ticker}&apikey={self.api_key}"
         return self.make_request(url)

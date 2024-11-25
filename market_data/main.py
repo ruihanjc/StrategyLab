@@ -1,9 +1,11 @@
+import datetime
+
 from Types.ArgumentRunType import ArgumentRunType
 from config_manager import ConfigManager
 import logging
 import sys
 from requestor_factory import RequesterFactory
-from ArcticDB import arcticdb_writer
+from Database import arcticdb_writer
 
 
 def setup_logging():
@@ -55,18 +57,18 @@ def main(config_arguments):
             logger.error("No data fetched from the source")
             return False
 
-        # Store data in ArcticDB
-        logger.info("Initializing ArcticDB storage...")
+        # Store data in Database
+        logger.info("Initializing Database storage...")
         arcticdb_helper = arcticdb_writer.MarketDataStore(database_config)
 
         logger.info("Storing fetched data...")
         success = arcticdb_helper.store_market_data(fetched_data)
 
         if success:
-            logger.info("Data successfully stored in ArcticDB")
+            logger.info("Data successfully stored in Database")
             return True
         else:
-            logger.error("Failed to store data in ArcticDB")
+            logger.error("Failed to store data in Database")
             return False
 
     except Exception as e:

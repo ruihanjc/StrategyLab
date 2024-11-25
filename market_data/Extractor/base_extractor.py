@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 import requests
 import pandas as pd
 from typing import Dict, Any
+import datetime
 
 
 class BaseExtractor(ABC):
@@ -23,7 +24,7 @@ class BaseExtractor(ABC):
         pass
 
     @abstractmethod
-    def get_eod_data(self, ticker: str):
+    def get_eod_data(self, ticker: str, start: datetime, to:datetime):
         """Get end of day data for a ticker"""
         pass
 
