@@ -10,13 +10,14 @@ import matplotlib.pyplot as plt
 import argparse
 from datetime import datetime
 
+from strategy_backtest.sysrules.ewma import EqualWeightMovingAverage
 # Import components from our framework
 from sysutils.config import ConfigManager
 from sysdata.arcticdb_handler import ArcticdDBHandler
 from systems.base_engine import BacktestEngine
 
 
-def run_single_backtest(config_manager=None, use_sample_data=True):
+def run_single_backtest(config_manager=None):
     """Run a single-asset backtest using configuration"""
     if config_manager is None:
         config_manager = ConfigManager()
@@ -37,18 +38,18 @@ def run_single_backtest(config_manager=None, use_sample_data=True):
     raw_data_dict = arcticdb.load_from_arcticdb(
         symbols=[ticker],
         start_date=backtest_settings.get('start_date', '2020-01-01'),
-        end_date=backtest_settings.get('end_date', '2022-12-31'),
-        lib_path=arcticdb_settings.get('lib_path', './arctic_data')
+        end_date=backtest_settings.get('end_date', '2024-12-31')
     )
-    ticker_data = raw_data_dict.get(ticker)
+    ticker_data = raw_data_dict
 
     # Preprocess data
 
 
     # Create strategy from config
-    strategy = StrategyFactory.create_strategy(config='ma_crossover')
-    print(f"\nStrategy: {strategy.name}")
-    print(f"Parameters: {strategy.get_parameters()}")
+    strategy = EqualWeightMovingAverage(
+        ma_periods=[20, 40],
+        threshold=0.8  # 60% of MAs must agree for a signal
+    )
 
     # Initialize backtesting engine
     engine = BacktestEngine(
@@ -71,7 +72,7 @@ def run_single_backtest(config_manager=None, use_sample_data=True):
     # Plot results
     plt.figure(figsize=(12, 8))
     plt.subplot(3, 1, 1)
-    plt.plot(processed_data.index, processed_data['close'])
+    plt.plot(ticker_data.index, ticker_data['close'])
     plt.title(f"{ticker} Close Price")
     plt.grid(True)
 
@@ -98,3 +99,10 @@ def run_multi_strategy_backtest(config_manager=None, use_sample_data=True):
 
     # Load configurations
     backtest_settings = config_manager.get
+
+
+if __name__ == "__main__":
+    print("Running Equal Weight Moving Average Backtest")
+
+    # Option 1: Run with YAML config
+    results_yaml, metrics_yaml, strategy_yaml = run_single_backtest()

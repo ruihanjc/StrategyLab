@@ -1,0 +1,22 @@
+2025-02-27 11:19:52,244 - INFO - 
+Current ArcticDB Contents:
+2025-02-27 11:19:52,253 - INFO - 
+Library: forex
+2025-02-27 11:19:52,253 - INFO - Symbols: []
+2025-02-27 11:19:52,261 - INFO - 
+Library: crypto
+2025-02-27 11:19:52,262 - INFO - Symbols: []
+2025-02-27 11:19:52,269 - INFO - 
+Library: equity
+2025-02-27 11:19:52,269 - INFO - Symbols: ['TEST_SYMBOL']
+2025-02-27 11:19:52,276 - INFO - 
+Library: futures
+2025-02-27 11:19:52,276 - INFO - Symbols: []
+2025-02-27 11:19:52,283 - INFO - 
+Library: metadata
+2025-02-27 11:19:52,283 - INFO - Symbols: []
+2025-02-27 11:19:52,292 - INFO - 
+Library: market_index
+2025-02-27 11:19:52,292 - INFO - Symbols: []
+2025-02-27 11:20:36,979 - INFO - Created backup at: C:\Users\ruiha\Downloads\1\PathToAnalyst\arcticdb_backup_20250227_112032
+2025-02-27 11:20:38,110 - INFO - Deleted ArcticDB directory: C:\Users\ruiha\Downloads\1\PathToAnalyst\arcticdb

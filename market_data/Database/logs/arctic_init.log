@@ -1,0 +1,97 @@
+2025-02-27 11:20:54,989 - INFO - Initialized directory: C:\Users\ruiha\Downloads\1\PathToAnalyst\arcticdb
+2025-02-27 11:20:55,002 - INFO - Connected to ArcticDB successfully
+2025-02-27 11:20:55,006 - INFO - Created library: equity
+2025-02-27 11:20:55,009 - INFO - Created library: market_index
+2025-02-27 11:20:55,012 - INFO - Created library: crypto
+2025-02-27 11:20:55,014 - INFO - Created library: forex
+2025-02-27 11:20:55,016 - INFO - Created library: futures
+2025-02-27 11:20:55,020 - INFO - Created library: metadata
+2025-02-27 11:20:55,020 - INFO - 
+Initialization Summary:
+2025-02-27 11:20:55,020 - INFO - Created libraries: equity, market_index, crypto, forex, futures, metadata
+2025-02-27 11:20:55,021 - INFO - 
+Verifying libraries:
+2025-02-27 11:20:55,238 - INFO - Library forex: 0 symbols
+2025-02-27 11:20:55,453 - INFO - Library crypto: 0 symbols
+2025-02-27 11:20:55,656 - INFO - Library equity: 0 symbols
+2025-02-27 11:20:55,874 - INFO - Library futures: 0 symbols
+2025-02-27 11:20:56,077 - INFO - Library metadata: 0 symbols
+2025-02-27 11:20:56,280 - INFO - Library market_index: 0 symbols
+2025-02-27 11:20:56,314 - INFO - Created test data in stock_equity library
+2025-02-27 11:22:21,449 - INFO - Initialized directory: C:\Users\ruiha\Downloads\1\PathToAnalyst\arcticdb
+2025-02-27 11:22:21,455 - INFO - Connected to ArcticDB successfully
+2025-02-27 11:22:21,456 - INFO - Library already exists: equity
+2025-02-27 11:22:21,456 - INFO - Library already exists: market_index
+2025-02-27 11:22:21,456 - INFO - Library already exists: crypto
+2025-02-27 11:22:21,456 - INFO - Library already exists: forex
+2025-02-27 11:22:21,456 - INFO - Library already exists: futures
+2025-02-27 11:22:21,456 - INFO - Library already exists: metadata
+2025-02-27 11:22:21,456 - INFO - 
+Initialization Summary:
+2025-02-27 11:22:21,457 - INFO - Existing libraries: equity, market_index, crypto, forex, futures, metadata
+2025-02-27 11:22:21,457 - INFO - 
+Verifying libraries:
+2025-02-27 11:22:21,465 - INFO - Library forex: 0 symbols
+2025-02-27 11:22:21,473 - INFO - Library crypto: 0 symbols
+2025-02-27 11:22:21,480 - INFO - Library equity: 1 symbols
+2025-02-27 11:22:21,486 - INFO - Library futures: 0 symbols
+2025-02-27 11:22:21,493 - INFO - Library metadata: 0 symbols
+2025-02-27 11:22:21,501 - INFO - Library market_index: 0 symbols
+2025-02-27 11:22:37,934 - INFO - Initialized directory: C:\Users\ruiha\Downloads\1\PathToAnalyst\arcticdb
+2025-02-27 11:22:37,940 - INFO - Connected to ArcticDB successfully
+2025-02-27 11:22:37,941 - INFO - Library already exists: equity
+2025-02-27 11:22:37,941 - INFO - Library already exists: market_index
+2025-02-27 11:22:37,941 - INFO - Library already exists: crypto
+2025-02-27 11:22:37,941 - INFO - Library already exists: forex
+2025-02-27 11:22:37,941 - INFO - Library already exists: futures
+2025-02-27 11:22:37,941 - INFO - Library already exists: metadata
+2025-02-27 11:22:37,941 - INFO - 
+Initialization Summary:
+2025-02-27 11:22:37,941 - INFO - Existing libraries: equity, market_index, crypto, forex, futures, metadata
+2025-02-27 11:22:37,941 - INFO - 
+Verifying libraries:
+2025-02-27 11:22:37,947 - INFO - Library forex: 0 symbols
+2025-02-27 11:22:37,951 - INFO - Library crypto: 0 symbols
+2025-02-27 11:22:37,955 - INFO - Library equity: 1 symbols
+2025-02-27 11:22:37,960 - INFO - Library futures: 0 symbols
+2025-02-27 11:22:37,964 - INFO - Library metadata: 0 symbols
+2025-02-27 11:22:37,969 - INFO - Library market_index: 0 symbols
+2025-02-27 11:23:45,712 - INFO - Initialized directory: C:\Users\ruiha\Downloads\1\PathToAnalyst\arcticdb
+2025-02-27 11:23:45,717 - INFO - Connected to ArcticDB successfully
+2025-02-27 11:23:45,717 - INFO - Library already exists: equity
+2025-02-27 11:23:45,717 - INFO - Library already exists: market_index
+2025-02-27 11:23:45,717 - INFO - Library already exists: crypto
+2025-02-27 11:23:45,717 - INFO - Library already exists: forex
+2025-02-27 11:23:45,719 - INFO - Library already exists: futures
+2025-02-27 11:23:45,719 - INFO - Library already exists: metadata
+2025-02-27 11:23:45,719 - INFO - 
+Initialization Summary:
+2025-02-27 11:23:45,719 - INFO - Existing libraries: equity, market_index, crypto, forex, futures, metadata
+2025-02-27 11:23:45,719 - INFO - 
+Verifying libraries:
+2025-02-27 11:23:45,724 - INFO - Library forex: 0 symbols
+2025-02-27 11:23:45,728 - INFO - Library crypto: 0 symbols
+2025-02-27 11:23:45,732 - INFO - Library equity: 1 symbols
+2025-02-27 11:23:45,736 - INFO - Library futures: 0 symbols
+2025-02-27 11:23:45,740 - INFO - Library metadata: 0 symbols
+2025-02-27 11:23:45,744 - INFO - Library market_index: 0 symbols
+2025-02-27 11:24:39,476 - INFO - Initialized directory: C:\Users\ruiha\Downloads\1\PathToAnalyst\StrategyLab\arcticdb
+2025-02-27 11:24:39,489 - INFO - Connected to ArcticDB successfully
+2025-02-27 11:24:39,492 - INFO - Created library: equity
+2025-02-27 11:24:39,495 - INFO - Created library: market_index
+2025-02-27 11:24:39,498 - INFO - Created library: crypto
+2025-02-27 11:24:39,501 - INFO - Created library: forex
+2025-02-27 11:24:39,504 - INFO - Created library: futures
+2025-02-27 11:24:39,507 - INFO - Created library: metadata
+2025-02-27 11:24:39,507 - INFO - 
+Initialization Summary:
+2025-02-27 11:24:39,507 - INFO - Created libraries: equity, market_index, crypto, forex, futures, metadata
+2025-02-27 11:24:39,507 - INFO - 
+Verifying libraries:
+2025-02-27 11:24:39,722 - INFO - Library forex: 0 symbols
+2025-02-27 11:24:39,937 - INFO - Library crypto: 0 symbols
+2025-02-27 11:24:40,154 - INFO - Library equity: 0 symbols
+2025-02-27 11:24:40,372 - INFO - Library futures: 0 symbols
+2025-02-27 11:24:40,588 - INFO - Library metadata: 0 symbols
+2025-02-27 11:24:40,806 - INFO - Library market_index: 0 symbols
+2025-02-27 11:24:40,817 - INFO - Created test data in equity library

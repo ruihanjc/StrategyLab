@@ -10,7 +10,7 @@ import sys
 class ArcticdDBHandler:
     def __init__(self, type):
         current_dir = Path(os.getcwd())
-        self.arctic_dir = current_dir.parent.parent / 'arcticdb'
+        self.arctic_dir = current_dir.parent / 'arcticdb'
         self.arctic_uri = f"lmdb://{self.arctic_dir}"
         self.arctic = adb.Arctic(self.arctic_uri)
         self.library = self.arctic.get_library(type)
@@ -46,7 +46,7 @@ class ArcticdDBHandler:
 if __name__ == "__main__":
     symbols = ['AAPL']
     start_date = '2020-01-01'
-    end_date = '2022-12-31'
+    end_date = '2024-12-31'
 
     arcticlibrary = ArcticdDBHandler('equity')
 

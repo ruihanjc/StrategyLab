@@ -85,13 +85,26 @@ class EqualWeightMovingAverage(Strategy):
         # Create a DataFrame with all MAs for easier analysis
         ma_df = pd.DataFrame(ma_dict)
 
-        # Calculate how many MAs the price is above/below at each point
-        above_mas = (data[price_column] > ma_df).sum(axis=1)
-        below_mas = (data[price_column] < ma_df).sum(axis=1)
+        # Make sure we handle NaN values properly
+        ma_df_filled = ma_df.bfill() # Backfill NaN values
 
-        # Calculate ratios
-        price_above_ma_ratio = above_mas / len(ma_periods)
-        price_below_ma_ratio = below_mas / len(ma_periods)
+        # Calculate how many MAs the price is above/below at each point
+        # First align price with MA dataframe
+        price_series = data[price_column].reindex(ma_df_filled.index)
+
+        above_mas = (price_series.values.reshape(-1, 1) > ma_df_filled.values).sum(axis=1)
+        below_mas = (price_series.values.reshape(-1, 1) < ma_df_filled.values).sum(axis=1)
+
+        above_mas = pd.Series(above_mas, index=ma_df_filled.index)
+        below_mas = pd.Series(below_mas, index=ma_df_filled.index)
+
+        # Calculate ratios (avoid division by zero if no MA periods)
+        if len(ma_periods) > 0:
+            price_above_ma_ratio = above_mas / len(ma_periods)
+            price_below_ma_ratio = below_mas / len(ma_periods)
+        else:
+            price_above_ma_ratio = pd.Series(0, index=ma_df_filled.index)
+            price_below_ma_ratio = pd.Series(0, index=ma_df_filled.index)
 
         # Add indicators to data for rule evaluation
         indicators = {
@@ -100,30 +113,21 @@ class EqualWeightMovingAverage(Strategy):
             'threshold': threshold
         }
 
-        # Use signal rules from config if available
         if self.signal_rules and 'buy' in self.signal_rules and 'sell' in self.signal_rules:
-            # Process buy rules
             for rule in self.signal_rules['buy']:
-                # Replace variable names with actual values for evaluation
                 condition = rule['condition']
                 lookback = rule.get('lookback', 0)
                 prior_condition = rule.get('prior_condition', None)
-
-                # Evaluate current condition
                 condition_mask = self._evaluate_condition(condition, data, indicators)
 
-                # If there's a prior condition, evaluate it with lookback
                 if prior_condition:
                     prior_mask = self._evaluate_condition(prior_condition, data, indicators)
                     if lookback > 0:
                         prior_mask = prior_mask.shift(lookback)
-                    # Buy when current condition is true but prior condition was false
                     signals[condition_mask & prior_mask] = 1
                 else:
-                    # Simply use current condition
                     signals[condition_mask] = 1
 
-            # Process sell rules
             for rule in self.signal_rules['sell']:
                 condition = rule['condition']
                 lookback = rule.get('lookback', 0)
@@ -139,13 +143,10 @@ class EqualWeightMovingAverage(Strategy):
                 else:
                     signals[condition_mask] = -1
         else:
-            # Default implementation if no rules in config
-            # Buy when majority of MAs are below price
             buy_condition = price_above_ma_ratio >= threshold
             buy_signal = buy_condition & ~buy_condition.shift(1)
             signals[buy_signal] = 1
 
-            # Sell when majority of MAs are above price
             sell_condition = price_below_ma_ratio >= threshold
             sell_signal = sell_condition & ~sell_condition.shift(1)
             signals[sell_signal] = -1
@@ -156,34 +157,16 @@ class EqualWeightMovingAverage(Strategy):
         local_vars = {}
         local_vars.update(indicators)
 
-        # Add parameters to local vars
         for param_name, param_value in self.parameters.items():
             local_vars[param_name] = param_value
 
-        # Add columns from data to local vars
         for column in data.columns:
             local_vars[column] = data[column]
 
         try:
-            # Use safer eval approach with only necessary variables
             result = eval(condition, {"__builtins__": {}}, local_vars)
             return result
         except Exception as e:
             print(f"Error evaluating condition '{condition}': {str(e)}")
             return pd.Series(False, index=data.index)
 
-
-# Register with StrategyFactory
-if __name__ == "__main__":
-    from strategies.base import StrategyFactory
-    from utils.config import ConfigManager
-    import yaml
-
-    # Register the strategy
-    StrategyFactory.register_strategy('EqualWeightMovingAverage', EqualWeightMovingAverage)
-
-    # Create config
-    config_manager = ConfigManager()
-    config_manager.create_config('strategies/equal_weight_ma', yaml.safe_load(EQUAL_WEIGHT_MA_CONFIG))
-
-    print("Equal Weight Moving Average Strategy registered and config created")

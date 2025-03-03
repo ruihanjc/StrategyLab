@@ -3,7 +3,7 @@ initial_capital: 100000
 commission: 0.001  # 0.1%
 slippage: 0.0005   # 0.05%
 start_date: '2020-01-01'
-end_date: '2022-12-31'
+end_date: '2024-12-31'
 
 # Position sizing
 position_sizing:

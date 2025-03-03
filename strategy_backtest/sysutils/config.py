@@ -8,7 +8,7 @@ class ConfigManager:
     Configuration manager for loading and validating YAML configs
     """
 
-    def __init__(self, config_dir: str = './configs'):
+    def __init__(self):
         """
         Initialize config manager
 
@@ -17,7 +17,8 @@ class ConfigManager:
         config_dir: str
             Directory containing YAML config files
         """
-        self.config_dir = config_dir
+
+        self.config_dir = os.path.join(os.getcwd(), 'sysconfigs')
         self.configs = {}
 
     def load_config(self, config_name: str) -> Dict[str, Any]:
@@ -39,8 +40,14 @@ class ConfigManager:
         if config_name in self.configs:
             return self.configs[config_name]
 
+
+
+
         # Construct file path
         file_path = os.path.join(self.config_dir, f"{config_name}.yaml")
+
+        if (os.path.exists(file_path)):
+            print('hello')
 
         # Load and parse YAML
         try:
@@ -67,7 +74,7 @@ class ConfigManager:
         dict
             Strategy configuration
         """
-        return self.load_config(f"sysrules/{strategy_name}")
+        return self.load_config(f"strategy_config/{strategy_name}")
 
     def get_backtest_settings(self) -> Dict[str, Any]:
         """
@@ -78,7 +85,7 @@ class ConfigManager:
         dict
             Backtest settings
         """
-        return self.load_config("backtest_settings")
+        return self.load_config("backtest_config")
 
     def get_data_settings(self) -> Dict[str, Any]:
         """
@@ -89,7 +96,7 @@ class ConfigManager:
         dict
             Data settings
         """
-        return self.load_config("data_settings")
+        return self.load_config("data_config")
 
     def create_config(self, config_name: str, config_data: Dict[str, Any]) -> None:
         """
