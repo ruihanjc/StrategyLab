@@ -2,6 +2,7 @@ import arcticdb as adb
 import pandas as pd
 from datetime import datetime
 import os
+from pathlib import Path
 import logging
 
 
@@ -9,7 +10,8 @@ class ArcticDBInitializer:
     def __init__(self, arctic_path):
         self.arctic_path = arctic_path
         self.arctic_uri = f"lmdb://{arctic_path}"
-        self.arctic = None
+        self.arctic = adb.Arctic(self.arctic_uri)
+
         self.setup_logging()
 
     def setup_logging(self):
@@ -18,7 +20,7 @@ class ArcticDBInitializer:
             format='%(asctime)s - %(levelname)s - %(message)s',
             handlers=[
                 logging.StreamHandler(),
-                logging.FileHandler('arctic_init.log')
+                logging.FileHandler('./logs/arctic_init.log')
             ]
         )
         self.logger = logging.getLogger(__name__)
@@ -69,6 +71,8 @@ class ArcticDBInitializer:
     def verify_libraries(self):
         """Verify all libraries are accessible"""
         libraries = self.arctic.list_libraries()
+        print(libraries)
+        print(self.arctic.get_uri())
         self.logger.info("\nVerifying libraries:")
 
         for lib_name in libraries:
@@ -82,7 +86,7 @@ class ArcticDBInitializer:
     def create_test_data(self):
         """Create test data if libraries are empty"""
         try:
-            lib = self.arctic.get_library('stock_equity')
+            lib = self.arctic.get_library('equity')
             if not lib.list_symbols():
                 # Create sample data
                 dates = pd.date_range(start='2024-01-01', periods=10)
@@ -100,7 +104,7 @@ class ArcticDBInitializer:
                 })
 
                 lib.write('TEST_SYMBOL', test_data)
-                self.logger.info("Created test data in stock_equity library")
+                self.logger.info("Created test data in equity library")
         except Exception as e:
             self.logger.error(f"Error creating test data: {str(e)}")
 
@@ -125,8 +129,8 @@ class ArcticDBInitializer:
 
 def main():
     # Use relative path from script location
-    current_dir = os.Path(os.getcwd())
-    arctic_dir = current_dir.parent.parent.parent / 'arcticdb'
+    current_dir = Path(os.getcwd())
+    arctic_dir = current_dir.parent.parent / 'arcticdb'
     initializer = ArcticDBInitializer(arctic_dir)
     success = initializer.initialize()
 

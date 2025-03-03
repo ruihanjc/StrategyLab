@@ -1,4 +1,5 @@
 import arcticdb as adb
+from pathlib import Path
 import os
 import shutil
 import logging
@@ -14,7 +15,7 @@ class ArcticDBCleaner:
         self.setup_logging()
 
     def setup_logging(self):
-        log_filename = f'arctic_cleanup_{datetime.now().strftime("%Y%m%d_%H%M%S")}.log'
+        log_filename = f'./logs/arctic_cleanup_{datetime.now().strftime("%Y%m%d_%H%M%S")}.log'
         logging.basicConfig(
             level=logging.INFO,
             format='%(asctime)s - %(levelname)s - %(message)s',
@@ -106,7 +107,7 @@ def main():
     args = parser.parse_args()
 
     # Use relative path from script location
-    current_dir = os.Path(os.getcwd())
+    current_dir = Path(os.getcwd())
     arctic_dir = current_dir.parent.parent.parent / 'arcticdb'
     cleaner = ArcticDBCleaner(arctic_dir)
 

@@ -1,9 +1,14 @@
+import datetime
+
 import arcticdb as adb
 import pandas as pd
 import argparse
 from pathlib import Path
 import os
+from datetime import date
 import sys
+
+from dateutil.utils import today
 
 
 class ArcticReader:
@@ -25,11 +30,14 @@ class ArcticReader:
     def get_historical_range(self, library, symbol):
         """Read data from a symbol"""
         lib = self.arctic.get_library(library)
-        data = lib.read(symbol).data
-        if 'date' in data.columns:
-            earliest_date = data['date'].min()
-            latest_date = data['date'].max()
-            return earliest_date, latest_date
+        if (lib.has_symbol(symbol)):
+            data = lib.read(symbol).data
+            if 'date' in data.columns:
+                earliest_date = data['date'].min()
+                latest_date = data['date'].max()
+                return earliest_date, latest_date
+        else:
+            return datetime.datetime(2010, 1, 1, 12, 0, 0), datetime.datetime.today()
         return None
 
 
@@ -49,3 +57,7 @@ class ArcticReader:
             'columns': list(data.columns),
             'date_range': f"{data['date'].min()} to {data['date'].max()}" if 'date' in data.columns else 'N/A'
         }
+
+
+x = ArcticReader()
+print(x.list_libraries())

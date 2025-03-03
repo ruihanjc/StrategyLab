@@ -1,0 +1,11 @@
+# Data settings
+arcticdb:
+  lib_path: '../../arcticdb'
+  symbols:
+    - 'AAPL'
+
+  # Data preprocessing
+  preprocessing:
+    handle_missing: true
+    method: 'ffill'
+    resample: null  # Options: null, 'D', 'W', 'M'

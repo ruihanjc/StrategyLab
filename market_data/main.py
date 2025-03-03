@@ -1,6 +1,6 @@
 import datetime
 
-from Types.ArgumentRunType import ArgumentRunType
+from Types.argument_runtype import ArgumentRunType
 from config_manager import ConfigManager
 import logging
 import sys
