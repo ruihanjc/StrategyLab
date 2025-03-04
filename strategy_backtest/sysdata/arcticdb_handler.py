@@ -5,14 +5,13 @@ import argparse
 from pathlib import Path
 import os
 import sys
+from market_data.Database.arctic_connection import get_arcticdb_connection
 
 
 class ArcticdDBHandler:
-    def __init__(self, type):
-        current_dir = Path(os.getcwd())
-        self.arctic_dir = current_dir.parent / 'arcticdb'
-        self.arctic_uri = f"lmdb://{self.arctic_dir}"
-        self.arctic = adb.Arctic(self.arctic_uri)
+    def __init__(self, type, dir):
+        self.arctic = get_arcticdb_connection(dir)
+        print(self.arctic.list_libraries())
         self.library = self.arctic.get_library(type)
 
     def load_from_arcticdb(self, symbols, start_date, end_date):
@@ -44,10 +43,12 @@ class ArcticdDBHandler:
 
 
 if __name__ == "__main__":
-    symbols = ['AAPL']
+    symbols = ['PLTR']
     start_date = '2020-01-01'
     end_date = '2024-12-31'
 
-    arcticlibrary = ArcticdDBHandler('equity')
+    arcticlibrary = ArcticdDBHandler('equity', f"{Path(os.getcwd()).parent.parent}/arcticdb")
+
+    print(arcticlibrary.arctic.get_library('equity').read('TSLA'))
 
     data = arcticlibrary.load_from_arcticdb(symbols, start_date, end_date)

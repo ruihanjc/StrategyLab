@@ -4,9 +4,23 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0c6c299d-cb1e-4596-979e-03242c47f47c" name="Changes" comment="BackTest module">
+    <list default="true" id="0c6c299d-cb1e-4596-979e-03242c47f47c" name="Changes" comment="first backtest">
+      <change afterPath="$PROJECT_DIR$/market_data/Database/arctic_connection.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/strategy_backtest/config.ini" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/strategy_backtest/sysutils/math_algorithms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/Database/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/Database/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/Database/arctic_delete.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/Database/arctic_delete.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/Database/arctic_init.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/Database/arctic_init.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/Database/arcticdb_reader.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/Database/arcticdb_reader.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/Database/arcticdb_writer.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/Database/arcticdb_writer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/Extractor/marketstack_extractor.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/Extractor/marketstack_extractor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/config.ini" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/config.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/strategy_backtest/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_backtest/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/strategy_backtest/sysconfigs/backtest_config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_backtest/sysconfigs/backtest_config.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/strategy_backtest/sysconfigs/data_config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_backtest/sysconfigs/data_config.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/strategy_backtest/sysdata/arcticdb_handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_backtest/sysdata/arcticdb_handler.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/strategy_backtest/sysrules/ewma.py" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_backtest/sysrules/ewma.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/strategy_backtest/sysutils/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_backtest/sysutils/config.py" afterDir="false" />
@@ -52,13 +66,16 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Python.app.executor": "Debug",
+    "Python.Data_Extractor(marketdata main).executor": "Debug",
+    "Python.Data_Extractor.executor": "Debug",
+    "Python.app.executor": "Run",
     "Python.arctic_delete.executor": "Debug",
     "Python.arctic_init.executor": "Debug",
     "Python.arcticdb_diagnostics.executor": "Run",
     "Python.arcticdb_handler.executor": "Debug",
     "Python.arcticdb_reader.executor": "Debug",
-    "Python.main.executor": "Debug",
+    "Python.backtesting(main).executor": "Debug",
+    "Python.main.executor": "Run",
     "Python.marketstack_extractor.executor": "Debug",
     "Python.test.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -73,30 +90,8 @@
       <recent name="C:\Users\ruiha\Downloads\1\PathToAnalyst\StrategyLab\market_data\Database" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.main">
-    <configuration name="arctic_init" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="StrategyLab" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/market_data/Database" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/market_data/Database/arctic_init.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="arcticdb_handler" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Python.backtesting(main)">
+    <configuration name="Backtest_Data_Check(handlder)" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="StrategyLab" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -118,7 +113,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="arcticdb_reader" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="Data_Extractor(marketdata main)" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="StrategyLab" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -127,12 +122,12 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/market_data/Database" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/market_data/Extractor" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/market_data/Database/arcticdb_reader.py" />
-      <option name="PARAMETERS" value="" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/market_data/main.py" />
+      <option name="PARAMETERS" value="-service=Equity -source=MarketStack -ticker=QQQ" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -140,7 +135,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="backtesting(main)" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="StrategyLab" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -162,42 +157,16 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="marketstack_extractor" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="StrategyLab" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/market_data/Extractor" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/market_data/main.py" />
-      <option name="PARAMETERS" value="-service=Equity -source=MarketStack -ticker=AAPL" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <list>
-      <item itemvalue="Python.main" />
-      <item itemvalue="Python.arctic_init" />
-      <item itemvalue="Python.arcticdb_reader" />
-      <item itemvalue="Python.arcticdb_handler" />
-      <item itemvalue="Python.marketstack_extractor" />
+      <item itemvalue="Python.backtesting(main)" />
+      <item itemvalue="Python.Backtest_Data_Check(handlder)" />
+      <item itemvalue="Python.Data_Extractor(marketdata main)" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.main" />
-        <item itemvalue="Python.arcticdb_handler" />
-        <item itemvalue="Python.marketstack_extractor" />
-        <item itemvalue="Python.arcticdb_reader" />
-        <item itemvalue="Python.arctic_init" />
+        <item itemvalue="Python.backtesting(main)" />
+        <item itemvalue="Python.Data_Extractor(marketdata main)" />
+        <item itemvalue="Python.Backtest_Data_Check(handlder)" />
       </list>
     </recent_temporary>
   </component>
@@ -225,12 +194,21 @@
       <option name="project" value="LOCAL" />
       <updated>1741000555702</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="first backtest">
+      <option name="closed" value="true" />
+      <created>1741017807073</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1741017807073</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="BackTest module" />
-    <option name="LAST_COMMIT_MESSAGE" value="BackTest module" />
+    <MESSAGE value="first backtest" />
+    <option name="LAST_COMMIT_MESSAGE" value="first backtest" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -257,43 +235,68 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/market_data/Database/arcticdb_reader.py</url>
-          <line>31</line>
+          <line>35</line>
           <option name="timeStamp" value="5" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/market_data/Database/arcticdb_reader.py</url>
-          <line>39</line>
+          <line>42</line>
           <option name="timeStamp" value="7" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/market_data/Extractor/marketstack_extractor.py</url>
-          <line>32</line>
-          <option name="timeStamp" value="8" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/market_data/Extractor/marketstack_extractor.py</url>
-          <line>61</line>
+          <line>65</line>
           <option name="timeStamp" value="10" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/strategy_backtest/sysdata/arcticdb_handler.py</url>
-          <line>52</line>
-          <option name="timeStamp" value="17" />
+          <url>file://$PROJECT_DIR$/market_data/Extractor/marketstack_extractor.py</url>
+          <line>33</line>
+          <option name="timeStamp" value="37" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/strategy_backtest/sysdata/arcticdb_handler.py</url>
-          <line>50</line>
-          <option name="timeStamp" value="18" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/strategy_backtest/sysdata/arcticdb_handler.py</url>
-          <line>48</line>
-          <option name="timeStamp" value="22" />
+          <url>file://$PROJECT_DIR$/market_data/Extractor/marketstack_extractor.py</url>
+          <line>38</line>
+          <option name="timeStamp" value="38" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/strategy_backtest/main.py</url>
-          <line>91</line>
-          <option name="timeStamp" value="35" />
+          <line>33</line>
+          <option name="timeStamp" value="39" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/strategy_backtest/sysdata/arcticdb_handler.py</url>
+          <line>45</line>
+          <option name="timeStamp" value="46" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/strategy_backtest/sysdata/arcticdb_handler.py</url>
+          <line>49</line>
+          <option name="timeStamp" value="47" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/market_data/Database/arctic_connection.py</url>
+          <line>51</line>
+          <option name="timeStamp" value="49" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/strategy_backtest/sysutils/config.py</url>
+          <line>62</line>
+          <option name="timeStamp" value="53" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/market_data/Database/arctic_delete.py</url>
+          <line>111</line>
+          <option name="timeStamp" value="54" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/market_data/Database/arcticdb_reader.py</url>
+          <line>21</line>
+          <option name="timeStamp" value="55" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/market_data/Database/arctic_connection.py</url>
+          <line>20</line>
+          <option name="timeStamp" value="56" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

@@ -1,14 +1,14 @@
 import yaml
 import os
 from typing import Dict, Any, List, Optional, Union
-
+import configparser
 
 class ConfigManager:
     """
     Configuration manager for loading and validating YAML configs
     """
 
-    def __init__(self):
+    def __init__(self,config_path='./config.ini'):
         """
         Initialize config manager
 
@@ -17,7 +17,7 @@ class ConfigManager:
         config_dir: str
             Directory containing YAML config files
         """
-
+        self.config = configparser.ConfigParser()
         self.config_dir = os.path.join(os.getcwd(), 'sysconfigs')
         self.configs = {}
 
@@ -46,9 +46,6 @@ class ConfigManager:
         # Construct file path
         file_path = os.path.join(self.config_dir, f"{config_name}.yaml")
 
-        if (os.path.exists(file_path)):
-            print('hello')
-
         # Load and parse YAML
         try:
             with open(file_path, 'r') as file:
@@ -59,6 +56,12 @@ class ConfigManager:
             raise FileNotFoundError(f"Config file not found: {file_path}")
         except yaml.YAMLError as e:
             raise ValueError(f"Error parsing YAML file {file_path}: {str(e)}")
+
+
+    def get_database_config(self):
+        """Get database configuration section"""
+        print(self.config)
+        return self.config['DATABASE']
 
     def get_strategy_config(self, strategy_name: str) -> Dict[str, Any]:
         """

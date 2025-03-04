@@ -1,11 +1,14 @@
 import arcticdb as adb
 import pandas as pd
 from datetime import datetime
+from arcticdb import Arctic
+
+from market_data.Database.arctic_connection import get_arcticdb_connection
+
 
 class MarketDataStore:
     def __init__(self, arctic_path):
-        self.arctic_uri = f"lmdb://{arctic_path['local_storage']}"
-        self.arctic = adb.Arctic(self.arctic_uri)
+        self.arctic = get_arcticdb_connection(arctic_path['local_storage'])
         self._initialize_libraries()
 
     def _initialize_libraries(self):
@@ -53,6 +56,7 @@ class MarketDataStore:
         except Exception as e:
             print(f"Error storing data: {str(e)}")
             return False
+
 
     def get_service_stats(self):
         """Get statistics about each service library"""
@@ -110,3 +114,4 @@ class MarketDataStore:
                 df[col] = df[col].astype(str)
 
         return df
+

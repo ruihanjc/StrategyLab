@@ -26,13 +26,17 @@ class MarketStackExtractor(BaseExtractor):
 
     def process_data(self):
 
-        check_historical = ArcticReader().get_historical_range(self.service.lower(), self.ticker)
+        check_end, has_historical = ArcticReader().get_historical_range(self.service.lower(), self.ticker)
 
         start_date = end_date = None
 
-        if check_historical[0].date() is not datetime.datetime(2010, 1, 1, 12, 0, 0):
-            start_date = datetime.datetime(2020, 1, 1, 12, 0, 0)
-        if check_historical[1].date() is not datetime.datetime.today():
+        if has_historical:
+            if check_end.date() == datetime.date.today() - datetime.timedelta(days=1):
+                return None
+            start_date = check_end.date()
+            end_date = datetime.datetime.today()
+        else:
+            start_date = datetime.datetime(2020, 1, 1,  12, 0, 0)
             end_date = datetime.datetime.today()
 
         datapoints = []
@@ -47,11 +51,11 @@ class MarketStackExtractor(BaseExtractor):
                         'date': values['date'],
                         'service': 'Equity',
                         'source': 'MarketStack',
-                        'open': float(values['open']),
-                        'high': float(values['high']),
-                        'low': float(values['low']),
-                        'close': float(values['close']),
-                        'volume': int(values['volume']),
+                        'open': float(values['open']) if values['open'] else 0,
+                        'high': float(values['high']) if values['high'] else 0,
+                        'low': float(values['low']) if values['low'] else 0,
+                        'close': float(values['close']) if values['close'] else 0,
+                        'volume': int(values['volume']) if values['volume'] else 0,
                         'timestamp': datetime.date.today()
                     }
                 )

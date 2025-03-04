@@ -31,7 +31,7 @@ class EqualWeightMovingAverage(Strategy):
         if config is None:
             if ma_periods is None:
                 # Default MA periods if not specified
-                ma_periods = [5, 10, 20, 50, 100]
+                ma_periods = [16,32,64]
 
             self.parameters = {
                 'ma_periods': ma_periods,

@@ -9,6 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import argparse
 from datetime import datetime
+from pathlib import Path
 
 from strategy_backtest.sysrules.ewma import EqualWeightMovingAverage
 # Import components from our framework
@@ -26,70 +27,68 @@ def run_single_backtest(config_manager=None):
     backtest_settings = config_manager.get_backtest_settings()
     data_settings = config_manager.get_data_settings()
 
-    arcticdb = ArcticdDBHandler('equity')
+    arcticdb = ArcticdDBHandler('equity', f"{Path(os.getcwd()).parent}/arcticdb")
 
 
     # Load from ArcticDB
     arcticdb_settings = data_settings.get('arcticdb', {})
-    symbols = arcticdb_settings.get('symbols', ['AAPL'])
-    ticker = symbols[0]
+    symbols = arcticdb_settings.get('symbols', [])
+
+    for ticker in symbols:
+        raw_data_dict = arcticdb.load_from_arcticdb(
+            symbols=[ticker],
+            start_date=backtest_settings.get('start_date'),
+            end_date=backtest_settings.get('end_date')
+        )
+        ticker_data = raw_data_dict
+
+        # Preprocess data
 
 
-    raw_data_dict = arcticdb.load_from_arcticdb(
-        symbols=[ticker],
-        start_date=backtest_settings.get('start_date', '2020-01-01'),
-        end_date=backtest_settings.get('end_date', '2024-12-31')
-    )
-    ticker_data = raw_data_dict
+        # Create strategy from config
+        strategy = EqualWeightMovingAverage(
+            ma_periods = [16,32],
+            threshold=0.6  # 60% of MAs must agree for a signal
+        )
 
-    # Preprocess data
+        # Initialize backtesting engine
+        engine = BacktestEngine(
+            initial_capital=backtest_settings.get('initial_capital', 100000),
+            commission=backtest_settings.get('commission', 0.001),
+            slippage=backtest_settings.get('slippage', 0.0005)
+        )
 
+        # Run backtest
+        results, metrics = engine.run(ticker_data, strategy, price_column='close')
 
-    # Create strategy from config
-    strategy = EqualWeightMovingAverage(
-        ma_periods=[20, 40],
-        threshold=0.8  # 60% of MAs must agree for a signal
-    )
+        # Display results
+        print("\n=== Backtest Results ===")
+        print(f"Total Return: {metrics['total_return']:.2%}")
+        print(f"Annualized Return: {metrics['annualized_return']:.2%}")
+        print(f"Sharpe Ratio: {metrics['sharpe_ratio']:.2f}")
+        print(f"Max Drawdown: {metrics['max_drawdown']:.2%}")
+        print(f"Number of Trades: {metrics['num_trades']}")
 
-    # Initialize backtesting engine
-    engine = BacktestEngine(
-        initial_capital=backtest_settings.get('initial_capital', 100000),
-        commission=backtest_settings.get('commission', 0.001),
-        slippage=backtest_settings.get('slippage', 0.0005)
-    )
+        # Plot results
+        plt.figure(figsize=(12, 8))
+        plt.subplot(3, 1, 1)
+        plt.plot(ticker_data.index, ticker_data['close'])
+        plt.title(f"{ticker} Close Price")
+        plt.grid(True)
 
-    # Run backtest
-    results, metrics = engine.run(ticker_data, strategy, price_column='close')
+        plt.subplot(3, 1, 2)
+        plt.plot(results.index, results['equity'])
+        plt.title('Equity Curve')
+        plt.grid(True)
 
-    # Display results
-    print("\n=== Backtest Results ===")
-    print(f"Total Return: {metrics['total_return']:.2%}")
-    print(f"Annualized Return: {metrics['annualized_return']:.2%}")
-    print(f"Sharpe Ratio: {metrics['sharpe_ratio']:.2f}")
-    print(f"Max Drawdown: {metrics['max_drawdown']:.2%}")
-    print(f"Number of Trades: {metrics['num_trades']}")
+        plt.subplot(3, 1, 3)
+        plt.plot(results.index, results['equity']/results['equity'].cummax() - 1)
+        plt.title('Drawdown')
+        plt.grid(True)
 
-    # Plot results
-    plt.figure(figsize=(12, 8))
-    plt.subplot(3, 1, 1)
-    plt.plot(ticker_data.index, ticker_data['close'])
-    plt.title(f"{ticker} Close Price")
-    plt.grid(True)
+        plt.tight_layout()
+        plt.show()
 
-    plt.subplot(3, 1, 2)
-    plt.plot(results.index, results['equity'])
-    plt.title('Equity Curve')
-    plt.grid(True)
-
-    plt.subplot(3, 1, 3)
-    plt.plot(results.index, results['equity']/results['equity'].cummax() - 1)
-    plt.title('Drawdown')
-    plt.grid(True)
-
-    plt.tight_layout()
-    plt.show()
-
-    return results, metrics, strategy
 
 
 def run_multi_strategy_backtest(config_manager=None, use_sample_data=True):
@@ -103,6 +102,4 @@ def run_multi_strategy_backtest(config_manager=None, use_sample_data=True):
 
 if __name__ == "__main__":
     print("Running Equal Weight Moving Average Backtest")
-
-    # Option 1: Run with YAML config
-    results_yaml, metrics_yaml, strategy_yaml = run_single_backtest()
+    run_single_backtest()

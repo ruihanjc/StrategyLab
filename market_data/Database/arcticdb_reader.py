@@ -1,5 +1,4 @@
 import datetime
-
 import arcticdb as adb
 import pandas as pd
 import argparse
@@ -8,15 +7,20 @@ import os
 from datetime import date
 import sys
 
+from wheel.macosx_libfile import read_data
+
+from market_data.Database.arctic_connection import get_arcticdb_connection
+
+
 from dateutil.utils import today
+
 
 
 class ArcticReader:
     def __init__(self):
         current_dir = Path(os.getcwd())
-        self.arctic_dir = current_dir.parent.parent / 'arcticdb'
-        self.arctic_uri = f"lmdb://{self.arctic_dir}"
-        self.arctic = adb.Arctic(self.arctic_uri)
+        arctic_dir = current_dir.parent.parent / 'arcticdb'
+        self.arctic = get_arcticdb_connection(arctic_dir)
 
     def list_libraries(self):
         """List all libraries"""
@@ -33,11 +37,10 @@ class ArcticReader:
         if (lib.has_symbol(symbol)):
             data = lib.read(symbol).data
             if 'date' in data.columns:
-                earliest_date = data['date'].min()
                 latest_date = data['date'].max()
-                return earliest_date, latest_date
+                return latest_date, True
         else:
-            return datetime.datetime(2010, 1, 1, 12, 0, 0), datetime.datetime.today()
+            return datetime.date.today(), False
         return None
 
 
@@ -59,5 +62,7 @@ class ArcticReader:
         }
 
 
-x = ArcticReader()
-print(x.list_libraries())
+
+if __name__ == '__main__':
+    x = ArcticReader()
+    print(x.read_data('equity', 'TSLA', ''))

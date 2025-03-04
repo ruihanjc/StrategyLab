@@ -50,6 +50,8 @@ def main(config_arguments):
                     f"source: {parsed_args.source}, ticker: {parsed_args.ticker}")
         requestor = RequesterFactory.create(parsed_args, api_config)
 
+
+
         logger.info("Fetching data...")
         fetched_data = requestor.run()
 
@@ -63,6 +65,7 @@ def main(config_arguments):
 
         logger.info("Storing fetched data...")
         success = arcticdb_helper.store_market_data(fetched_data)
+
 
         if success:
             logger.info("Data successfully stored in Database")

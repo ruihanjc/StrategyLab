@@ -5,13 +5,13 @@ import shutil
 import logging
 from datetime import datetime
 import time
+from market_data.Database.arctic_connection import get_arcticdb_connection
+
 
 
 class ArcticDBCleaner:
     def __init__(self, arctic_path):
-        self.arctic_path = arctic_path
-        self.arctic_uri = f"lmdb://{arctic_path}"
-        self.arctic = None
+        self.arctic = get_arcticdb_connection(arctic_path)
         self.setup_logging()
 
     def setup_logging(self):
@@ -108,7 +108,7 @@ def main():
 
     # Use relative path from script location
     current_dir = Path(os.getcwd())
-    arctic_dir = current_dir.parent.parent.parent / 'arcticdb'
+    arctic_dir = current_dir.parent.parent / 'arcticdb'
     cleaner = ArcticDBCleaner(arctic_dir)
 
     if cleaner.cleanup(force=args.force):

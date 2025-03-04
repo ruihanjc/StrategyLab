@@ -5,13 +5,12 @@ import os
 from pathlib import Path
 import logging
 
+from market_data.Database.arctic_connection import get_arcticdb_connection
+
 
 class ArcticDBInitializer:
     def __init__(self, arctic_path):
-        self.arctic_path = arctic_path
-        self.arctic_uri = f"lmdb://{arctic_path}"
-        self.arctic = adb.Arctic(self.arctic_uri)
-
+        self.arctic = get_arcticdb_connection(arctic_path)
         self.setup_logging()
 
     def setup_logging(self):
