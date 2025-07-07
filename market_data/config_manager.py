@@ -9,7 +9,7 @@ class ConfigManager:
         self.config = configparser.ConfigParser()
         self.config_path = Path(__file__).parent / 'config.ini'
         current_dir = Path(os.getcwd())
-        self.arctic_dir = current_dir.parent.parent / 'arcticdb'
+        self.arctic_dir = current_dir / 'arcticdb'
         self.load_config()
     
     def load_config(self):

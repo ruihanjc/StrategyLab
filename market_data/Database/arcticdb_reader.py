@@ -19,7 +19,7 @@ from dateutil.utils import today
 class ArcticReader:
     def __init__(self):
         current_dir = Path(os.getcwd())
-        arctic_dir = current_dir.parent.parent / 'arcticdb'
+        arctic_dir = current_dir / 'arcticdb'
         self.arctic = get_arcticdb_connection(arctic_dir)
 
     def list_libraries(self):

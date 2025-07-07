@@ -18,7 +18,7 @@ class ConfigManager:
             Directory containing YAML config files
         """
         self.config = configparser.ConfigParser()
-        self.config_dir = os.path.join(os.getcwd(), 'sysconfigs')
+        self.config_dir = os.path.join(os.getcwd(), 'strategy_backtest')
         self.configs = {}
 
     def load_config(self, config_name: str) -> Dict[str, Any]:
@@ -44,7 +44,7 @@ class ConfigManager:
 
 
         # Construct file path
-        file_path = os.path.join(self.config_dir, f"{config_name}.yaml")
+        file_path = os.path.join(self.config_dir, f"sysconfigs/{config_name}.yaml")
 
         # Load and parse YAML
         try:

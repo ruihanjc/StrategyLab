@@ -31,12 +31,12 @@ class MarketStackExtractor(BaseExtractor):
         start_date = end_date = None
 
         if has_historical:
-            if check_end.date() == datetime.date.today() - datetime.timedelta(days=1):
-                return None
-            start_date = check_end.date()
+            if check_end.date() > datetime.date.today() - datetime.timedelta(days=5):
+                check_end = datetime.datetime(2020, 1, 1, 12, 0, 0)
+            start_date = check_end
             end_date = datetime.datetime.today()
         else:
-            start_date = datetime.datetime(2020, 1, 1,  12, 0, 0)
+            start_date = datetime.datetime(2020, 1, 1, 12, 0, 0)
             end_date = datetime.datetime.today()
 
         datapoints = []

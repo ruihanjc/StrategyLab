@@ -1,11 +1,9 @@
 # Data settings
 arcticdb:
-  lib_path: '../../arcticdb'
+  lib_path: '../arcticdb'
   symbols:
     - 'PLTR'
-    - 'TSLA'
     - 'AAPL'
-    - 'QQQ'
   # Data preprocessing
   preprocessing:
     handle_missing: true

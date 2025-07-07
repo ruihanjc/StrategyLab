@@ -4,13 +4,15 @@ Main script for running backtests using ArcticDB data
 Demonstrates complete workflow with YAML configuration
 """
 import os
+import sys
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import argparse
 from datetime import datetime
 from pathlib import Path
-
+import logging
 from strategy_backtest.sysrules.ewma import EqualWeightMovingAverage
 # Import components from our framework
 from sysutils.config import ConfigManager
@@ -18,16 +20,40 @@ from sysdata.arcticdb_handler import ArcticdDBHandler
 from systems.base_engine import BacktestEngine
 
 
-def run_single_backtest(config_manager=None):
+def setup_logging():
+    """Initialize logging configuration"""
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
+
+
+def main(config_arguments):
+    # Setup logging first
+    setup_logging()
+    logger = logging.getLogger(__name__)
+
+    try:
+        # Initialize configuration
+        logger.info("Initializing configuration...")
+        config = ConfigManager()
+
+        run_single_backtest(config)
+
+
+    except Exception as e:
+        logger.error(f"Application error: {str(e)}", exc_info=True)
+        raise
+
+
+def run_single_backtest(config_manager):
     """Run a single-asset backtest using configuration"""
-    if config_manager is None:
-        config_manager = ConfigManager()
 
     # Load configurations
     backtest_settings = config_manager.get_backtest_settings()
     data_settings = config_manager.get_data_settings()
 
-    arcticdb = ArcticdDBHandler('equity', f"{Path(os.getcwd()).parent}/arcticdb")
+    arcticdb = ArcticdDBHandler('equity', f"{Path(os.getcwd())}/arcticdb")
 
 
     # Load from ArcticDB
@@ -100,6 +126,11 @@ def run_multi_strategy_backtest(config_manager=None, use_sample_data=True):
     backtest_settings = config_manager.get
 
 
-if __name__ == "__main__":
-    print("Running Equal Weight Moving Average Backtest")
-    run_single_backtest()
+
+if __name__ == '__main__':
+    try:
+        success = main(sys.argv)
+        sys.exit(0 if success else 1)
+    except Exception as e:
+        logging.error(f"Application failed: {str(e)}", exc_info=True)
+        sys.exit(1)

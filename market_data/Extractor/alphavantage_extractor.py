@@ -20,6 +20,8 @@ class AlphaVantageExtractor(BaseExtractor):
             raise
 
     def process_data(self):
+
+
         response = self.get_eod_data(self.ticker)
         datapoints = response['Time Series (Daily)']
 
