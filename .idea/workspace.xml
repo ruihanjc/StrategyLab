@@ -58,38 +58,38 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Python.1.executor": "Debug",
-    "Python.AppleDataIngestion.executor": "Run",
-    "Python.BackTesting.executor": "Run",
-    "Python.Data_Extractor(marketdata main).executor": "Debug",
-    "Python.Data_Extractor.executor": "Debug",
-    "Python.EquityDataIngestion.executor": "Run",
-    "Python.PalantirDataIngestion.executor": "Debug",
-    "Python.app.executor": "Run",
-    "Python.arctic_delete.executor": "Debug",
-    "Python.arctic_init.executor": "Debug",
-    "Python.arcticdb_diagnostics.executor": "Run",
-    "Python.arcticdb_handler.executor": "Debug",
-    "Python.arcticdb_reader.executor": "Debug",
-    "Python.backtesting(main).executor": "Debug",
-    "Python.hubspot.executor": "Run",
-    "Python.hubspot_interview.executor": "Run",
-    "Python.main.executor": "Run",
-    "Python.marketstack_extractor.executor": "Debug",
-    "Python.test (1).executor": "Debug",
-    "Python.test.executor": "Run",
-    "Python.test2.executor": "Debug",
-    "Python.testing.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "C:/Users/ruiha/Downloads/PathToAnalyst/StrategyLab/strategy_backtest/main.py",
-    "settings.editor.selected.configurable": "debugger.dataViews.python.type.renderers"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Python.1.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.AppleDataIngestion.executor&quot;: &quot;Run&quot;,
+    &quot;Python.BackTesting.executor&quot;: &quot;Run&quot;,
+    &quot;Python.Data_Extractor(marketdata main).executor&quot;: &quot;Debug&quot;,
+    &quot;Python.Data_Extractor.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.EquityDataIngestion.executor&quot;: &quot;Run&quot;,
+    &quot;Python.PalantirDataIngestion.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.app.executor&quot;: &quot;Run&quot;,
+    &quot;Python.arctic_delete.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.arctic_init.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.arcticdb_diagnostics.executor&quot;: &quot;Run&quot;,
+    &quot;Python.arcticdb_handler.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.arcticdb_reader.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.backtesting(main).executor&quot;: &quot;Debug&quot;,
+    &quot;Python.hubspot.executor&quot;: &quot;Run&quot;,
+    &quot;Python.hubspot_interview.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.marketstack_extractor.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.test (1).executor&quot;: &quot;Debug&quot;,
+    &quot;Python.test.executor&quot;: &quot;Run&quot;,
+    &quot;Python.test2.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.testing.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/ruiha/Downloads/PathToAnalyst/StrategyLab/strategy_backtest/main.py&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;debugger.dataViews.python.type.renderers&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\ruiha\Downloads\1\PathToAnalyst\StrategyLab\strategy_backtest\sysstrategy" />
@@ -106,7 +106,6 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.11 (marketData)" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -129,7 +128,6 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.11 (marketData)" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -152,7 +150,6 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.11 (marketData)" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -167,9 +164,9 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.PalantirDataIngestion" />
       <item itemvalue="Python.AppleDataIngestion" />
       <item itemvalue="Python.BackTesting" />
+      <item itemvalue="Python.PalantirDataIngestion" />
     </list>
   </component>
   <component name="SharedIndexes">
