@@ -13,4 +13,3 @@ arcticdb/
 env/
 venv/
 ENV/
-strategy_venv/
