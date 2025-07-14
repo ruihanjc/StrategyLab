@@ -4,22 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0c6c299d-cb1e-4596-979e-03242c47f47c" name="Changes" comment="Changing directory adding arctic connection to have only one instance of arcticdb at one time">
-      <change afterPath="$PROJECT_DIR$/strategy_backtest/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/strategy_backtest/systems/backtest_engine.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/strategy_backtest/systems/rules/TradingRule.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/strategy_backtest/systems/rules/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/strategy_backtest/sysutils/constants.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/strategy_backtest/sysutils/models/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/strategy_backtest/sysutils/models/trading_rule_models.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/strategy_backtest/sysutils/object.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/StrategyLab.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/StrategyLab.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/strategy_backtest/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_backtest/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/strategy_backtest/sysrules/strategy_factory.py" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_backtest/sysrules/strategy_factory.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/strategy_backtest/systems/base_engine.py" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_backtest/systems/base_engine.py" afterDir="false" />
-    </list>
+    <list default="true" id="0c6c299d-cb1e-4596-979e-03242c47f47c" name="Changes" comment="Changing directory adding arctic connection to have only one instance of arcticdb at one time" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -34,6 +19,7 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RESET_MODE" value="HARD" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
@@ -85,7 +71,7 @@
     "Python.testing.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "building-trading-rule",
     "last_opened_file_path": "C:/Users/ruiha/Downloads/PathToAnalyst/pysystemtrade",
     "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
@@ -108,7 +94,6 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.11 (marketData)" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -131,7 +116,6 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.11 (marketData)" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -154,7 +138,6 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.11 (marketData)" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -169,9 +152,9 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.PalantirDataIngestion" />
       <item itemvalue="Python.AppleDataIngestion" />
       <item itemvalue="Python.BackTesting" />
+      <item itemvalue="Python.PalantirDataIngestion" />
     </list>
   </component>
   <component name="SharedIndexes">
@@ -214,8 +197,27 @@
       <option name="project" value="LOCAL" />
       <updated>1741109794634</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Changing directory adding arctic connection to have only one instance of arcticdb at one time">
+      <option name="closed" value="true" />
+      <created>1752527850100</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1752527850100</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="BackTest module" />
