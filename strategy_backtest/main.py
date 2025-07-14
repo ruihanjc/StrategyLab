@@ -6,8 +6,6 @@ Demonstrates complete workflow with YAML configuration
 import os
 import sys
 
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 import argparse
 from datetime import datetime
@@ -17,7 +15,7 @@ from strategy_backtest.sysrules.ewma import EqualWeightMovingAverage
 # Import components from our framework
 from sysutils.config import ConfigManager
 from sysdata.arcticdb_handler import ArcticdDBHandler
-from systems.base_engine import BacktestEngine
+from systems.backtest_engine import BacktestEngine
 
 
 def setup_logging():

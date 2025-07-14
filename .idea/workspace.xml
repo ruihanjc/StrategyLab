@@ -5,20 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0c6c299d-cb1e-4596-979e-03242c47f47c" name="Changes" comment="Changing directory adding arctic connection to have only one instance of arcticdb at one time">
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/strategy_backtest/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/strategy_backtest/systems/backtest_engine.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/strategy_backtest/systems/rules/TradingRule.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/strategy_backtest/systems/rules/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/strategy_backtest/sysutils/constants.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/strategy_backtest/sysutils/models/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/strategy_backtest/sysutils/models/trading_rule_models.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/strategy_backtest/sysutils/object.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/StrategyLab.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/StrategyLab.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_data/Database/arcticdb_reader.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/Database/arcticdb_reader.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_data/Extractor/alphavantage_extractor.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/Extractor/alphavantage_extractor.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_data/Extractor/marketstack_extractor.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/Extractor/marketstack_extractor.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_data/config_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/config_manager.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_viz/temp.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_viz/test.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/strategy_backtest/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_backtest/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/strategy_backtest/sysconfigs/backtest_config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_backtest/sysconfigs/backtest_config.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/strategy_backtest/sysconfigs/data_config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_backtest/sysconfigs/data_config.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/strategy_backtest/sysrules/strategy_factory.py" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_backtest/sysrules/strategy_factory.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/strategy_backtest/sysutils/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_backtest/sysutils/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/strategy_backtest/systems/base_engine.py" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_backtest/systems/base_engine.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,7 +67,7 @@
     "Python.Data_Extractor(marketdata main).executor": "Debug",
     "Python.Data_Extractor.executor": "Debug",
     "Python.EquityDataIngestion.executor": "Run",
-    "Python.PalantirDataIngestion.executor": "Debug",
+    "Python.PalantirDataIngestion.executor": "Run",
     "Python.app.executor": "Run",
     "Python.arctic_delete.executor": "Debug",
     "Python.arctic_init.executor": "Debug",
@@ -86,17 +86,19 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "main",
-    "last_opened_file_path": "C:/Users/ruiha/Downloads/PathToAnalyst/StrategyLab/strategy_backtest/main.py",
-    "settings.editor.selected.configurable": "debugger.dataViews.python.type.renderers"
+    "last_opened_file_path": "C:/Users/ruiha/Downloads/PathToAnalyst/pysystemtrade",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
 }]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\ruiha\Downloads\PathToAnalyst\StrategyLab\strategy_backtest\sysutils\models" />
+      <recent name="C:\Users\ruiha\Downloads\PathToAnalyst\StrategyLab" />
       <recent name="C:\Users\ruiha\Downloads\1\PathToAnalyst\StrategyLab\strategy_backtest\sysstrategy" />
       <recent name="C:\Users\ruiha\Downloads\1\PathToAnalyst\StrategyLab\market_data\Database" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.BackTesting">
+  <component name="RunManager" selected="Python.PalantirDataIngestion">
     <configuration name="AppleDataIngestion" type="PythonConfigurationType" factoryName="Python">
       <module name="StrategyLab" />
       <option name="ENV_FILES" value="" />
@@ -281,7 +283,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/strategy_backtest/main.py</url>
-          <line>115</line>
+          <line>113</line>
           <option name="timeStamp" value="56" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -301,32 +303,32 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/strategy_backtest/main.py</url>
-          <line>35</line>
+          <line>33</line>
           <option name="timeStamp" value="76" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/strategy_backtest/main.py</url>
-          <line>32</line>
+          <line>30</line>
           <option name="timeStamp" value="77" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/strategy_backtest/main.py</url>
-          <line>38</line>
+          <line>36</line>
           <option name="timeStamp" value="78" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/strategy_backtest/main.py</url>
-          <line>55</line>
+          <line>53</line>
           <option name="timeStamp" value="79" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/strategy_backtest/main.py</url>
-          <line>60</line>
+          <line>58</line>
           <option name="timeStamp" value="80" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/strategy_backtest/main.py</url>
-          <line>62</line>
+          <line>60</line>
           <option name="timeStamp" value="81" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -336,7 +338,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/strategy_backtest/main.py</url>
-          <line>87</line>
+          <line>85</line>
           <option name="timeStamp" value="83" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
