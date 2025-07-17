@@ -18,7 +18,7 @@ class ConfigManager:
             Directory containing YAML config files
         """
         self.config = configparser.ConfigParser()
-        self.config_dir = os.path.join(os.getcwd(), 'strategy_backtest')
+        self.config_dir = os.path.abspath(__file__  + "/../../")  # Use current working directory
         self.configs = {}
 
     def load_config(self, config_name: str) -> Dict[str, Any]:
