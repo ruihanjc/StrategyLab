@@ -1,0 +1,371 @@
+# Trading Rules Configuration
+# Based on pysystemtrade rule configurations
+
+# Global settings
+auto_calculate_scalars: true
+default_forecast_cap: 20.0
+default_vol_days: 35
+
+# Rule definitions
+rules:
+  # EWMAC (Exponential Weighted Moving Average Crossover) Rules
+  ewmac_2_8:
+    rule_class: "EWMAC"
+    parameters:
+      Lfast: 2
+      Lslow: 8
+      vol_days: 35
+    forecast_scalar: 10.6
+    description: "Very fast EWMAC trend following"
+    
+  ewmac_4_16:
+    rule_class: "EWMAC"
+    parameters:
+      Lfast: 4
+      Lslow: 16
+      vol_days: 35
+    forecast_scalar: 7.5
+    description: "Fast EWMAC trend following"
+    
+  ewmac_8_32:
+    rule_class: "EWMAC"
+    parameters:
+      Lfast: 8
+      Lslow: 32
+      vol_days: 35
+    forecast_scalar: 5.3
+    description: "Medium-fast EWMAC trend following"
+    
+  ewmac_16_64:
+    rule_class: "EWMAC"
+    parameters:
+      Lfast: 16
+      Lslow: 64
+      vol_days: 35
+    forecast_scalar: 3.75
+    description: "Medium EWMAC trend following"
+    
+  ewmac_32_128:
+    rule_class: "EWMAC"
+    parameters:
+      Lfast: 32
+      Lslow: 128
+      vol_days: 35
+    forecast_scalar: 2.65
+    description: "Medium-slow EWMAC trend following"
+    
+  ewmac_64_256:
+    rule_class: "EWMAC"
+    parameters:
+      Lfast: 64
+      Lslow: 256
+      vol_days: 35
+    forecast_scalar: 1.87
+    description: "Slow EWMAC trend following"
+
+  # Breakout Rules
+  breakout_10:
+    rule_class: "Breakout"
+    parameters:
+      lookback: 10
+      smooth: 3
+    forecast_scalar: 1.2
+    description: "Very short-term breakout"
+    
+  breakout_20:
+    rule_class: "Breakout"
+    parameters:
+      lookback: 20
+      smooth: 5
+    forecast_scalar: 1.0
+    description: "Short-term breakout"
+    
+  breakout_40:
+    rule_class: "Breakout"
+    parameters:
+      lookback: 40
+      smooth: 10
+    forecast_scalar: 0.8
+    description: "Medium-term breakout"
+    
+  breakout_80:
+    rule_class: "Breakout"
+    parameters:
+      lookback: 80
+      smooth: 20
+    forecast_scalar: 0.65
+    description: "Long-term breakout"
+    
+  breakout_160:
+    rule_class: "Breakout"
+    parameters:
+      lookback: 160
+      smooth: 40
+    forecast_scalar: 0.5
+    description: "Very long-term breakout"
+    
+  breakout_320:
+    rule_class: "Breakout"
+    parameters:
+      lookback: 320
+      smooth: 80
+    forecast_scalar: 0.4
+    description: "Ultra long-term breakout"
+
+  # Momentum Rules
+  momentum_10:
+    rule_class: "Momentum"
+    parameters:
+      lookback: 10
+      vol_days: 35
+    forecast_scalar: 2.5
+    description: "Very short-term momentum"
+    
+  momentum_20:
+    rule_class: "Momentum"
+    parameters:
+      lookback: 20
+      vol_days: 35
+    forecast_scalar: 2.0
+    description: "Short-term momentum"
+    
+  momentum_40:
+    rule_class: "Momentum"
+    parameters:
+      lookback: 40
+      vol_days: 35
+    forecast_scalar: 1.5
+    description: "Medium-term momentum"
+    
+  momentum_80:
+    rule_class: "Momentum"
+    parameters:
+      lookback: 80
+      vol_days: 35
+    forecast_scalar: 1.2
+    description: "Long-term momentum"
+    
+  momentum_250:
+    rule_class: "Momentum"
+    parameters:
+      lookback: 250
+      vol_days: 35
+    forecast_scalar: 0.8
+    description: "Very long-term momentum"
+
+  # Acceleration Rules
+  acceleration_4:
+    rule_class: "Acceleration"
+    parameters:
+      Lfast: 4
+      vol_days: 35
+    forecast_scalar: 2.0
+    description: "Short-term acceleration"
+    
+  acceleration_8:
+    rule_class: "Acceleration"
+    parameters:
+      Lfast: 8
+      vol_days: 35
+    forecast_scalar: 1.5
+    description: "Medium-term acceleration"
+    
+  acceleration_16:
+    rule_class: "Acceleration"
+    parameters:
+      Lfast: 16
+      vol_days: 35
+    forecast_scalar: 1.0
+    description: "Long-term acceleration"
+
+  # Mean Reversion Rules
+  mean_reversion_10:
+    rule_class: "MeanReversion"
+    parameters:
+      lookback: 10
+      threshold: 1.5
+      vol_days: 35
+    forecast_scalar: 1.5
+    description: "Very short-term mean reversion"
+    
+  mean_reversion_20:
+    rule_class: "MeanReversion"
+    parameters:
+      lookback: 20
+      threshold: 2.0
+      vol_days: 35
+    forecast_scalar: 1.0
+    description: "Short-term mean reversion"
+    
+  mean_reversion_40:
+    rule_class: "MeanReversion"
+    parameters:
+      lookback: 40
+      threshold: 2.5
+      vol_days: 35
+    forecast_scalar: 0.8
+    description: "Medium-term mean reversion"
+
+  # Carry Rules
+  carry_30:
+    rule_class: "Carry"
+    parameters:
+      smooth_days: 30
+    forecast_scalar: 1.5
+    description: "Fast carry"
+    
+  carry_60:
+    rule_class: "Carry"
+    parameters:
+      smooth_days: 60
+    forecast_scalar: 1.2
+    description: "Medium carry"
+    
+  carry_90:
+    rule_class: "Carry"
+    parameters:
+      smooth_days: 90
+    forecast_scalar: 1.0
+    description: "Slow carry"
+    
+  carry_125:
+    rule_class: "Carry"
+    parameters:
+      smooth_days: 125
+    forecast_scalar: 0.8
+    description: "Very slow carry"
+
+  # Relative Momentum Rules
+  relative_momentum_20:
+    rule_class: "RelativeMomentum"
+    parameters:
+      horizon: 20
+      ewma_span: 5
+    forecast_scalar: 1.5
+    description: "Short-term relative momentum"
+    
+  relative_momentum_40:
+    rule_class: "RelativeMomentum"
+    parameters:
+      horizon: 40
+      ewma_span: 10
+    forecast_scalar: 1.0
+    description: "Medium-term relative momentum"
+    
+  relative_momentum_80:
+    rule_class: "RelativeMomentum"
+    parameters:
+      horizon: 80
+      ewma_span: 20
+    forecast_scalar: 0.8
+    description: "Long-term relative momentum"
+    
+  relative_momentum_250:
+    rule_class: "RelativeMomentum"
+    parameters:
+      horizon: 250
+      ewma_span: 60
+    forecast_scalar: 0.6
+    description: "Very long-term relative momentum"
+
+  # Volatility Rules
+  volatility_10:
+    rule_class: "Volatility"
+    parameters:
+      vol_lookback: 10
+      signal_lookback: 3
+    forecast_scalar: 1.5
+    description: "Short-term volatility"
+    
+  volatility_20:
+    rule_class: "Volatility"
+    parameters:
+      vol_lookback: 20
+      signal_lookback: 5
+    forecast_scalar: 1.0
+    description: "Medium-term volatility"
+    
+  volatility_40:
+    rule_class: "Volatility"
+    parameters:
+      vol_lookback: 40
+      signal_lookback: 10
+    forecast_scalar: 0.8
+    description: "Long-term volatility"
+
+# Predefined rule sets
+rule_sets:
+  # Trend following focused
+  trend_following:
+    ewmac_16_64: 0.20
+    ewmac_32_128: 0.20
+    ewmac_8_32: 0.15
+    ewmac_64_256: 0.15
+    breakout_20: 0.15
+    breakout_80: 0.15
+    
+  # Breakout focused
+  breakout_focused:
+    breakout_10: 0.20
+    breakout_20: 0.20
+    breakout_40: 0.20
+    breakout_80: 0.20
+    breakout_160: 0.20
+    
+  # Momentum focused
+  momentum_focused:
+    momentum_20: 0.25
+    momentum_40: 0.25
+    momentum_80: 0.25
+    acceleration_4: 0.25
+    
+  # Mixed strategy
+  mixed_strategy:
+    ewmac_16_64: 0.15
+    ewmac_32_128: 0.15
+    breakout_20: 0.15
+    breakout_80: 0.15
+    momentum_20: 0.15
+    momentum_40: 0.15
+    acceleration_4: 0.10
+    
+  # Comprehensive strategy
+  comprehensive:
+    ewmac_16_64: 0.10
+    ewmac_32_128: 0.10
+    ewmac_8_32: 0.08
+    ewmac_64_256: 0.08
+    breakout_20: 0.08
+    breakout_40: 0.08
+    breakout_80: 0.08
+    momentum_20: 0.08
+    momentum_40: 0.08
+    momentum_80: 0.08
+    acceleration_4: 0.06
+    mean_reversion_20: 0.06
+    carry_90: 0.04
+    
+  # Conservative strategy
+  conservative:
+    ewmac_32_128: 0.30
+    ewmac_64_256: 0.30
+    breakout_80: 0.20
+    momentum_80: 0.20
+    
+  # Aggressive strategy
+  aggressive:
+    ewmac_4_16: 0.15
+    ewmac_8_32: 0.15
+    breakout_10: 0.15
+    breakout_20: 0.15
+    momentum_10: 0.15
+    momentum_20: 0.15
+    acceleration_4: 0.10
+
+# Rule validation settings
+validation:
+  max_forecast_scalar: 20.0
+  min_forecast_scalar: 0.1
+  max_lookback_periods: 500
+  min_lookback_periods: 2
+  required_data_points: 100

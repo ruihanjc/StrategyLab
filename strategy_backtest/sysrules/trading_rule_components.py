@@ -9,7 +9,7 @@ from strategy_backtest.sysutils.constants import *
 
 class TradingRuleComponents(object):
     def __init__(self, rule, data, other_data, data_args: list = arg_not_supplied):
-        rule, data, other_data, data_args = self.pre_process(rule, data, other_data)
+        rule, data, other_data, data_args = self.pre_process(rule, data, other_data, data_args)
 
         self._rule = rule
         self._data = data
@@ -19,7 +19,7 @@ class TradingRuleComponents(object):
 
 
     @staticmethod
-    def pre_process(rule, data, other_data, data_args: list = arg_not_supplied, ):
+    def pre_process(rule, data, other_data, data_args: list = arg_not_supplied):
         rule = resolve_rule(rule)
 
         if isinstance(data, str):

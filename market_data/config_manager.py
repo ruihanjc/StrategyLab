@@ -7,9 +7,9 @@ from pathlib import Path
 class ConfigManager:
     def __init__(self, config_path='./config.ini'):
         self.config = configparser.ConfigParser()
-        self.config_path = Path(__file__).parent / 'config.ini'
-        current_dir = Path(os.getcwd())
-        self.arctic_dir = current_dir / 'arcticdb'
+        self.config_path = os.path.abspath(__file__) + '/../config.ini'
+        current_dir = os.path.abspath(__file__) + '/../../'
+        self.arctic_dir = current_dir + 'arcticdb'
         self.load_config()
     
     def load_config(self):

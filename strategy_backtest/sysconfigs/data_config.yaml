@@ -3,7 +3,6 @@ arcticdb:
   lib_path: '../arcticdb'
   symbols:
     - 'PLTR'
-    - 'AAPL'
   # Data preprocessing
   preprocessing:
     handle_missing: true

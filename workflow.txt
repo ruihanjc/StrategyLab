@@ -1,0 +1,194 @@
+ Detailed Production Trading Setup
+
+  Production Architecture & Components
+
+  Core Infrastructure:
+  - MongoDB: Production database with 12+ collections for positions, orders, risk limits
+  - Interactive Brokers: Live data feeds and order execution via ib-insync library
+  - Process Control: Automated cron-based execution with process status monitoring
+  - Risk Management: Multi-layer position limits and risk overlay system
+
+  Daily Production Workflow:
+  1. 00:15 - Order execution via run_stack_handler.py
+  2. 00:45 - Capital updates from broker
+  3. 07:05 - Price data collection and FX updates
+  4. 20:30 - Strategy backtesting for next day signals
+  5. 20:45 - Order generation for next trading session
+  6. 21:00+ - Reports, backups, and system maintenance
+
+  Key Production Setup Steps
+
+  1. Database Setup
+
+  # MongoDB installation and configuration
+  mongod --dbpath /data/db
+  # Creates 12+ collections: futures_contracts, IBClientTracker, locks, etc.
+
+  2. IB Connection Configuration
+
+  # private_config.yaml (required)
+  broker_account: 'UXXXXXX'  # IB account number
+  ib_ipaddress: 'localhost'
+  ib_port: 4001             # IB Gateway port
+
+  3. Production Scripts
+
+  - startup.py: Clears client IDs, initializes system
+  - run_stack_handler.py: 8-stage order execution pipeline
+  - run_systems.py: Overnight backtesting for signal generation
+  - interactive_controls.py: Manual system control interface
+
+  4. Order Execution Pipeline
+
+  Three-level order stack:
+  1. Instrument Stack: Strategy-level virtual orders
+  2. Contract Stack: Contract-specific orders
+  3. Broker Stack: Orders sent to IB
+
+  Execution stages:
+  - Check position breaks → Spawn contract orders → Generate force rolls → Create broker orders → Process fills → Handle completions → Stack cleanup → Additional sampling
+
+  5. Risk Management
+
+  - Position Limits: Per instrument and per strategy
+  - Risk Overlay: Dynamic position sizing based on portfolio risk
+  - Trade Limits: Daily/weekly trading constraints
+  - Emergency Controls: Manual override capabilities
+
+  ---
+  Detailed Backtesting Setup
+
+  Backtesting Architecture
+
+  Staged Pipeline System:
+  1. RawData → 2. Rules → 3. ForecastScaleCap → 4. ForecastCombine → 5. PositionSizing → 6. Portfolio → 7. Accounts
+
+  Data Sources & Formats
+
+  CSV Data (Default for Backtesting)
+
+  from sysdata.sim.csv_futures_sim_data import csvFuturesSimData
+  data = csvFuturesSimData()  # Loads 249 instruments
+
+  Data Structure:
+  - adjusted_prices_csv/ - Backadjusted continuous prices
+  - multiple_prices_csv/ - Individual contract prices
+  - fx_prices_csv/ - Currency conversion rates
+  - csvconfig/ - Instrument metadata and specifications
+
+  Alternative Data Sources
+
+  - MongoDB: sysdata.mongodb - Production database
+  - Parquet: sysdata.parquet - High-performance storage
+  - Arctic: sysdata.arctic - Time series database (deprecated)
+
+  System Configuration
+
+  Complete System Example
+
+  from systems.provided.example.simplesystem import simplesystem
+  from sysdata.config.configdata import Config
+
+  # Load configuration
+  config = Config("systems.provided.example.simplesystemconfig.yaml")
+
+  # Create system with all stages
+  system = simplesystem(data=data, config=config)
+
+  # Run backtest
+  profits = system.accounts.portfolio()
+  print(profits.percent.stats())  # Sharpe ratio, drawdown, etc.
+
+  Key Configuration Parameters
+
+  # Risk and capital
+  percentage_vol_target: 16.0
+  notional_trading_capital: 1000000
+  base_currency: "USD"
+
+  # Trading rules
+  trading_rules:
+    ewmac8_32:
+      function: systems.provided.rules.ewmac.ewmac
+      other_args: {Lfast: 8, Lslow: 32}
+      forecast_scalar: 5.3
+
+  # Portfolio weights
+  instrument_weights:
+    SOFR: 0.4
+    US10: 0.1
+    CORN: 0.3
+    SP500: 0.2
+
+  Trading Rules & Signal Generation
+
+  Built-in Rules
+
+  - EWMAC: systems.provided.rules.ewmac - Moving average crossover
+  - Carry: systems.provided.rules.carry - Carry-based strategies
+  - Breakout: systems.provided.rules.breakout - Breakout systems
+  - Mean Reversion: systems.provided.rules.mr_wings - Mean reversion
+
+  Custom Rule Example
+
+  from systems.trading_rules import TradingRule
+  from systems.provided.rules.ewmac import ewmac
+
+  # Create custom rule with parameters
+  ewmac_8_32 = TradingRule((ewmac, [], dict(Lfast=8, Lslow=32)))
+
+  # Add to system
+  config.trading_rules = dict(ewmac8_32=ewmac_8_32)
+
+  Portfolio Construction
+
+  Optimization Methods
+
+  - Fixed Weights: Manual instrument allocation
+  - Shrinkage: Bayesian shrinkage towards equal weights
+  - Bootstrap: Monte Carlo optimization
+  - Handcraft: Manual with optimization constraints
+
+  Position Sizing
+
+  # Volatility-targeted position sizing
+  config.percentage_vol_target = 16.0  # 16% annual volatility target
+  config.notional_trading_capital = 1000000  # $1M capital
+
+  Performance Analysis
+
+  Available Statistics
+
+  profits = system.accounts.portfolio()
+  stats = profits.percent.stats()
+
+  # Key metrics included:
+  # - Sharpe ratio
+  # - Maximum drawdown
+  # - Average drawdown
+  # - Time in drawdown
+  # - Skew and kurtosis
+  # - Hit rate
+
+  Cost Analysis
+
+  # Gross vs net returns
+  print(profits.gross.percent.stats())  # Before costs
+  print(profits.net.percent.stats())    # After transaction costs
+
+  Advanced Features
+
+  Order Simulation
+
+  - Realistic Fills: Market impact and slippage modeling
+  - Intraday Execution: Hourly order simulation
+  - Multiple Order Types: Market, limit, adaptive algorithms
+
+  Dynamic Optimization
+
+  - Real-time Rebalancing: Continuous portfolio optimization
+  - Constraint Handling: Position limits and risk constraints
+  - Greedy Algorithms: Efficient optimization methods
+
+  Both systems (production and backtesting) share the same core architecture, allowing seamless transition from research to live trading with comprehensive risk management and performance
+  monitoring.

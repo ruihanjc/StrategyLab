@@ -37,10 +37,10 @@ class ArcticdDBHandler:
 
                 data_dict[symbol] = df
                 print(f"Loaded {symbol} data: {len(df)} rows")
-                return data_dict[symbol]
             except Exception as e:
                 print(f"Error loading {symbol}: {str(e)}")
 
+        return data_dict
 
 if __name__ == "__main__":
     symbols = ['PLTR']

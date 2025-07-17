@@ -1,7 +1,7 @@
 
 from strategy_backtest.sysutils.constants import arg_not_supplied
 
-from strategy_backtest.sysutils.models.trading_rule_models import (
+from strategy_backtest.sysrules.trading_rule_components import (
     get_trading_rule_components
 )
 
