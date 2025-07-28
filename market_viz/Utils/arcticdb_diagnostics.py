@@ -10,10 +10,10 @@ class ArcticDiagnostic:
         self.arctic_uri = f"lmdb://{arctic_path}"
 
     def run_diagnostics(self):
-        print("\n=== Database Diagnostic Report ===")
+        print("\n=== database Diagnostic Report ===")
 
         # Check path exists
-        print("\n1. Checking Database path:")
+        print("\n1. Checking database path:")
         path = Path(self.arctic_path)
         print(f"Path: {path.absolute()}")
         print(f"Exists: {path.exists()}")
@@ -21,7 +21,7 @@ class ArcticDiagnostic:
             print(f"Contents: {os.listdir(path)}")
 
         # Try connecting
-        print("\n2. Attempting Database connection:")
+        print("\n2. Attempting database connection:")
         try:
             arctic = adb.Arctic(self.arctic_uri)
             print("Connection successful")
@@ -69,7 +69,7 @@ class ArcticDiagnostic:
 
 
 if __name__ == "__main__":
-    # Adjust this path to your Database location
+    # Adjust this path to your database location
     arctic_path = "../../arcticdb"
 
     diagnostic = ArcticDiagnostic(arctic_path)

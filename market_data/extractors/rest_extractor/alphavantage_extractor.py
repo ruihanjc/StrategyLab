@@ -1,27 +1,23 @@
-from .base_extractor import BaseExtractor
+from abc import ABC
+
+from market_data.extractors.base_extractor import BaseRestExtractor
 import datetime
 
 
-class AlphaVantageExtractor(BaseExtractor):
+class AlphaVantageExtractor(BaseRestExtractor, ABC):
     def __init__(self, config, api_config) -> None:
         super().__init__(config, api_config)
         self.alphavantage_base_url = api_config["alphavantage_api"]
         self.file_format = "&datatype=csv"
-        self.api_key = api_config["alphavantage_api_key"]
+        self.api_key = api_config['alphavantage_api_key']
 
     def run(self):
         try:
-            match self.service:
-                case "Equity":
-                    return self.process_data()
-                case _:
-                    raise ValueError(f"Unsupported service: {self.service}")
+            return self.process_data()
         except Exception as e:
             raise
 
     def process_data(self):
-
-
         response = self.get_eod_data(self.ticker)
         datapoints = response['Time Series (Daily)']
 
@@ -29,7 +25,7 @@ class AlphaVantageExtractor(BaseExtractor):
             {
                 'ticker': self.ticker,
                 'date': date,
-                'service': 'StockEquity',
+                'service': 'Equity',
                 'source': 'AlphaVantage',
                 'open': float(values['1. open']),
                 'high': float(values['2. high']),

@@ -5,7 +5,7 @@ import shutil
 import logging
 from datetime import datetime
 import time
-from market_data.Database.arctic_connection import get_arcticdb_connection
+from market_data.database.arctic_connection import get_arcticdb_connection
 
 
 

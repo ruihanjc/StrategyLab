@@ -5,23 +5,39 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0c6c299d-cb1e-4596-979e-03242c47f47c" name="Changes" comment="Changing directory adding arctic connection to have only one instance of arcticdb at one time">
-      <change afterPath="$PROJECT_DIR$/workflow.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/market_data/configuration/config_manager.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/market_data/configuration/configs/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/market_data/extractors/rest_extractor/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/StrategyLab.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/StrategyLab.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_data/Extractor/marketstack_extractor.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/Extractor/marketstack_extractor.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_data/config.ini" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/config.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_data/config_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/config_manager.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/strategy_backtest/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_backtest/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/strategy_backtest/sysconfigs/backtest_config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_backtest/sysconfigs/backtest_config.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/strategy_backtest/sysconfigs/data_config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_backtest/sysconfigs/data_config.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/Api/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/configuration/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/Api/api.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/Database/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/database/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/Database/arctic_connection.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/database/arctic_connection.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/Database/arctic_delete.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/database/arctic_delete.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/Database/arctic_init.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/database/arctic_init.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/Database/arcticdb_reader.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/database/arcticdb_reader.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/Database/arcticdb_writer.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/database/arcticdb_writer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/Database/logs/arctic_cleanup_20250227_111952.log" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/database/logs/arctic_cleanup_20250227_111952.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/Database/logs/arctic_init.log" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/database/logs/arctic_init.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/Extractor/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/extractors/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/Extractor/alphavantage_extractor.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/extractors/rest_extractor/alphavantage_extractor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/Extractor/base_extractor.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/extractors/base_extractor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/Extractor/marketstack_extractor.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/extractors/rest_extractor/marketstack_extractor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/Extractor/yahoo_extractor.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/Types/__init__" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/arguments/__init__" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/Types/argument_runtype.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/arguments/argument_runtype.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/Types/base_data_point.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/config.ini" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/config_manager.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/standard_update_data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/requestor_factory.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/requestor_factory.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_viz/Utils/arcticdb_diagnostics.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_viz/Utils/arcticdb_diagnostics.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/strategy_backtest/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_backtest/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/strategy_backtest/sysdata/arcticdb_handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_backtest/sysdata/arcticdb_handler.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/strategy_backtest/systems/base_engine.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/strategy_backtest/systems/rules/TradingRule.py" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_backtest/sysrules/trading_rule.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/strategy_backtest/systems/rules/__init__.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/strategy_backtest/sysutils/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_backtest/sysutils/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/strategy_backtest/sysutils/math_algorithms.py" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_backtest/sysutils/math_algorithms.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/strategy_backtest/sysutils/models/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/strategy_backtest/sysutils/models/trading_rule_models.py" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_backtest/sysrules/trading_rule_components.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,46 +78,46 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;Python.1.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.AppleDataIngestion.executor&quot;: &quot;Run&quot;,
-    &quot;Python.BackTesting.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.Data_Extractor(marketdata main).executor&quot;: &quot;Debug&quot;,
-    &quot;Python.Data_Extractor.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.EquityDataIngestion.executor&quot;: &quot;Run&quot;,
-    &quot;Python.PalantirDataIngestion.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.app.executor&quot;: &quot;Run&quot;,
-    &quot;Python.arctic_delete.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.arctic_init.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.arcticdb_diagnostics.executor&quot;: &quot;Run&quot;,
-    &quot;Python.arcticdb_handler.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.arcticdb_reader.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.backtesting(main).executor&quot;: &quot;Debug&quot;,
-    &quot;Python.config.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.hubspot.executor&quot;: &quot;Run&quot;,
-    &quot;Python.hubspot_interview.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.marketstack_extractor.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.test (1).executor&quot;: &quot;Debug&quot;,
-    &quot;Python.test.executor&quot;: &quot;Run&quot;,
-    &quot;Python.test2.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.testing.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;building-trading-rule&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/ruiha/Downloads/PathToAnalyst/pysystemtrade&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;debugger.dataViews.python.type.renderers&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Python.1.executor": "Debug",
+    "Python.AppleDataIngestion.executor": "Run",
+    "Python.BackTesting.executor": "Debug",
+    "Python.Data_Extractor(marketdata main).executor": "Debug",
+    "Python.Data_Extractor.executor": "Debug",
+    "Python.EquityDataIngestion.executor": "Run",
+    "Python.PalantirDataIngestion.executor": "Debug",
+    "Python.app.executor": "Run",
+    "Python.arctic_delete.executor": "Debug",
+    "Python.arctic_init.executor": "Debug",
+    "Python.arcticdb_diagnostics.executor": "Run",
+    "Python.arcticdb_handler.executor": "Debug",
+    "Python.arcticdb_reader.executor": "Debug",
+    "Python.backtesting(main).executor": "Debug",
+    "Python.config.executor": "Debug",
+    "Python.hubspot.executor": "Run",
+    "Python.hubspot_interview.executor": "Run",
+    "Python.main.executor": "Debug",
+    "Python.marketstack_extractor.executor": "Debug",
+    "Python.test (1).executor": "Debug",
+    "Python.test.executor": "Run",
+    "Python.test2.executor": "Debug",
+    "Python.testing.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "building-trading-rule",
+    "last_opened_file_path": "C:/Users/ruiha/Downloads/PathToAnalyst/pysystemtrade",
+    "settings.editor.selected.configurable": "debugger.dataViews.python.type.renderers"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\ruiha\Downloads\PathToAnalyst\StrategyLab\market_data\configs\configs" />
+      <recent name="C:\Users\ruiha\Downloads\PathToAnalyst\StrategyLab\market_data\configs" />
+      <recent name="C:\Users\ruiha\Downloads\PathToAnalyst\StrategyLab\market_data\Extractor\RestExtractors" />
       <recent name="C:\Users\ruiha\Downloads\PathToAnalyst\StrategyLab\strategy_backtest\sysrules" />
       <recent name="C:\Users\ruiha\Downloads\PathToAnalyst\StrategyLab\strategy_backtest\sysutils\models" />
-      <recent name="C:\Users\ruiha\Downloads\PathToAnalyst\StrategyLab" />
-      <recent name="C:\Users\ruiha\Downloads\1\PathToAnalyst\StrategyLab\strategy_backtest\sysstrategy" />
-      <recent name="C:\Users\ruiha\Downloads\1\PathToAnalyst\StrategyLab\market_data\Database" />
     </key>
   </component>
   <component name="RunManager" selected="Python.PalantirDataIngestion">
@@ -118,7 +134,7 @@
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/market_data/main.py" />
+      <option name="SCRIPT_NAME" value="C:\Users\ruiha\Downloads\PathToAnalyst\StrategyLab\market_data\standard_update_data.py" />
       <option name="PARAMETERS" value="-service=&quot;Equity&quot; -source=&quot;MarketStack&quot; -ticker=&quot;AAPL&quot;" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -158,12 +174,13 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Python 3.11 (StrategyLab)" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/market_data/main.py" />
-      <option name="PARAMETERS" value="-service=&quot;Equity&quot; -source=&quot;MarketStack&quot; -ticker=&quot;PLTR&quot;" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/market_data/standard_update_data.py" />
+      <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -259,12 +276,7 @@
           <option name="timeStamp" value="2" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/market_data/Extractor/marketstack_extractor.py</url>
-          <line>28</line>
-          <option name="timeStamp" value="3" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/market_data/main.py</url>
+          <url>file://$PROJECT_DIR$/market_data/standard_update_data.py</url>
           <line>20</line>
           <option name="timeStamp" value="4" />
         </line-breakpoint>
@@ -279,22 +291,12 @@
           <option name="timeStamp" value="47" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/market_data/Database/arctic_delete.py</url>
+          <url>file://$PROJECT_DIR$/market_data/database/arctic_delete.py</url>
           <line>111</line>
           <option name="timeStamp" value="54" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/market_data/Extractor/marketstack_extractor.py</url>
-          <line>17</line>
-          <option name="timeStamp" value="72" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/market_data/Extractor/marketstack_extractor.py</url>
-          <line>19</line>
-          <option name="timeStamp" value="73" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/market_data/Database/arctic_init.py</url>
+          <url>file://$PROJECT_DIR$/market_data/database/arctic_init.py</url>
           <line>13</line>
           <option name="timeStamp" value="74" />
         </line-breakpoint>
@@ -309,12 +311,7 @@
           <option name="timeStamp" value="87" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/market_data/Extractor/marketstack_extractor.py</url>
-          <line>32</line>
-          <option name="timeStamp" value="88" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/market_data/Extractor/marketstack_extractor.py</url>
+          <url>file://$PROJECT_DIR$/market_data/extractors/rest_extractor/marketstack_extractor.py</url>
           <line>63</line>
           <option name="timeStamp" value="89" />
         </line-breakpoint>
@@ -339,14 +336,29 @@
           <option name="timeStamp" value="100" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/market_data/main.py</url>
+          <url>file://$PROJECT_DIR$/market_data/standard_update_data.py</url>
           <line>25</line>
           <option name="timeStamp" value="101" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/market_data/main.py</url>
-          <line>55</line>
-          <option name="timeStamp" value="102" />
+          <url>file://$PROJECT_DIR$/market_data/arguments/argument_runtype.py</url>
+          <line>31</line>
+          <option name="timeStamp" value="103" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/market_data/configuration/config_manager.py</url>
+          <line>6</line>
+          <option name="timeStamp" value="104" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/market_data/standard_update_data.py</url>
+          <line>53</line>
+          <option name="timeStamp" value="107" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/market_data/extractors/rest_extractor/marketstack_extractor.py</url>
+          <line>10</line>
+          <option name="timeStamp" value="108" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

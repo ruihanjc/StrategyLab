@@ -1,34 +1,24 @@
-from calendar import month
-from turtledemo.penrose import start
+from abc import ABC
 
-from .base_extractor import BaseExtractor
-from market_data.Database.arcticdb_reader import ArcticReader
+from market_data.extractors.base_extractor import BaseRestExtractor
+from market_data.database.arcticdb_reader import ArcticReader
 import datetime
 
 
-class MarketStackExtractor(BaseExtractor):
+class MarketStackExtractor(BaseRestExtractor, ABC):
     def __init__(self, config, api_config) -> None:
         super().__init__(config, api_config)
-        self.mktstack_eod_base_url = api_config["mktstack_api"]
-        self.api_key = api_config["mktstack_api_key"]
+        self.mktstack_eod_base_url = api_config["marketstack"]["base_url"]
+        self.api_key = api_config["marketstack"]["api_key"]
 
     def run(self):
         try:
-            match self.service:
-                case "MarketIndex":
-                    return self.get_eod_data(self.ticker)
-                case "Equity":
-                    return self.process_data()
-                case _:
-                    raise ValueError(f"Unsupported service: {self.service}")
+            return self.process_data()
         except Exception as e:
             raise
 
     def process_data(self):
-
         check_end, has_historical = ArcticReader().get_historical_range(self.service.lower(), self.ticker)
-
-        start_date = end_date = None
 
         if has_historical:
             start_date = check_end
@@ -64,5 +54,5 @@ class MarketStackExtractor(BaseExtractor):
         return self.create_dataframe(datapoints)
 
     def get_eod_data(self, ticker, start, end):
-        url = f"{self.mktstack_eod_base_url}symbols={ticker}&access_key={self.api_key}&date_from={start}&date_to={end}"
+        url = f"{self.mktstack_eod_base_url}?symbols={ticker}&access_key={self.api_key}&date_from={start}&date_to={end}"
         return self.make_request(url)
