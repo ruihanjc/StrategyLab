@@ -309,7 +309,7 @@ The system calculates comprehensive performance metrics:
 ### From Command Line
 ```bash
 cd StrategyLab/strategy_backtest
-python main.py
+python standard_update_data.py
 ```
 
 ### From Python Script

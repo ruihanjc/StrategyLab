@@ -1,0 +1,2 @@
+from market_data.extractors.rest_extractor import marketstack_extractor
+from .base_extractor import BaseExtractor

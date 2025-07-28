@@ -9,7 +9,7 @@ import sys
 
 from wheel.macosx_libfile import read_data
 
-from market_data.Database.arctic_connection import get_arcticdb_connection
+from market_data.database.arctic_connection import get_arcticdb_connection
 
 
 from dateutil.utils import today

@@ -5,13 +5,11 @@ from typing import Dict, Any
 import datetime
 
 
-class BaseExtractor(ABC):
-    """Base class for all data extractors"""
 
-    def __init__(self, config: Any, api_config: Dict[str, str]) -> None:
-        self.service = config.service
-        self.ticker = config.ticker
-        self.api_config = api_config
+class BaseExtractor(ABC):
+    def __init__(self, config: Any):
+        self.service = config[0] #Service
+        self.ticker = config[2] #Ticker
 
     @abstractmethod
     def run(self):
@@ -24,11 +22,21 @@ class BaseExtractor(ABC):
         pass
 
     @abstractmethod
-    def get_eod_data(self, ticker: str, start: datetime, to:datetime):
+    def get_eod_data(self, ticker: str, start: datetime, to: datetime):
         """Get end of day data for a ticker"""
         pass
 
-    def make_request(self, url: str, headers: Dict = None, payload: str = "") -> Dict:
+
+
+class BaseRestExtractor(BaseExtractor, ABC):
+    """Base class for all REST extractors"""
+
+    def __init__(self, config: Any, api_config: dict[str, str]) -> None:
+        super().__init__(config)
+        self.api_config = api_config
+
+    @staticmethod
+    def make_request(url: str, headers: Dict = None, payload: str = "") -> Dict:
         """Make HTTP request with error handling"""
         try:
             headers = headers or {}
@@ -38,7 +46,8 @@ class BaseExtractor(ABC):
         except requests.exceptions.RequestException as e:
             raise Exception(f"API request failed: {str(e)}")
 
-    def create_dataframe(self, records: list) -> pd.DataFrame:
+    @staticmethod
+    def create_dataframe(records: list) -> pd.DataFrame:
         """Create and format DataFrame from records"""
         df = pd.DataFrame(records)
         df['date'] = pd.to_datetime(df['date'])

@@ -5,7 +5,7 @@ import configparser
 
 class ConfigManager:
     """
-    Configuration manager for loading and validating YAML configs
+    Configuration manager for loading and validating YAML configuration
     """
 
     def __init__(self,config_path='./config.ini'):

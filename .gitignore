@@ -4,7 +4,7 @@
 *.mdf
 *.ndf
 
-# Database files
+# database files
 arcticdb/
 
 # Environment

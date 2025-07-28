@@ -22,6 +22,30 @@ class ArgumentRunType:
 
         return parser
 
+    @staticmethod
+    def validate_arguments(args, update_config):
+        """Validate required arguments"""
+        all_should_update = []
+        if getattr(args, "ticker", None) is None or getattr(args, "service", None) == "update":
+            # Fill arguments from update_config
+            all_updates = update_config.get("current")
+
+            for service in all_updates:
+                for source_ticker in update_config.get(service.lower()):
+                    all_should_update.append((service, source_ticker["source"], source_ticker["ticker"]))
+        else:
+            # Validate required fields are now present
+            required = ['service', 'source']
+            missing = [arg for arg in required if getattr(args, arg) is None]
+
+            if missing:
+                print(f"Error: Missing required arguments: {', '.join(missing)}")
+                return []
+
+            all_should_update.append((getattr(args, 'service'), getattr(args, 'source'), getattr(args, 'ticker')))
+
+        return all_should_update
+
     def parse_arguments(self, args=None):
         """Parse command line arguments"""
         if args:
@@ -33,15 +57,3 @@ class ArgumentRunType:
             return self.parser.parse_args(args)
         return self.parser.parse_args()
 
-
-
-    @staticmethod
-    def validate_arguments(args):
-        """Validate required arguments"""
-        required = ['service', 'source', 'ticker']
-        missing = [arg for arg in required if getattr(args, arg) is None]
-
-        if missing:
-            print(f"Error: Missing required arguments: {', '.join(missing)}")
-            return False
-        return True
