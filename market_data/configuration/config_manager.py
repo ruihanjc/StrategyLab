@@ -3,17 +3,18 @@ import yaml
 import re
 from dotenv import load_dotenv
 
+
 class ConfigManager:
     def __init__(self, config_path='./config.yaml'):
         # Load environment variables from .env file
         load_dotenv()
-        
+
         current_dir = os.path.dirname(os.path.dirname(__file__))
         self.config_path = os.path.join(current_dir, 'configuration', 'configs', 'config.yaml')
         self.arctic_dir = os.path.join(current_dir, '../arcticdb')
         self.config = {}
         self.load_config()
-    
+
     def load_config(self):
         """Load configuration from YAML file and substitute environment variables"""
         if os.path.exists(self.config_path):
@@ -24,7 +25,7 @@ class ConfigManager:
                 self.config = yaml.safe_load(content)
         else:
             raise FileNotFoundError(f"Configuration file not found: {self.config_path}")
-    
+
     def get_database_config(self):
         """Get database configuration section"""
         db_config = self.config.get('database', {}).copy()
@@ -34,7 +35,7 @@ class ConfigManager:
     def get_logging_config(self):
         """Get logging configuration section"""
         return self.config.get('logging', {})
-    
+
     def get_api_config(self):
         """Get API configuration section"""
         return self.config.get('api', {})
@@ -51,4 +52,3 @@ class ConfigManager:
         with open(self.config_path, 'w') as config_file:
             yaml.safe_dump(self.config, config_file, default_flow_style=False)
 
-# Usage example

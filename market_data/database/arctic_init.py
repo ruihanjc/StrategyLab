@@ -10,6 +10,10 @@ from market_data.database.arctic_connection import get_arcticdb_connection
 
 class ArcticDBInitializer:
     def __init__(self, arctic_path):
+        self.logger = None
+        self.setup_logging()
+        current_path = Path(os.getcwd())
+        self.arctic_path = current_path.parent.parent / 'arcticdb'
         self.arctic = get_arcticdb_connection(arctic_path)
         self.setup_logging()
 
@@ -32,7 +36,7 @@ class ArcticDBInitializer:
             self.logger.info(f"Initialized directory: {self.arctic_path}")
 
             # Connect to ArcticDB
-            self.arctic = adb.Arctic(self.arctic_uri)
+            arctic = get_arcticdb_connection(self.arctic_path)
             self.logger.info("Connected to ArcticDB successfully")
             return True
         except Exception as e:
@@ -126,7 +130,7 @@ class ArcticDBInitializer:
         return True
 
 
-def main():
+def arctic_init():
     # Use relative path from script location
     current_dir = Path(os.getcwd())
     arctic_dir = current_dir.parent.parent / 'arcticdb'
@@ -139,7 +143,3 @@ def main():
     else:
         print("\nArcticDB initialization failed!")
         print("Check arctic_init.log for error details")
-
-
-if __name__ == "__main__":
-    main()

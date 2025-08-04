@@ -95,3 +95,34 @@ Verifying libraries:
 2025-02-27 11:24:40,588 - INFO - Library metadata: 0 symbols
 2025-02-27 11:24:40,806 - INFO - Library market_index: 0 symbols
 2025-02-27 11:24:40,817 - INFO - Created test data in equity library
+2025-08-04 23:42:22,464 - ERROR - Failed to initialize ArcticDB: expected str, bytes or os.PathLike object, not NoneType
+2025-08-04 23:43:14,778 - ERROR - Failed to initialize ArcticDB: expected str, bytes or os.PathLike object, not NoneType
+2025-08-04 23:49:00,591 - INFO - Initializing ArcticDB connection to: /home/ruihanjc/src/StrategyLab/arcticdb
+2025-08-04 23:49:00,593 - INFO - ArcticDB connection established successfully
+2025-08-04 23:49:03,296 - INFO - Initialized directory: /home/ruihanjc/src/StrategyLab/arcticdb
+2025-08-04 23:49:03,296 - ERROR - Failed to initialize ArcticDB: 'Arctic' object has no attribute 'startswith'
+2025-08-04 23:49:16,963 - INFO - Initializing ArcticDB connection to: /home/ruihanjc/src/StrategyLab/arcticdb
+2025-08-04 23:49:16,965 - INFO - ArcticDB connection established successfully
+2025-08-04 23:49:23,293 - INFO - Initialized directory: /home/ruihanjc/src/StrategyLab/arcticdb
+2025-08-04 23:50:07,725 - INFO - Initializing ArcticDB connection to: /home/ruihanjc/src/StrategyLab/arcticdb
+2025-08-04 23:50:07,727 - INFO - ArcticDB connection established successfully
+2025-08-04 23:50:09,494 - INFO - Initialized directory: /home/ruihanjc/src/StrategyLab/arcticdb
+2025-08-04 23:50:09,495 - INFO - Connected to ArcticDB successfully
+2025-08-04 23:50:28,957 - INFO - Created library: equity
+2025-08-04 23:50:28,966 - INFO - Created library: market_index
+2025-08-04 23:50:28,975 - INFO - Created library: crypto
+2025-08-04 23:50:28,984 - INFO - Created library: forex
+2025-08-04 23:50:28,993 - INFO - Created library: futures
+2025-08-04 23:50:29,002 - INFO - Created library: metadata
+2025-08-04 23:50:37,142 - INFO - 
+Initialization Summary:
+2025-08-04 23:50:38,635 - INFO - Created libraries: equity, market_index, crypto, forex, futures, metadata
+2025-08-04 23:50:39,878 - INFO - 
+Verifying libraries:
+2025-08-04 23:50:40,097 - INFO - Library forex: 0 symbols
+2025-08-04 23:50:40,315 - INFO - Library crypto: 0 symbols
+2025-08-04 23:50:40,534 - INFO - Library equity: 0 symbols
+2025-08-04 23:50:40,752 - INFO - Library futures: 0 symbols
+2025-08-04 23:50:40,971 - INFO - Library metadata: 0 symbols
+2025-08-04 23:50:41,188 - INFO - Library market_index: 0 symbols
+2025-08-04 23:50:41,981 - INFO - Created test data in equity library

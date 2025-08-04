@@ -12,7 +12,7 @@ logging:
   backup_count: 5
 
 api:
-  mktstack_api : https://api.marketstack.com/v1/eod?
+  mktstack_api : https://api.marketstack.com/v1/eod
   mktstack_api_key : ${MKTSTACK_API_KEY}
   alphavantage_api_key : ${ALPHAVANTAGE_API_KEY}
   alphavantage_api : https://www.alphavantage.co/query?

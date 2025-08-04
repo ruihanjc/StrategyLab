@@ -28,10 +28,10 @@ class MarketDataStore:
 
     def store_market_data(self, df):
         """Store market data in appropriate service library"""
+        global service, ticker
         if df is not None:
             ticker = df['ticker'][0]
             service = df['service'][0].lower()
-
 
         if service not in self.services:
             raise ValueError(f"Unknown service type: {service}")
@@ -56,7 +56,6 @@ class MarketDataStore:
         except Exception as e:
             print(f"Error storing data: {str(e)}")
             return False
-
 
     def get_service_stats(self):
         """Get statistics about each service library"""
@@ -87,6 +86,7 @@ class MarketDataStore:
 
         return stats
 
+    @staticmethod
     def normalize_dataframe(self, df):
         """Normalize DataFrame to ensure proper data types"""
         # Convert timestamp to pandas Timestamp
@@ -114,4 +114,3 @@ class MarketDataStore:
                 df[col] = df[col].astype(str)
 
         return df
-

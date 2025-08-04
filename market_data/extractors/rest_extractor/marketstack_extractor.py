@@ -29,7 +29,7 @@ class MarketStackExtractor(BaseRestExtractor, ABC):
 
         datapoints = []
         while start_date < end_date:
-            temp_end = start_date+datetime.timedelta(days=90)
+            temp_end = start_date + datetime.timedelta(days=90)
             response = self.get_eod_data(self.ticker, start_date.date(), temp_end.date())
             range_points = response['data']
             for values in range_points:
@@ -47,9 +47,8 @@ class MarketStackExtractor(BaseRestExtractor, ABC):
                         'timestamp': datetime.date.today()
                     }
                 )
-                
-            start_date = temp_end + datetime.timedelta(days=1)
 
+            start_date = temp_end + datetime.timedelta(days=1)
 
         return self.create_dataframe(datapoints)
 

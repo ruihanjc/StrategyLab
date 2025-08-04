@@ -1,4 +1,4 @@
-from extractors import *
+from ..extractors import *
 
 from market_data.extractors import BaseExtractor
 from market_data.extractors.rest_extractor.alphavantage_extractor import AlphaVantageExtractor
@@ -16,5 +16,7 @@ class RequesterFactory:
                         return MarketStackExtractor(entry, api_config)
                     case "AlphaVantage":
                         return AlphaVantageExtractor(entry, api_config)
+                    case _:
+                        raise RuntimeError("Failed to choose equity extractor")
             case _:
-                return "Something is wrong with the configuration"
+                raise RuntimeError("Failed to choose extractor")

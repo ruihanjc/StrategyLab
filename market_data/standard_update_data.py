@@ -63,15 +63,15 @@ def standard_update_data(config_arguments):
             logger.info("Initializing database storage...")
             arcticdb_helper = arcticdb_writer.MarketDataStore(database_config)
 
-            logger.info("Storing fetched data...")
+            logger.info(f"Storing fetched data for {entry}")
 
             if arcticdb_helper.store_market_data(fetched_data):
                 logger.info("Data successfully stored in database")
             else:
                 logger.error("Failed to store data in database")
 
-    except Exception as e:
-        logger.error(f"Application error: {str(e)}", exc_info=True)
+    except Exception as error:
+        logger.error(f"Application error: {str(error)}", exc_info=True)
         raise
 
 
