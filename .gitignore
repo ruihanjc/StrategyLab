@@ -14,3 +14,5 @@ env/
 venv/
 ENV/
 strategy_venv/
+strategylab_venv/
+StrategyLabVenv/
