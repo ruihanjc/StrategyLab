@@ -1,0 +1,2 @@
+[console_scripts]
+arcticdb_update_storage = arcticdb.scripts.update_storage:main

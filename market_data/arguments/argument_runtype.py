@@ -31,7 +31,7 @@ class ArgumentRunType:
             all_updates = update_config.get("current")
 
             for service in all_updates:
-                for source_ticker in update_config.get(service.lower()):
+                for source_ticker in all_updates.get(service):
                     all_should_update.append((service, source_ticker["source"], source_ticker["ticker"]))
         else:
             # Validate required fields are now present

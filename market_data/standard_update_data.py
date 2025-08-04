@@ -2,7 +2,7 @@ from arguments.argument_runtype import ArgumentRunType
 from market_data.configuration.config_manager import ConfigManager
 import logging
 import sys
-from requestor_factory import RequesterFactory
+from market_data.arguments.requestor_factory import RequesterFactory
 from database import arcticdb_writer
 
 
@@ -40,7 +40,6 @@ def standard_update_data(config_arguments):
         else:
             parsed_args = argument_parser.parse_arguments(config_arguments)
 
-
         update_list = argument_parser.validate_arguments(parsed_args, update_config)
 
         if not update_list:
@@ -51,10 +50,10 @@ def standard_update_data(config_arguments):
         logger.info(f"Creating requester for service: {update_list}")
 
         for entry in update_list:
-            requestor = RequesterFactory.create(entry, api_config)
+            requester = RequesterFactory.create(entry, api_config)
 
             logger.info("Fetching data...")
-            fetched_data = requestor.run()
+            fetched_data = requester.run()
 
             if fetched_data is None:
                 logger.error("No data fetched from the source")
@@ -65,10 +64,8 @@ def standard_update_data(config_arguments):
             arcticdb_helper = arcticdb_writer.MarketDataStore(database_config)
 
             logger.info("Storing fetched data...")
-            success = arcticdb_helper.store_market_data(fetched_data)
 
-
-            if success:
+            if arcticdb_helper.store_market_data(fetched_data):
                 logger.info("Data successfully stored in database")
             else:
                 logger.error("Failed to store data in database")

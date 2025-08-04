@@ -1,0 +1,48 @@
+# Market Data Configuration
+database:
+  name: "arcticdb"
+  connection_timeout: 30
+  read_timeout: 60
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "market_data.log"
+  max_file_size: "10MB"
+  backup_count: 5
+
+api:
+  mktstack_api : https://api.marketstack.com/v1/eod?
+  mktstack_api_key : ${MKTSTACK_API_KEY}
+  alphavantage_api_key : ${ALPHAVANTAGE_API_KEY}
+  alphavantage_api : https://www.alphavantage.co/query?
+  rate_limit: 5  # requests per second
+  timeout: 30
+  retry_attempts: 3
+  retry_delay: 1
+  
+update_services:
+  current:
+    equity:
+      - source: "MarketStack"
+        ticker: "TSLA"
+      - source: "MarketStack" 
+        ticker: "AAPL"
+      - source: "MarketStack"
+        ticker: "PLTR"
+  
+data_sources:
+  default: "market_stack"
+  available:
+    - "yahoo"
+    - "alpha_vantage"
+    - "market_stack"
+    
+instruments:
+  default_currency: "USD"
+  supported_asset_classes:
+    - "equity"
+    - "forex"
+    - "commodity"
+    - "crypto"
+    - "futures"

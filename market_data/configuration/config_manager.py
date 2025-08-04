@@ -1,19 +1,27 @@
 import os
 import yaml
+import re
+from dotenv import load_dotenv
 
 class ConfigManager:
     def __init__(self, config_path='./config.yaml'):
+        # Load environment variables from .env file
+        load_dotenv()
+        
         current_dir = os.path.dirname(os.path.dirname(__file__))
-        self.config_path = os.path.join(current_dir, 'configuration\\configs\\config.yaml')
-        self.arctic_dir = os.path.join(current_dir, 'arcticdb')
+        self.config_path = os.path.join(current_dir, 'configuration', 'configs', 'config.yaml')
+        self.arctic_dir = os.path.join(current_dir, '../arcticdb')
         self.config = {}
         self.load_config()
     
     def load_config(self):
-        """Load configuration from YAML file"""
+        """Load configuration from YAML file and substitute environment variables"""
         if os.path.exists(self.config_path):
             with open(self.config_path, 'r') as file:
-                self.config = yaml.safe_load(file)
+                content = file.read()
+                # Substitute environment variables ${VAR_NAME}
+                content = re.sub(r'\$\{([^}]+)\}', lambda m: os.getenv(m.group(1), ''), content)
+                self.config = yaml.safe_load(content)
         else:
             raise FileNotFoundError(f"Configuration file not found: {self.config_path}")
     

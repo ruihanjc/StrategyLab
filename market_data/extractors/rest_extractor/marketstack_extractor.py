@@ -8,8 +8,8 @@ import datetime
 class MarketStackExtractor(BaseRestExtractor, ABC):
     def __init__(self, config, api_config) -> None:
         super().__init__(config, api_config)
-        self.mktstack_eod_base_url = api_config["marketstack"]["base_url"]
-        self.api_key = api_config["marketstack"]["api_key"]
+        self.mktstack_eod_base_url = api_config["mktstack_api"]
+        self.api_key = api_config["mktstack_api_key"]
 
     def run(self):
         try:

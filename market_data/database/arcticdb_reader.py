@@ -11,9 +11,7 @@ from wheel.macosx_libfile import read_data
 
 from market_data.database.arctic_connection import get_arcticdb_connection
 
-
 from dateutil.utils import today
-
 
 
 class ArcticReader:
@@ -34,7 +32,7 @@ class ArcticReader:
     def get_historical_range(self, library, symbol):
         """Read data from a symbol"""
         lib = self.arctic.get_library(library)
-        if (lib.has_symbol(symbol)):
+        if lib.has_symbol(symbol):
             data = lib.read(symbol).data
             if 'date' in data.columns:
                 latest_date = data['date'].max()
@@ -43,13 +41,11 @@ class ArcticReader:
             return datetime.date.today(), False
         return None
 
-
     def read_data(self, library, symbol, head):
         """Read data from a symbol"""
         lib = self.arctic.get_library(library)
         data = lib.read(symbol).data
         return data.head(head) if head else data
-
 
     def get_info(self, library, symbol):
         """Get information about a symbol"""
@@ -60,7 +56,6 @@ class ArcticReader:
             'columns': list(data.columns),
             'date_range': f"{data['date'].min()} to {data['date'].max()}" if 'date' in data.columns else 'N/A'
         }
-
 
 
 if __name__ == '__main__':

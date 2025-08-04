@@ -5,39 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0c6c299d-cb1e-4596-979e-03242c47f47c" name="Changes" comment="Changing directory adding arctic connection to have only one instance of arcticdb at one time">
-      <change afterPath="$PROJECT_DIR$/market_data/configuration/config_manager.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/market_data/configuration/configs/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/market_data/extractors/rest_extractor/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/market_data/arguments/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/StrategyLab.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/StrategyLab.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_data/Api/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/configuration/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_data/Api/api.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_data/Database/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/database/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_data/Database/arctic_connection.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/database/arctic_connection.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_data/Database/arctic_delete.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/database/arctic_delete.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_data/Database/arctic_init.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/database/arctic_init.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_data/Database/arcticdb_reader.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/database/arcticdb_reader.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_data/Database/arcticdb_writer.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/database/arcticdb_writer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_data/Database/logs/arctic_cleanup_20250227_111952.log" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/database/logs/arctic_cleanup_20250227_111952.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_data/Database/logs/arctic_init.log" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/database/logs/arctic_init.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_data/Extractor/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/extractors/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_data/Extractor/alphavantage_extractor.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/extractors/rest_extractor/alphavantage_extractor.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_data/Extractor/base_extractor.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/extractors/base_extractor.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_data/Extractor/marketstack_extractor.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/extractors/rest_extractor/marketstack_extractor.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_data/Extractor/yahoo_extractor.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_data/Types/__init__" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/arguments/__init__" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_data/Types/argument_runtype.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/arguments/argument_runtype.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_data/Types/base_data_point.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_data/config.ini" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_data/config_manager.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_data/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/standard_update_data.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_data/requestor_factory.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/requestor_factory.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_viz/Utils/arcticdb_diagnostics.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_viz/Utils/arcticdb_diagnostics.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/strategy_backtest/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_backtest/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/strategy_backtest/sysdata/arcticdb_handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_backtest/sysdata/arcticdb_handler.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/strategy_backtest/sysutils/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_backtest/sysutils/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/arguments/argument_runtype.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/arguments/argument_runtype.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/configuration/config_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/configuration/config_manager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/database/arcticdb_reader.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/database/arcticdb_reader.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/extractors/rest_extractor/marketstack_extractor.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/extractors/rest_extractor/marketstack_extractor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/requestor_factory.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/arguments/requestor_factory.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/requirements.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/market_data/standard_update_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_data/standard_update_data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/strategy_backtest/sysconfigs/data_config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/strategy_backtest/sysconfigs/data_config.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,6 +46,12 @@
     &quot;accountId&quot;: &quot;60f68444-f65f-45bc-ad5a-3c87420d0ca1&quot;
   }
 }</component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 0
 }</component>
@@ -104,20 +89,21 @@
     "Python.test.executor": "Run",
     "Python.test2.executor": "Debug",
     "Python.testing.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "building-trading-rule",
-    "last_opened_file_path": "C:/Users/ruiha/Downloads/PathToAnalyst/pysystemtrade",
-    "settings.editor.selected.configurable": "debugger.dataViews.python.type.renderers"
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "/home/ruihanjc/src/StrategyLab",
+    "settings.editor.selected.configurable": "settings.sync"
   }
 }]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/market_data/arguments" />
       <recent name="C:\Users\ruiha\Downloads\PathToAnalyst\StrategyLab\market_data\configs\configs" />
       <recent name="C:\Users\ruiha\Downloads\PathToAnalyst\StrategyLab\market_data\configs" />
       <recent name="C:\Users\ruiha\Downloads\PathToAnalyst\StrategyLab\market_data\Extractor\RestExtractors" />
       <recent name="C:\Users\ruiha\Downloads\PathToAnalyst\StrategyLab\strategy_backtest\sysrules" />
-      <recent name="C:\Users\ruiha\Downloads\PathToAnalyst\StrategyLab\strategy_backtest\sysutils\models" />
     </key>
   </component>
   <component name="RunManager" selected="Python.PalantirDataIngestion">
@@ -174,7 +160,6 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.11 (StrategyLab)" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -197,7 +182,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-d7ad00fb9fc3-c546a90a8094-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-242.23726.102" />
+        <option value="bundled-python-sdk-5a2391486177-d3b881c8e49f-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-233.13763.11" />
       </set>
     </attachedChunks>
   </component>
@@ -311,11 +296,6 @@
           <option name="timeStamp" value="87" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/market_data/extractors/rest_extractor/marketstack_extractor.py</url>
-          <line>63</line>
-          <option name="timeStamp" value="89" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/strategy_backtest/main.py</url>
           <line>386</line>
           <option name="timeStamp" value="91" />
@@ -336,29 +316,19 @@
           <option name="timeStamp" value="100" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/market_data/standard_update_data.py</url>
-          <line>25</line>
-          <option name="timeStamp" value="101" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/market_data/arguments/argument_runtype.py</url>
           <line>31</line>
           <option name="timeStamp" value="103" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/market_data/configuration/config_manager.py</url>
-          <line>6</line>
-          <option name="timeStamp" value="104" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/market_data/standard_update_data.py</url>
-          <line>53</line>
-          <option name="timeStamp" value="107" />
+          <line>79</line>
+          <option name="timeStamp" value="109" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/market_data/extractors/rest_extractor/marketstack_extractor.py</url>
-          <line>10</line>
-          <option name="timeStamp" value="108" />
+          <line>20</line>
+          <option name="timeStamp" value="113" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
