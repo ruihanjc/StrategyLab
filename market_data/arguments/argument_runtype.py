@@ -28,10 +28,9 @@ class ArgumentRunType:
         all_should_update = []
         if getattr(args, "ticker", None) is None or getattr(args, "service", None) == "update":
             # Fill arguments from update_config
-            all_updates = update_config.get("current")
 
-            for service in all_updates:
-                for source_ticker in all_updates.get(service):
+            for service in update_config:
+                for source_ticker in update_config.get(service):
                     all_should_update.append((service, source_ticker["source"], source_ticker["ticker"]))
         else:
             # Validate required fields are now present

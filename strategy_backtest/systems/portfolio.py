@@ -198,7 +198,9 @@ class PositionSizer:
             Position series
         """
         # Align forecast and price
-        aligned_forecast, aligned_price = forecast.align(price, method='ffill')
+        aligned_forecast, aligned_price = forecast.align(price)
+        aligned_forecast = aligned_forecast.ffill()
+        aligned_price = aligned_price.ffill()
         
         # Calculate volatility if not provided
         if volatility is None:
@@ -206,13 +208,13 @@ class PositionSizer:
             volatility = returns.rolling(window=25).std() * np.sqrt(252)
         
         # Align volatility
-        aligned_volatility = volatility.reindex(aligned_forecast.index, method='ffill')
+        aligned_volatility = volatility.reindex(aligned_forecast.index).ffill()
         
         # Calculate FX rate if needed
         if fx_rate is None:
             fx_rate = pd.Series(1.0, index=aligned_forecast.index)
         else:
-            fx_rate = fx_rate.reindex(aligned_forecast.index, method='ffill')
+            fx_rate = fx_rate.reindex(aligned_forecast.index).ffill()
         
         # Calculate position size
         # Position = (forecast / forecast_cap) * (target_vol / instrument_vol) * capital_multiplier

@@ -17,6 +17,7 @@ try:
         AccelerationRule, MeanReversionRule, CarryRule, 
         RelativeMomentumRule, VolatilityRule, create_standard_trading_rules
     )
+    from .proper_ewmac import ProperEWMAC
     from ..sysobjects.forecasts import Forecast
     from ..sysobjects.prices import AdjustedPrices
     from ..sysutils.math_algorithms import calculate_forecast_scalar
@@ -32,6 +33,7 @@ except ImportError:
         AccelerationRule, MeanReversionRule, CarryRule, 
         RelativeMomentumRule, VolatilityRule, create_standard_trading_rules
     )
+    from sysrules.proper_ewmac import ProperEWMAC
     from sysobjects.forecasts import Forecast
     from sysobjects.prices import AdjustedPrices
     from sysutils.math_algorithms import calculate_forecast_scalar
@@ -52,7 +54,7 @@ class TradingRuleFactory:
         """Register standard trading rules"""
         # Register rule classes
         self.rule_registry.update({
-            'EWMAC': EWMACRule,
+            'EWMAC': ProperEWMAC,  # Use proper EWMAC implementation
             'Breakout': BreakoutRule,
             'Momentum': MomentumRule,
             'Acceleration': AccelerationRule,

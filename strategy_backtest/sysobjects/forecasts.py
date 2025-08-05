@@ -44,6 +44,15 @@ class Forecast(pd.Series):
         if self.isna().any():
             warnings.warn("Missing values detected in forecast data")
     
+    def get_data(self) -> pd.Series:
+        """Get the underlying forecast data as pandas Series"""
+        return pd.Series(self)  # Return a copy as pandas Series
+    
+    @property
+    def data(self) -> pd.Series:
+        """Property to access forecast data"""
+        return self.get_data()
+    
     def cap_forecast(self, cap: float = None) -> 'Forecast':
         """Cap forecast values"""
         if cap is None:
@@ -144,7 +153,7 @@ class ForecastCombination:
         aligned_forecasts = {}
         
         for name, forecast in self.forecasts.items():
-            aligned_forecasts[name] = forecast.reindex(common_index, method='ffill')
+            aligned_forecasts[name] = forecast.reindex(common_index).ffill()
         
         # Calculate weighted combination
         combined = pd.Series(0.0, index=common_index)
@@ -199,7 +208,7 @@ class ForecastCombination:
         aligned_data = {}
         
         for name, forecast in self.forecasts.items():
-            aligned_data[name] = forecast.reindex(common_index, method='ffill')
+            aligned_data[name] = forecast.reindex(common_index).ffill()
         
         # Create DataFrame and calculate correlations
         forecast_df = pd.DataFrame(aligned_data)
@@ -212,7 +221,7 @@ class ForecastCombination:
         
         for name, forecast in self.forecasts.items():
             weight = self.weights[name]
-            aligned_forecast = forecast.reindex(common_index, method='ffill')
+            aligned_forecast = forecast.reindex(common_index).ffill()
             contributions[name] = weight * aligned_forecast
         
         return pd.DataFrame(contributions)

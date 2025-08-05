@@ -1,8 +1,13 @@
 # Data settings
-arcticdb:
-  lib_path: '../arcticdb'
-  symbols:
-    - 'PLTR'
+backtest_services:
+  equity:
+    - source: "MarketStack"
+      ticker: "TSLA"
+    - source: "MarketStack"
+      ticker: "AAPL"
+    - source: "MarketStack"
+      ticker: "PLTR"
+
   # Data preprocessing
   preprocessing:
     handle_missing: true

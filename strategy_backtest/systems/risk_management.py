@@ -166,7 +166,7 @@ class RiskManager:
         positions_df = positions.get_portfolio_positions()
         
         for col in positions_df.columns:
-            aligned_scaling = scaling_factor.reindex(positions_df.index, method='ffill')
+            aligned_scaling = scaling_factor.reindex(positions_df.index).ffill()
             positions_df[col] = positions_df[col] * aligned_scaling
         
         # Convert back to PositionSeries
@@ -202,7 +202,7 @@ class RiskManager:
         positions_df = positions.get_portfolio_positions()
         
         for col in positions_df.columns:
-            aligned_scaling = vol_scaling.reindex(positions_df.index, method='ffill')
+            aligned_scaling = vol_scaling.reindex(positions_df.index).ffill()
             positions_df[col] = positions_df[col] * aligned_scaling
         
         # Convert back to PositionSeries
@@ -233,9 +233,9 @@ class RiskManager:
                 price_series = prices[instrument]
                 
                 # Align position and price
-                aligned_position, aligned_price = position_series.align(
-                    price_series, method='ffill'
-                )
+                aligned_position, aligned_price = position_series.align(price_series)
+                aligned_position = aligned_position.ffill()
+                aligned_price = aligned_price.ffill()
                 
                 # Calculate returns
                 price_returns = aligned_price.pct_change()
@@ -353,9 +353,9 @@ class VolatilityTargeting:
                 price_series = prices[instrument]
                 
                 # Align and calculate returns
-                aligned_position, aligned_price = position_series.align(
-                    price_series, method='ffill'
-                )
+                aligned_position, aligned_price = position_series.align(price_series)
+                aligned_position = aligned_position.ffill()
+                aligned_price = aligned_price.ffill()
                 
                 price_returns = aligned_price.pct_change()
                 instrument_returns = aligned_position.shift(1) * price_returns
@@ -549,9 +549,9 @@ class RiskReporter:
                 price_series = prices[instrument]
                 
                 # Align and calculate returns
-                aligned_position, aligned_price = position_series.align(
-                    price_series, method='ffill'
-                )
+                aligned_position, aligned_price = position_series.align(price_series)
+                aligned_position = aligned_position.ffill()
+                aligned_price = aligned_price.ffill()
                 
                 price_returns = aligned_price.pct_change()
                 instrument_returns = aligned_position.shift(1) * price_returns

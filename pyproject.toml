@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "strategy-lab"
+version = "0.1.0"
+description = "Enhanced backtesting framework inspired by pysystemtrade"
+authors = [{name = "Strategy Lab", email = "info@strategylab.com"}]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "pandas>=1.3.0",
+    "numpy>=1.21.0",
+    "matplotlib>=3.3.0",
+    "pyyaml>=5.4.0",
+    "arcticdb>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "black", "flake8", "mypy"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["strategy_backtest*", "market_data*"]
+exclude = ["tests*"]

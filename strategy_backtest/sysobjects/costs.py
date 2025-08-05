@@ -116,7 +116,9 @@ class CostCalculator:
             Cost series
         """
         # Align positions and prices
-        aligned_positions, aligned_prices = positions.align(prices, method='ffill')
+        aligned_positions, aligned_prices = positions.align(prices)
+        aligned_positions = aligned_positions.ffill()
+        aligned_prices = aligned_prices.ffill()
         
         # Calculate position changes (trades)
         position_changes = aligned_positions.diff().fillna(0)

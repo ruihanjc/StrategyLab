@@ -119,7 +119,9 @@ class ForecastScaler:
             return pd.Series()
         
         # Align forecast and prices
-        aligned_forecast, aligned_prices = forecast.align(prices, method='ffill')
+        aligned_forecast, aligned_prices = forecast.align(prices)
+        aligned_forecast = aligned_forecast.ffill()
+        aligned_prices = aligned_prices.ffill()
         
         # Calculate returns
         returns = aligned_prices.pct_change()
@@ -410,7 +412,9 @@ class ForecastMapper:
         
         # Apply volatility scaling if provided
         if instrument_volatility is not None:
-            aligned_base, aligned_vol = base_position.align(instrument_volatility, method='ffill')
+            aligned_base, aligned_vol = base_position.align(instrument_volatility)
+            aligned_base = aligned_base.ffill()
+            aligned_vol = aligned_vol.ffill()
             
             # Volatility scalar
             vol_scalar = target_volatility / aligned_vol

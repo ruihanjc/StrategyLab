@@ -5,28 +5,29 @@ Complete system that combines all major pysystemtrade functionality
 
 import pandas as pd
 import numpy as np
+import logging
 from typing import Dict, Union, Any
 from datetime import datetime
 
-from ..sysobjects.instruments import Instrument, InstrumentList
-from ..sysobjects.prices import AdjustedPrices, MultiplePrices
-from ..sysobjects.forecasts import Forecast, ForecastCombination
-from ..sysobjects.positions import Position, PositionSeries
-from ..sysobjects.costs import TradingCosts, CostCalculator
+from strategy_backtest.sysobjects.instruments import Instrument, InstrumentList
+from strategy_backtest.sysobjects.prices import AdjustedPrices, MultiplePrices
+from strategy_backtest.sysobjects.forecasts import Forecast, ForecastCombination
+from strategy_backtest.sysobjects.positions import Position, PositionSeries
+from strategy_backtest.sysobjects.costs import TradingCosts, CostCalculator
 
-from .portfolio import PortfolioOptimizer, PositionSizer, VolatilityEstimator, RiskBudgeter
-from .risk_management import RiskManager, VolatilityTargeting, CorrelationMonitor, RiskReporter
-from .forecast_processing import ForecastScaler, ForecastCombiner, ForecastMapper, ForecastProcessor
-from .performance_analytics import PerformanceAnalyzer, PerformanceReporter
-
+from strategy_backtest.systems.portfolio import PortfolioOptimizer, PositionSizer, VolatilityEstimator, RiskBudgeter
+from strategy_backtest.systems.risk_management import RiskManager, VolatilityTargeting, CorrelationMonitor, RiskReporter
+from strategy_backtest.systems.forecast_processing import ForecastScaler, ForecastCombiner, ForecastMapper, ForecastProcessor
+from strategy_backtest.systems.performance_analytics import PerformanceAnalyzer, PerformanceReporter
+from strategy_backtest.sysrules.rule_factory import TradingRuleManager, TradingRuleSet
 
 
 class EnhancedBacktestSystem:
     """
     Complete backtesting system with pysystemtrade-style functionality
     """
-    
-    def __init__(self, 
+
+    def __init__(self,
                  instruments: InstrumentList,
                  initial_capital: float = 1000000,
                  volatility_target: float = 0.25,
@@ -60,29 +61,29 @@ class EnhancedBacktestSystem:
         self.forecast_cap = forecast_cap
         self.risk_free_rate = risk_free_rate
         self.max_leverage = max_leverage
-        
+
         # Initialize components
         self._initialize_components(trading_costs)
-        
+
         # Setup logging
         self.logger = logging.getLogger(__name__)
-        
+
         # Storage for backtest results
         self.results = {}
-    
+
     def _initialize_components(self, trading_costs):
         """Initialize all system components"""
         # Cost calculator
         if trading_costs is None:
             trading_costs = TradingCosts()
         self.cost_calculator = CostCalculator(trading_costs)
-        
+
         # Portfolio components
         self.portfolio_optimizer = PortfolioOptimizer(max_portfolio_leverage=self.max_leverage)
         self.position_sizer = PositionSizer(volatility_target=self.volatility_target)
         self.volatility_estimator = VolatilityEstimator()
         self.risk_budgeter = RiskBudgeter(max_leverage=self.max_leverage)
-        
+
         # Risk management
         self.risk_manager = RiskManager(
             max_portfolio_leverage=self.max_leverage,
@@ -91,7 +92,7 @@ class EnhancedBacktestSystem:
         self.volatility_targeting = VolatilityTargeting(target_volatility=self.volatility_target)
         self.correlation_monitor = CorrelationMonitor()
         self.risk_reporter = RiskReporter()
-        
+
         # Forecast processing
         self.forecast_scaler = ForecastScaler(forecast_cap=self.forecast_cap)
         self.forecast_combiner = ForecastCombiner(forecast_cap=self.forecast_cap)
@@ -99,17 +100,17 @@ class EnhancedBacktestSystem:
         self.forecast_processor = ForecastProcessor(
             self.forecast_scaler, self.forecast_combiner, self.forecast_mapper
         )
-        
+
         # Performance analytics
         self.performance_analyzer = PerformanceAnalyzer(risk_free_rate=self.risk_free_rate)
         self.performance_reporter = PerformanceReporter(self.performance_analyzer)
-    
-    def run_backtest(self, 
-                    price_data: Dict[str, Union[pd.Series, MultiplePrices]],
-                    trading_rules: Dict[str, Any],
-                    forecast_weights: Dict[str, float] = None,
-                    start_date: datetime = None,
-                    end_date: datetime = None) -> Dict:
+
+    def run_backtest(self,
+                     price_data: Dict[str, Union[pd.Series, MultiplePrices]],
+                     trading_rules: Dict[str, Any],
+                     forecast_weights: Dict[str, float] = None,
+                     start_date: datetime = None,
+                     end_date: datetime = None) -> Dict:
         """
         Run complete backtest
         
@@ -132,63 +133,68 @@ class EnhancedBacktestSystem:
             Complete backtest results
         """
         self.logger.info("Starting enhanced backtest...")
-        
+
         # Step 1: Prepare data
-        self.logger.info("Preparing data...")
+        self.logger.info("Preparing price data...")
         prepared_data = self._prepare_data(price_data, start_date, end_date)
-        
-        # Step 2: Generate forecasts
-        self.logger.info("Generating forecasts...")
-        raw_forecasts = self._generate_forecasts(prepared_data, trading_rules)
-        
-        # Step 3: Process forecasts
-        self.logger.info("Processing forecasts...")
-        processed_forecasts = self._process_forecasts(raw_forecasts, prepared_data, forecast_weights)
-        
-        # Step 4: Calculate positions
-        self.logger.info("Calculating positions...")
-        raw_positions = self._calculate_positions(processed_forecasts, prepared_data)
-        
-        # Step 5: Apply risk management
-        self.logger.info("Applying risk management...")
-        risk_adjusted_positions = self._apply_risk_management(raw_positions, prepared_data)
-        
-        # Step 6: Calculate costs
-        self.logger.info("Calculating costs...")
-        costs = self._calculate_costs(risk_adjusted_positions, prepared_data)
-        
-        # Step 7: Analyze performance
-        self.logger.info("Analyzing performance...")
-        performance = self._analyze_performance(risk_adjusted_positions, prepared_data, costs)
-        
-        # Step 8: Generate reports
+
+        # Step 2: Test trading rules (CORE PURPOSE)
+        self.logger.info("Testing trading rules...")
+        rule_signals = self._test_trading_rules(prepared_data, trading_rules)
+
+        # Step 3: Evaluate rule performance (CORE PURPOSE) 
+        self.logger.info("Evaluating rule signal quality...")
+        rule_performance = self._evaluate_rule_signals(rule_signals, prepared_data)
+
+        # Step 4: Combine rule signals (if multiple rules)
+        self.logger.info("Combining rule signals...")
+        combined_signals = self._combine_rule_signals(rule_signals, prepared_data, forecast_weights)
+
+        # Step 5: Apply position sizing (SECONDARY: How much to bet)
+        self.logger.info("Calculating position sizes...")
+        raw_positions = self._calculate_position_sizes(combined_signals, prepared_data)
+
+        # Step 6: Apply risk management (SECONDARY: Risk controls)
+        self.logger.info("Applying risk controls...")
+        final_positions = self._apply_risk_controls(raw_positions, prepared_data)
+
+        # Step 7: Calculate trading costs
+        self.logger.info("Calculating trading costs...")
+        costs = self._calculate_costs(final_positions, prepared_data)
+
+        # Step 8: Analyze backtest results
+        self.logger.info("Analyzing backtest results...")
+        performance = self._analyze_performance(final_positions, prepared_data, costs)
+
+        # Step 9: Generate reports
         self.logger.info("Generating reports...")
-        reports = self._generate_reports(risk_adjusted_positions, prepared_data, costs)
-        
+        reports = self._generate_reports(final_positions, prepared_data, costs, rule_performance, rule_signals)
+
         # Compile results
         self.results = {
             'prepared_data': prepared_data,
-            'raw_forecasts': raw_forecasts,
-            'processed_forecasts': processed_forecasts,
+            'rule_signals': rule_signals,
+            'rule_performance': rule_performance,  # NEW: Core rule testing results
+            'combined_signals': combined_signals,
             'raw_positions': raw_positions,
-            'final_positions': risk_adjusted_positions,
+            'final_positions': final_positions,
             'costs': costs,
-            'performance': performance,
+            'portfolio_performance': performance,  # Portfolio performance (secondary)
             'reports': reports,
             'configuration': self._get_configuration()
         }
-        
+
         self.logger.info("Backtest completed successfully!")
-        
+
         return self.results
-    
-    def _prepare_data(self, 
-                     price_data: Dict[str, Union[pd.Series, MultiplePrices]],
-                     start_date: datetime = None,
-                     end_date: datetime = None) -> Dict:
+
+    def _prepare_data(self,
+                      price_data: Dict[str, Union[pd.Series, MultiplePrices]],
+                      start_date: datetime = None,
+                      end_date: datetime = None) -> Dict:
         """Prepare and align data"""
         prepared = {}
-        
+
         # Convert all price data to AdjustedPrices
         for instrument_name, data in price_data.items():
             if instrument_name in self.instruments:
@@ -198,40 +204,36 @@ class EnhancedBacktestSystem:
                     prepared[instrument_name] = AdjustedPrices(data)
                 else:
                     prepared[instrument_name] = AdjustedPrices(data)
-                
+
                 # Apply date filter if specified
                 if start_date or end_date:
                     prepared[instrument_name] = prepared[instrument_name].get_data_for_period(
                         start_date or prepared[instrument_name].index[0],
                         end_date or prepared[instrument_name].index[-1]
                     )
-        
+
         # Calculate volatilities
         volatilities = self.volatility_estimator.estimate_portfolio_volatilities(prepared)
-        
+
         return {
             'prices': prepared,
             'volatilities': volatilities
         }
-    
-    def _generate_forecasts(self, 
-                          prepared_data: Dict,
-                          trading_rules: Dict[str, Any]) -> Dict[str, Dict[str, Forecast]]:
-        """Generate raw forecasts from trading rules"""
-        try:
-            from ..sysrules.rule_factory import TradingRuleManager, TradingRuleSet
-        except ImportError:
-            from sysrules.rule_factory import TradingRuleManager, TradingRuleSet
-        
+
+    def _test_trading_rules(self,
+                            prepared_data: Dict,
+                            trading_rules: Dict[str, Any]) -> Dict[str, Dict[str, Forecast]]:
+        """Test trading rules and generate forecasts for each instrument"""
+
         forecasts = {}
-        
+
         for instrument_name in prepared_data['prices'].keys():
             if instrument_name in self.instruments:
                 instrument_forecasts = {}
-                
+
                 # Create rule manager for this instrument
                 rule_manager = TradingRuleManager()
-                
+
                 # Add rules from trading_rules config
                 for rule_name, rule_config in trading_rules.items():
                     try:
@@ -243,50 +245,61 @@ class EnhancedBacktestSystem:
                             rule_manager.add_rule(rule_name)
                     except Exception as e:
                         self.logger.warning(f"Failed to add rule {rule_name}: {e}")
-                
+
                 # Generate forecasts for all rules
                 try:
                     price_data = prepared_data['prices'][instrument_name]
+                    
+                    # Convert AdjustedPrices to pandas Series if needed
+                    if hasattr(price_data, 'get_data'):
+                        price_series = price_data.get_data()
+                    elif hasattr(price_data, 'data'):
+                        price_series = price_data.data
+                    else:
+                        price_series = price_data
+                    
                     additional_data = prepared_data.get('additional_data', {}).get(instrument_name, {})
-                    
+
                     instrument_forecasts = rule_manager.generate_all_forecasts(
-                        price_data, additional_data
+                        price_series, additional_data
                     )
-                    
+
                 except Exception as e:
                     self.logger.warning(f"Failed to generate forecasts for {instrument_name}: {e}")
-                
+                    import traceback
+                    traceback.print_exc()
+
                 if instrument_forecasts:
                     forecasts[instrument_name] = instrument_forecasts
-        
+
         return forecasts
-    
-    def _generate_single_forecast(self, 
-                                price_data: AdjustedPrices,
-                                rule_name: str,
-                                rule_config: Dict) -> Forecast:
+
+    def _generate_single_forecast(self,
+                                  price_data: AdjustedPrices,
+                                  rule_name: str,
+                                  rule_config: Dict) -> Forecast:
         """Generate a single forecast (simplified example)"""
         # This is a simplified example - you would implement actual trading rules here
         if rule_name == 'ewmac':
             # Simple EWMAC implementation
             fast_span = rule_config.get('fast_span', 16)
             slow_span = rule_config.get('slow_span', 64)
-            
+
             fast_ma = price_data.ewm(span=fast_span).mean()
             slow_ma = price_data.ewm(span=slow_span).mean()
-            
+
             # Calculate forecast
             forecast_values = (fast_ma - slow_ma) / slow_ma * 100
-            
+
             return Forecast(forecast_values, forecast_cap=self.forecast_cap)
-        
+
         elif rule_name == 'momentum':
             # Simple momentum
             lookback = rule_config.get('lookback', 20)
             forecast_values = price_data.pct_change(lookback) * 100
-            
+
             return Forecast(forecast_values, forecast_cap=self.forecast_cap)
-        
+
         else:
             # Default: random forecast for demonstration
             np.random.seed(42)
@@ -294,16 +307,16 @@ class EnhancedBacktestSystem:
                 np.random.normal(0, 5, len(price_data)),
                 index=price_data.index
             )
-            
+
             return Forecast(forecast_values, forecast_cap=self.forecast_cap)
-    
-    def _process_forecasts(self, 
-                          raw_forecasts: Dict,
-                          prepared_data: Dict,
-                          forecast_weights: Dict[str, float] = None) -> Dict[str, Forecast]:
+
+    def _process_forecasts(self,
+                           raw_forecasts: Dict,
+                           prepared_data: Dict,
+                           forecast_weights: Dict[str, float] = None) -> Dict[str, Forecast]:
         """Process raw forecasts through scaling and combination"""
         processed_forecasts = {}
-        
+
         for instrument_name, instrument_forecasts in raw_forecasts.items():
             if len(instrument_forecasts) == 1:
                 # Single forecast - just scale it
@@ -317,92 +330,293 @@ class EnhancedBacktestSystem:
                     instrument_forecasts, forecast_weights
                 )
                 processed_forecasts[instrument_name] = combined_forecast
-        
+
         return processed_forecasts
     
-    def _calculate_positions(self, 
-                           processed_forecasts: Dict[str, Forecast],
-                           prepared_data: Dict) -> PositionSeries:
-        """Calculate raw positions from processed forecasts"""
-        positions = {}
+    def _evaluate_rule_signals(self,
+                               rule_forecasts: Dict,
+                               prepared_data: Dict) -> Dict:
+        """Evaluate the quality of trading rule forecasts (CORE PURPOSE)"""
+        rule_performance = {}
         
-        for instrument_name, forecast in processed_forecasts.items():
+        for instrument_name, instrument_forecasts in rule_forecasts.items():
+            if instrument_name not in prepared_data['prices']:
+                continue
+                
+            price_data = prepared_data['prices'][instrument_name]
+            
+            # Convert AdjustedPrices to pandas Series if needed
+            if hasattr(price_data, 'get_data'):
+                price_series = price_data.get_data()
+            elif hasattr(price_data, 'data'):
+                price_series = price_data.data
+            else:
+                price_series = price_data
+                
+            instrument_rule_performance = {}
+            
+            for rule_name, forecast in instrument_forecasts.items():
+                # Test forecast quality
+                forecast_performance = self._test_forecast_quality(forecast, price_series, rule_name)
+                instrument_rule_performance[rule_name] = forecast_performance
+            
+            rule_performance[instrument_name] = instrument_rule_performance
+        
+        return rule_performance
+    
+    def _test_forecast_quality(self, forecast: Forecast, price_data: pd.Series, rule_name: str) -> Dict:
+        """Test the quality of individual trading rule forecasts"""
+        if forecast.empty or price_data.empty:
+            return {'valid': False, 'reason': 'Empty forecast or price data'}
+        
+        # Get forecast data
+        if hasattr(forecast, 'get_data'):
+            forecast_values = forecast.get_data()
+        elif hasattr(forecast, 'data'):
+            forecast_values = forecast.data
+        else:
+            forecast_values = forecast
+        
+        # Align forecast and price data
+        common_index = forecast_values.index.intersection(price_data.index)
+        if len(common_index) < 10:
+            return {'valid': False, 'reason': 'Insufficient overlapping data'}
+            
+        aligned_forecast = forecast_values.reindex(common_index).fillna(0)
+        aligned_price = price_data.reindex(common_index).ffill()
+        
+        # Calculate future returns for forecast evaluation
+        price_returns = aligned_price.pct_change().shift(-1)  # Next period return
+        
+        # Test forecast predictive power
+        forecast_strength = aligned_forecast.abs()
+        forecast_direction = np.sign(aligned_forecast)
+        
+        # Calculate forecast-return correlation (key test)
+        try:
+            # Remove last observation (no future return available)
+            test_forecast = aligned_forecast[:-1]
+            test_returns = price_returns[:-1]
+            
+            # Remove NaN values
+            valid_mask = ~(test_forecast.isna() | test_returns.isna())
+            test_forecast = test_forecast[valid_mask]
+            test_returns = test_returns[valid_mask]
+            
+            if len(test_forecast) > 10:
+                forecast_return_corr = np.corrcoef(test_forecast, test_returns)[0, 1]
+                if np.isnan(forecast_return_corr):
+                    forecast_return_corr = 0.0
+            else:
+                forecast_return_corr = 0.0
+        except (ValueError, IndexError, TypeError):
+            forecast_return_corr = 0.0
+        
+        # Calculate hit rate (% of correct directional calls)
+        try:
+            direction_forecast = forecast_direction[:-1]
+            direction_returns = price_returns[:-1]
+            
+            valid_mask = ~(direction_forecast.isna() | direction_returns.isna())
+            direction_forecast = direction_forecast[valid_mask]
+            direction_returns = direction_returns[valid_mask]
+            
+            if len(direction_forecast) > 0:
+                correct_direction = (direction_forecast * direction_returns) > 0
+                hit_rate = correct_direction.sum() / len(correct_direction)
+            else:
+                hit_rate = 0.0
+        except (ValueError, IndexError, TypeError):
+            hit_rate = 0.0
+        
+        # Calculate average return when forecast is strong
+        try:
+            strong_forecasts = forecast_strength > forecast_strength.quantile(0.75)
+            strong_forecast_returns = price_returns[:-1][strong_forecasts[:-1]]
+            avg_strong_forecast_return = strong_forecast_returns.mean() if len(strong_forecast_returns) > 0 else 0
+        except (ValueError, IndexError, TypeError):
+            avg_strong_forecast_return = 0.0
+        
+        # Forecast volatility (measure of activity)
+        forecast_volatility = aligned_forecast.std()
+        
+        return {
+            'valid': True,
+            'rule_name': rule_name,
+            'forecast_return_correlation': forecast_return_corr,
+            'hit_rate': hit_rate,
+            'avg_strong_forecast_return': avg_strong_forecast_return,
+            'forecast_volatility': forecast_volatility,
+            'total_observations': len(aligned_forecast),
+            'forecast_mean': aligned_forecast.mean(),
+            'forecast_std': aligned_forecast.std()
+        }
+    
+    def _combine_rule_signals(self,
+                             rule_signals: Dict,
+                             prepared_data: Dict,
+                             signal_weights: Dict[str, float] = None) -> Dict[str, Forecast]:
+        """Combine multiple rule signals (renamed from _process_forecasts)"""
+        return self._process_forecasts(rule_signals, prepared_data, signal_weights)
+
+    def _calculate_position_sizes(self,
+                             processed_signals: Dict[str, Forecast],
+                             prepared_data: Dict) -> PositionSeries:
+        """Calculate position sizes based on trading signals (SECONDARY PURPOSE)"""
+        positions = {}
+
+        for instrument_name, signal in processed_signals.items():
             if instrument_name in self.instruments:
                 instrument = self.instruments[instrument_name]
                 price_data = prepared_data['prices'][instrument_name]
                 volatility = prepared_data['volatilities'].get(instrument_name)
-                
-                # Calculate position
+
+                # Calculate position size based on signal
                 position = self.position_sizer.calculate_position_size(
-                    forecast, price_data, instrument, volatility=volatility
+                    signal, price_data, instrument, volatility=volatility
                 )
-                
+
                 positions[instrument_name] = position
-        
+
         return PositionSeries(positions)
-    
-    def _apply_risk_management(self, 
-                             raw_positions: PositionSeries,
-                             prepared_data: Dict) -> PositionSeries:
-        """Apply risk management overlay"""
+
+    def _apply_risk_controls(self,
+                               raw_positions: PositionSeries,
+                               prepared_data: Dict) -> PositionSeries:
+        """Apply risk controls to position sizes (SECONDARY PURPOSE)"""
         # Apply portfolio risk management
         risk_adjusted = self.risk_manager.apply_risk_overlay(
             raw_positions, prepared_data['prices'], self.instruments
         )
-        
+
         # Apply risk budgeting
         budgeted = self.risk_budgeter.apply_risk_budgets(
             risk_adjusted, self.instruments
         )
-        
+
         return budgeted
-    
-    def _calculate_costs(self, 
-                        positions: PositionSeries,
-                        prepared_data: Dict) -> Dict[str, pd.Series]:
+
+    def _calculate_costs(self,
+                         positions: PositionSeries,
+                         prepared_data: Dict) -> Dict[str, pd.Series]:
         """Calculate transaction costs"""
         costs = {}
-        
+
         for instrument_name in positions.get_instruments():
             position = positions.get_position(instrument_name)
             price_data = prepared_data['prices'][instrument_name]
-            
+
             if position is not None and not price_data.empty:
                 instrument_costs = self.cost_calculator.calculate_position_costs(
                     position, price_data, instrument_name
                 )
                 costs[instrument_name] = instrument_costs
-        
+
         return costs
-    
-    def _analyze_performance(self, 
-                           positions: PositionSeries,
-                           prepared_data: Dict,
-                           costs: Dict[str, pd.Series]) -> Dict:
+
+    def _analyze_performance(self,
+                             positions: PositionSeries,
+                             prepared_data: Dict,
+                             costs: Dict[str, pd.Series]) -> Dict:
         """Analyze performance"""
         return self.performance_analyzer.analyze_performance(
             positions, prepared_data['prices'], costs, self.initial_capital
         )
-    
-    def _generate_reports(self, 
-                         positions: PositionSeries,
-                         prepared_data: Dict,
-                         costs: Dict[str, pd.Series]) -> Dict[str, str]:
+
+    def _generate_reports(self,
+                          positions: PositionSeries,
+                          prepared_data: Dict,
+                          costs: Dict[str, pd.Series],
+                          rule_performance: Dict = None,
+                          rule_signals: Dict = None) -> Dict[str, str]:
         """Generate comprehensive reports"""
         reports = {}
-        
-        # Performance report
+
+        # Rule performance report (NEW - CORE PURPOSE)
+        if rule_performance:
+            reports['rule_performance'] = self._generate_rule_performance_report(rule_performance, rule_signals)
+
+        # Portfolio performance report
         reports['performance'] = self.performance_reporter.generate_performance_report(
             positions, prepared_data['prices'], costs, self.initial_capital
         )
-        
+
         # Risk report
         reports['risk'] = self.risk_reporter.generate_risk_report(
             positions, prepared_data['prices'], self.instruments
         )
-        
+
         return reports
     
+    def _generate_rule_performance_report(self, rule_performance: Dict, rule_forecasts: Dict = None) -> str:
+        """Generate report focused on trading rule forecast quality"""
+        report = ["=== TRADING RULE FORECAST ANALYSIS ===\n"]
+        
+        for instrument, rules in rule_performance.items():
+            report.append(f"{instrument}:")
+            
+            for rule_name, performance in rules.items():
+                if not performance.get('valid', False):
+                    report.append(f"  {rule_name}: INVALID - {performance.get('reason', 'Unknown error')}")
+                    continue
+                
+                report.append(f"  {rule_name}:")
+                report.append(f"    Forecast-Return Correlation: {performance.get('forecast_return_correlation', 0):.3f}")
+                report.append(f"    Hit Rate: {performance.get('hit_rate', 0):.1%}")
+                report.append(f"    Strong Forecast Avg Return: {performance.get('avg_strong_forecast_return', 0):.4f}")
+                report.append(f"    Forecast Volatility: {performance.get('forecast_volatility', 0):.2f}")
+                report.append(f"    Forecast Mean: {performance.get('forecast_mean', 0):.2f}")
+                report.append(f"    Forecast Std: {performance.get('forecast_std', 0):.2f}")
+                report.append(f"    Total Observations: {performance.get('total_observations', 0)}")
+                
+                # Interpretation
+                corr = performance.get('forecast_return_correlation', 0)
+                hit_rate = performance.get('hit_rate', 0)
+                volatility = performance.get('forecast_volatility', 0)
+                
+                if abs(corr) > 0.1 and hit_rate > 0.55 and volatility > 1:
+                    verdict = "EXCELLENT RULE - Strong predictive power and active"
+                elif abs(corr) > 0.05 and hit_rate > 0.52:
+                    verdict = "GOOD RULE - Some predictive ability"
+                elif abs(corr) > 0.02 or hit_rate > 0.51:
+                    verdict = "WEAK RULE - Marginal predictive power"
+                else:
+                    verdict = "POOR RULE - No meaningful predictive power"
+                
+                report.append(f"    VERDICT: {verdict}")
+                
+                # Add forecast distribution info
+                forecast_obj = rule_forecasts.get(instrument, {}).get(rule_name) if rule_forecasts else None
+                if forecast_obj is not None:
+                    try:
+                        if hasattr(forecast_obj, 'get_data'):
+                            forecast_values = forecast_obj.get_data()
+                        elif hasattr(forecast_obj, 'data'):
+                            forecast_values = forecast_obj.data
+                        else:
+                            forecast_values = forecast_obj
+                            
+                        if not forecast_values.empty:
+                            positive_forecasts = (forecast_values > 0).sum()
+                            negative_forecasts = (forecast_values < 0).sum()
+                            zero_forecasts = (forecast_values == 0).sum()
+                            total_forecasts = len(forecast_values)
+                            
+                            report.append(f"    Forecast Distribution:")
+                            report.append(f"      Positive (Long): {positive_forecasts} ({positive_forecasts/total_forecasts*100:.1f}%)")
+                            report.append(f"      Negative (Short): {negative_forecasts} ({negative_forecasts/total_forecasts*100:.1f}%)")
+                            report.append(f"      Zero: {zero_forecasts} ({zero_forecasts/total_forecasts*100:.1f}%)")
+                            
+                            max_forecast = forecast_values.max()
+                            min_forecast = forecast_values.min()
+                            report.append(f"      Range: {min_forecast:.2f} to {max_forecast:.2f}")
+                    except Exception as e:
+                        report.append(f"    Forecast Distribution: Error analyzing - {e}")
+                
+                report.append("")
+        
+        return "\n".join(report)
+
     def _get_configuration(self) -> Dict:
         """Get system configuration"""
         return {
@@ -414,119 +628,40 @@ class EnhancedBacktestSystem:
             'num_instruments': len(self.instruments),
             'instruments': self.instruments.get_instrument_list()
         }
-    
+
     def get_performance_summary(self) -> pd.DataFrame:
         """Get performance summary table"""
         if not self.results:
             raise ValueError("No backtest results available. Run backtest first.")
-        
+
         return self.performance_reporter.generate_summary_table(
             self.results['final_positions'],
             self.results['prepared_data']['prices'],
             self.results['costs']
         )
-    
+
     def plot_results(self):
         """Plot backtest results"""
         if not self.results:
             raise ValueError("No backtest results available. Run backtest first.")
-        
+
         self.performance_reporter.plot_performance(
             self.results['final_positions'],
             self.results['prepared_data']['prices'],
             self.results['costs']
         )
-    
+
     def save_results(self, filepath: str):
         """Save results to file"""
         if not self.results:
             raise ValueError("No backtest results available. Run backtest first.")
-        
+
         import pickle
         with open(filepath, 'wb') as f:
             pickle.dump(self.results, f)
-    
+
     def load_results(self, filepath: str):
         """Load results from file"""
         import pickle
         with open(filepath, 'rb') as f:
             self.results = pickle.load(f)
-
-
-def create_sample_enhanced_backtest():
-    """Create a sample enhanced backtest for demonstration"""
-    from ..sysobjects.instruments import create_sample_instruments
-    from ..sysobjects.prices import create_sample_price_data
-    
-    # Create sample instruments
-    instruments = create_sample_instruments()
-    
-    # Create sample price data
-    price_data = {}
-    for instrument_name in instruments.get_instrument_list()[:4]:  # First 4 instruments
-        price_data[instrument_name] = create_sample_price_data(instrument_name)
-    
-    # Create trading rules
-    trading_rules = {
-        'ewmac_fast': {'fast_span': 16, 'slow_span': 64},
-        'ewmac_slow': {'fast_span': 32, 'slow_span': 128},
-        'momentum': {'lookback': 20}
-    }
-    
-    # Create forecast weights
-    forecast_weights = {
-        'ewmac_fast': 0.4,
-        'ewmac_slow': 0.4,
-        'momentum': 0.2
-    }
-    
-    # Create enhanced backtest system
-    system = EnhancedBacktestSystem(
-        instruments=instruments,
-        initial_capital=1000000,
-        volatility_target=0.25,
-        max_leverage=1.0
-    )
-    
-    # Run backtest
-    results = system.run_backtest(
-        price_data=price_data,
-        trading_rules=trading_rules,
-        forecast_weights=forecast_weights
-    )
-    
-    return {
-        'system': system,
-        'results': results,
-        'instruments': instruments,
-        'price_data': price_data,
-        'trading_rules': trading_rules,
-        'forecast_weights': forecast_weights
-    }
-
-
-if __name__ == "__main__":
-    # Example usage
-    import logging
-    logging.basicConfig(level=logging.INFO)
-    
-    # Create and run sample backtest
-    sample = create_sample_enhanced_backtest()
-    system = sample['system']
-    
-    # Print performance summary
-    print("Performance Summary:")
-    print(system.get_performance_summary())
-    
-    # Print reports
-    print("\n" + "="*50)
-    print(system.results['reports']['performance'])
-    
-    print("\n" + "="*50)
-    print(system.results['reports']['risk'])
-    
-    # Plot results (if matplotlib is available)
-    try:
-        system.plot_results()
-    except ImportError:
-        print("Matplotlib not available for plotting")

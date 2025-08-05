@@ -22,10 +22,10 @@ class MarketStackExtractor(BaseRestExtractor, ABC):
 
         if has_historical:
             start_date = check_end
-            end_date = datetime.datetime.today()
+            end_date = datetime.datetime.today().date() - datetime.timedelta(days=1)
         else:
             start_date = datetime.datetime(2020, 1, 1, 12, 0, 0)
-            end_date = datetime.datetime.today()
+            end_date = datetime.datetime.today().date() - datetime.timedelta(days=1)
 
         datapoints = []
         while start_date < end_date:

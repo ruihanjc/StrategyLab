@@ -22,14 +22,13 @@ api:
   retry_delay: 1
   
 update_services:
-  current:
-    equity:
-      - source: "MarketStack"
-        ticker: "TSLA"
-      - source: "MarketStack" 
-        ticker: "AAPL"
-      - source: "MarketStack"
-        ticker: "PLTR"
+  equity:
+    - source: "MarketStack"
+      ticker: "TSLA"
+    - source: "MarketStack"
+      ticker: "AAPL"
+    - source: "MarketStack"
+      ticker: "PLTR"
   
 data_sources:
   default: "market_stack"

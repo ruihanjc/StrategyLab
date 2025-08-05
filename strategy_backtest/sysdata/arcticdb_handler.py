@@ -9,19 +9,19 @@ from market_data.database.arctic_connection import get_arcticdb_connection
 
 
 class ArcticdDBHandler:
-    def __init__(self, type, dir):
+    def __init__(self, service, dir):
         self.arctic = get_arcticdb_connection(dir)
         print(self.arctic.list_libraries())
-        self.library = self.arctic.get_library(type)
+        self.library = self.arctic.get_library(service)
 
-    def load_from_arcticdb(self, symbols, start_date, end_date):
+    def load_from_arcticdb(self, source_tickers, start_date, end_date):
         # Connect to local ArcticDB
 
         data_dict = {}
-        for symbol in symbols:
+        for source_ticker in source_tickers:
             try:
                 # Read versioned item from ArcticDB
-                item = self.library.read(symbol)
+                item = self.library.read(source_ticker["ticker"])
                 df = item.data
 
                 # Filter by date
@@ -35,10 +35,10 @@ class ArcticdDBHandler:
                         df = df[(df[date_col] >= start_date) & (df[date_col] <= end_date)]
                         df.set_index(date_col, inplace=True)
 
-                data_dict[symbol] = df
-                print(f"Loaded {symbol} data: {len(df)} rows")
+                data_dict[source_ticker["ticker"]] = df
+                print(f"Loaded {source_ticker["ticker"]} data: {len(df)} rows")
             except Exception as e:
-                print(f"Error loading {symbol}: {str(e)}")
+                print(f"Error loading {source_ticker["ticker"]}: {str(e)}")
 
         return data_dict
 

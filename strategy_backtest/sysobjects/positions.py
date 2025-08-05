@@ -159,7 +159,7 @@ class PositionSeries:
         aligned_positions = {}
         
         for instrument, position in self.positions.items():
-            aligned_positions[instrument] = position.reindex(common_index, method='ffill').fillna(0)
+            aligned_positions[instrument] = position.reindex(common_index).ffill().fillna(0)
         
         return pd.DataFrame(aligned_positions)
     
