@@ -1,1 +1,0 @@
-print(sorted_inventory)

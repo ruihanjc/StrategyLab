@@ -5,7 +5,7 @@ from typing import Dict, Any, List, Optional, Union
 import yaml
 
 # Import config manager
-from strategy_backtest.sysutils.config import ConfigManager
+from strategy_core.sysutils.config_manager import ConfigManager
 
 
 class Strategy(ABC):

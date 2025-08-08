@@ -9,20 +9,9 @@ from typing import Dict, List, Optional, Union, Tuple, Callable
 from datetime import datetime
 import warnings
 
-try:
-    from ..sysobjects.forecasts import Forecast, ForecastCombination
-    from ..sysobjects.instruments import Instrument, InstrumentList
-    from ..sysobjects.prices import AdjustedPrices
-except ImportError:
-    # Fallback for direct execution
-    import sys
-    from pathlib import Path
-    parent_dir = Path(__file__).parent.parent
-    sys.path.insert(0, str(parent_dir))
-    
-    from sysobjects.forecasts import Forecast, ForecastCombination
-    from sysobjects.instruments import Instrument, InstrumentList
-    from sysobjects.prices import AdjustedPrices
+from ..sysobjects.forecasts import Forecast, ForecastCombination
+from ..sysobjects.instruments import Instrument, InstrumentList
+from ..sysobjects.prices import AdjustedPrices
 
 
 class ForecastScaler:

@@ -16,11 +16,11 @@ class ConfigManager:
 
         Parameters:
         -----------
-        config_dir: str
+        project_dir: str
             Directory containing YAML config files
         """
         self.config = configparser.ConfigParser()
-        self.config_dir = os.path.abspath(__file__ + "/../../")  # Use current working directory
+        self.project_dir = os.path.abspath(__file__ + "/../../../")  # Use current working directory
         self.configs = {}
 
     def load_config(self, config_name: str) -> Dict[str, Any]:
@@ -43,7 +43,7 @@ class ConfigManager:
             return self.configs[config_name]
 
         # Construct file path
-        file_path = os.path.join(self.config_dir, f"sysconfigs/{config_name}.yaml")
+        file_path = os.path.join(self.project_dir, f"strategy_backtest/backtest_configs/{config_name}.yaml")
 
         # Load and parse YAML
         try:
@@ -118,7 +118,7 @@ class ConfigManager:
             Configuration data to save
         """
         # Construct file path
-        file_path = os.path.join(self.config_dir, f"{config_name}.yaml")
+        file_path = os.path.join(self.project_dir, f"{config_name}.yaml")
 
         # Ensure directory exists
         os.makedirs(os.path.dirname(file_path), exist_ok=True)

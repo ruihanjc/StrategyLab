@@ -129,7 +129,7 @@
   - Breakout: systems.provided.rules.breakout - Breakout systems
   - Mean Reversion: systems.provided.rules.mr_wings - Mean reversion
 
-  Custom Rule Example
+  Custom Strategy Example
 
   from systems.trading_rules import TradingRule
   from systems.provided.rules.ewmac import ewmac

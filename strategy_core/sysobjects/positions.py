@@ -13,7 +13,6 @@ import warnings
 class Position(pd.Series):
     """
     Single position series with validation and analysis
-    Similar to pysystemtrade positions
     """
     
     def __init__(self, data, instrument: str = None, *args, **kwargs):
@@ -255,43 +254,3 @@ class PositionSeries:
     def to_dataframe(self) -> pd.DataFrame:
         """Convert to DataFrame"""
         return self.get_portfolio_positions()
-
-
-def create_sample_position(instrument: str = "AAPL", 
-                          start_date: str = "2020-01-01",
-                          end_date: str = "2023-12-31") -> Position:
-    """Create sample position data for testing"""
-    dates = pd.date_range(start=start_date, end=end_date, freq='D')
-    
-    # Generate synthetic position data
-    np.random.seed(42)
-    n_periods = len(dates)
-    
-    # Generate trending position with occasional reversals
-    base_position = 0.5  # Base long position
-    trend = np.sin(np.arange(n_periods) * 2 * np.pi / 252) * 0.3  # Annual cycle
-    noise = np.random.normal(0, 0.1, n_periods)
-    
-    # Add some regime changes
-    regime_changes = np.random.random(n_periods) < 0.01  # 1% chance per day
-    regime_multiplier = np.where(regime_changes, np.random.choice([-1, 1]), 1)
-    regime_multiplier = np.cumprod(regime_multiplier)
-    
-    position_values = (base_position + trend + noise) * regime_multiplier
-    
-    # Clip to reasonable range
-    position_values = np.clip(position_values, -2, 2)
-    
-    position = pd.Series(position_values, index=dates)
-    return Position(position, instrument=instrument)
-
-
-def create_sample_position_series() -> PositionSeries:
-    """Create sample position series for testing"""
-    instruments = ['AAPL', 'GOOGL', 'MSFT', 'TSLA']
-    positions = {}
-    
-    for instrument in instruments:
-        positions[instrument] = create_sample_position(instrument)
-    
-    return PositionSeries(positions)

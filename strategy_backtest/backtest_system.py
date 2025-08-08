@@ -9,17 +9,21 @@ import logging
 from typing import Dict, Union, Any
 from datetime import datetime
 
-from strategy_backtest.sysobjects.instruments import Instrument, InstrumentList
-from strategy_backtest.sysobjects.prices import AdjustedPrices, MultiplePrices
-from strategy_backtest.sysobjects.forecasts import Forecast, ForecastCombination
-from strategy_backtest.sysobjects.positions import Position, PositionSeries
-from strategy_backtest.sysobjects.costs import TradingCosts, CostCalculator
+from strategy_core.sysobjects.instruments import InstrumentList
+from strategy_core.sysobjects.prices import AdjustedPrices, MultiplePrices
+from strategy_core.sysobjects.forecasts import Forecast
+from strategy_core.sysobjects.positions import PositionSeries
+from strategy_core.sysobjects.costs import TradingCosts, CostCalculator
 
-from strategy_backtest.systems.portfolio import PortfolioOptimizer, PositionSizer, VolatilityEstimator, RiskBudgeter
-from strategy_backtest.systems.risk_management import RiskManager, VolatilityTargeting, CorrelationMonitor, RiskReporter
-from strategy_backtest.systems.forecast_processing import ForecastScaler, ForecastCombiner, ForecastMapper, ForecastProcessor
-from strategy_backtest.systems.performance_analytics import PerformanceAnalyzer, PerformanceReporter
-from strategy_backtest.sysrules.rule_factory import TradingRuleManager, TradingRuleSet
+from strategy_core.sysobjects.portfolio import Portfolio
+from strategy_core.sysobjects.position_sizer import PositionSizer
+from strategy_core.sysriskutils.portfolio_optimizer import PortfolioOptimizer
+from strategy_core.sysriskutils.volatility_estimator import VolatilityEstimator
+from strategy_core.sysriskutils.risk_budgeter import RiskBudgeter
+from strategy_core.sysriskutils.risk_management import RiskManager, VolatilityTargeting, CorrelationMonitor, RiskReporter
+from strategy_core.sysriskutils.forecast_processing import ForecastScaler, ForecastCombiner, ForecastMapper, ForecastProcessor
+from strategy_core.sysriskutils.performance_analytics import PerformanceAnalyzer, PerformanceReporter
+from strategy_core.sysrules.rule_factory import TradingRuleManager
 
 
 class EnhancedBacktestSystem:
@@ -522,146 +526,3 @@ class EnhancedBacktestSystem:
         return self.performance_analyzer.analyze_performance(
             positions, prepared_data['prices'], costs, self.initial_capital
         )
-
-    def _generate_reports(self,
-                          positions: PositionSeries,
-                          prepared_data: Dict,
-                          costs: Dict[str, pd.Series],
-                          rule_performance: Dict = None,
-                          rule_signals: Dict = None) -> Dict[str, str]:
-        """Generate comprehensive reports"""
-        reports = {}
-
-        # Rule performance report (NEW - CORE PURPOSE)
-        if rule_performance:
-            reports['rule_performance'] = self._generate_rule_performance_report(rule_performance, rule_signals)
-
-        # Portfolio performance report
-        reports['performance'] = self.performance_reporter.generate_performance_report(
-            positions, prepared_data['prices'], costs, self.initial_capital
-        )
-
-        # Risk report
-        reports['risk'] = self.risk_reporter.generate_risk_report(
-            positions, prepared_data['prices'], self.instruments
-        )
-
-        return reports
-    
-    def _generate_rule_performance_report(self, rule_performance: Dict, rule_forecasts: Dict = None) -> str:
-        """Generate report focused on trading rule forecast quality"""
-        report = ["=== TRADING RULE FORECAST ANALYSIS ===\n"]
-        
-        for instrument, rules in rule_performance.items():
-            report.append(f"{instrument}:")
-            
-            for rule_name, performance in rules.items():
-                if not performance.get('valid', False):
-                    report.append(f"  {rule_name}: INVALID - {performance.get('reason', 'Unknown error')}")
-                    continue
-                
-                report.append(f"  {rule_name}:")
-                report.append(f"    Forecast-Return Correlation: {performance.get('forecast_return_correlation', 0):.3f}")
-                report.append(f"    Hit Rate: {performance.get('hit_rate', 0):.1%}")
-                report.append(f"    Strong Forecast Avg Return: {performance.get('avg_strong_forecast_return', 0):.4f}")
-                report.append(f"    Forecast Volatility: {performance.get('forecast_volatility', 0):.2f}")
-                report.append(f"    Forecast Mean: {performance.get('forecast_mean', 0):.2f}")
-                report.append(f"    Forecast Std: {performance.get('forecast_std', 0):.2f}")
-                report.append(f"    Total Observations: {performance.get('total_observations', 0)}")
-                
-                # Interpretation
-                corr = performance.get('forecast_return_correlation', 0)
-                hit_rate = performance.get('hit_rate', 0)
-                volatility = performance.get('forecast_volatility', 0)
-                
-                if abs(corr) > 0.1 and hit_rate > 0.55 and volatility > 1:
-                    verdict = "EXCELLENT RULE - Strong predictive power and active"
-                elif abs(corr) > 0.05 and hit_rate > 0.52:
-                    verdict = "GOOD RULE - Some predictive ability"
-                elif abs(corr) > 0.02 or hit_rate > 0.51:
-                    verdict = "WEAK RULE - Marginal predictive power"
-                else:
-                    verdict = "POOR RULE - No meaningful predictive power"
-                
-                report.append(f"    VERDICT: {verdict}")
-                
-                # Add forecast distribution info
-                forecast_obj = rule_forecasts.get(instrument, {}).get(rule_name) if rule_forecasts else None
-                if forecast_obj is not None:
-                    try:
-                        if hasattr(forecast_obj, 'get_data'):
-                            forecast_values = forecast_obj.get_data()
-                        elif hasattr(forecast_obj, 'data'):
-                            forecast_values = forecast_obj.data
-                        else:
-                            forecast_values = forecast_obj
-                            
-                        if not forecast_values.empty:
-                            positive_forecasts = (forecast_values > 0).sum()
-                            negative_forecasts = (forecast_values < 0).sum()
-                            zero_forecasts = (forecast_values == 0).sum()
-                            total_forecasts = len(forecast_values)
-                            
-                            report.append(f"    Forecast Distribution:")
-                            report.append(f"      Positive (Long): {positive_forecasts} ({positive_forecasts/total_forecasts*100:.1f}%)")
-                            report.append(f"      Negative (Short): {negative_forecasts} ({negative_forecasts/total_forecasts*100:.1f}%)")
-                            report.append(f"      Zero: {zero_forecasts} ({zero_forecasts/total_forecasts*100:.1f}%)")
-                            
-                            max_forecast = forecast_values.max()
-                            min_forecast = forecast_values.min()
-                            report.append(f"      Range: {min_forecast:.2f} to {max_forecast:.2f}")
-                    except Exception as e:
-                        report.append(f"    Forecast Distribution: Error analyzing - {e}")
-                
-                report.append("")
-        
-        return "\n".join(report)
-
-    def _get_configuration(self) -> Dict:
-        """Get system configuration"""
-        return {
-            'initial_capital': self.initial_capital,
-            'volatility_target': self.volatility_target,
-            'forecast_cap': self.forecast_cap,
-            'risk_free_rate': self.risk_free_rate,
-            'max_leverage': self.max_leverage,
-            'num_instruments': len(self.instruments),
-            'instruments': self.instruments.get_instrument_list()
-        }
-
-    def get_performance_summary(self) -> pd.DataFrame:
-        """Get performance summary table"""
-        if not self.results:
-            raise ValueError("No backtest results available. Run backtest first.")
-
-        return self.performance_reporter.generate_summary_table(
-            self.results['final_positions'],
-            self.results['prepared_data']['prices'],
-            self.results['costs']
-        )
-
-    def plot_results(self):
-        """Plot backtest results"""
-        if not self.results:
-            raise ValueError("No backtest results available. Run backtest first.")
-
-        self.performance_reporter.plot_performance(
-            self.results['final_positions'],
-            self.results['prepared_data']['prices'],
-            self.results['costs']
-        )
-
-    def save_results(self, filepath: str):
-        """Save results to file"""
-        if not self.results:
-            raise ValueError("No backtest results available. Run backtest first.")
-
-        import pickle
-        with open(filepath, 'wb') as f:
-            pickle.dump(self.results, f)
-
-    def load_results(self, filepath: str):
-        """Load results from file"""
-        import pickle
-        with open(filepath, 'rb') as f:
-            self.results = pickle.load(f)

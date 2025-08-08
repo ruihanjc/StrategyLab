@@ -50,20 +50,9 @@ def _show_or_save_plot(filename_prefix='plot'):
         except Exception as e2:
             print(f"Plot display failed: {e}, {e2}")
 
-try:
-    from ..sysobjects.positions import Position, PositionSeries
-    from ..sysobjects.costs import CostCalculator
-    from ..sysobjects.instruments import InstrumentList
-except ImportError:
-    # Fallback for direct execution
-    import sys
-    from pathlib import Path
-    parent_dir = Path(__file__).parent.parent
-    sys.path.insert(0, str(parent_dir))
-    
-    from sysobjects.positions import Position, PositionSeries
-    from sysobjects.costs import CostCalculator
-    from sysobjects.instruments import InstrumentList
+from ..sysobjects.positions import Position, PositionSeries
+from ..sysobjects.costs import CostCalculator
+from ..sysobjects.instruments import InstrumentList
 
 
 class PerformanceAnalyzer:

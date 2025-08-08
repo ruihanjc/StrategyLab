@@ -9,20 +9,9 @@ from typing import Dict, List, Optional, Union, Callable, Any
 from datetime import datetime
 import warnings
 
-try:
-    from ..sysobjects.prices import AdjustedPrices
-    from ..sysobjects.forecasts import Forecast
-    from ..sysutils.math_algorithms import robust_vol_calc, ewmac_calc
-except ImportError:
-    # Fallback for direct execution
-    import sys
-    from pathlib import Path
-    parent_dir = Path(__file__).parent.parent
-    sys.path.insert(0, str(parent_dir))
-    
-    from sysobjects.prices import AdjustedPrices
-    from sysobjects.forecasts import Forecast
-    from sysutils.math_algorithms import robust_vol_calc, ewmac_calc
+from strategy_core.sysobjects.prices import AdjustedPrices
+from strategy_core.sysobjects.forecasts import Forecast
+from strategy_core.sysutils.math_algorithms import robust_vol_calc, ewmac_calc
 
 
 class TradingRuleBase:
@@ -45,7 +34,7 @@ class TradingRuleBase:
         price_data: pd.Series
             Price data for the instrument
         **kwargs: dict
-            Rule-specific parameters
+            Strategy-specific parameters
             
         Returns:
         --------

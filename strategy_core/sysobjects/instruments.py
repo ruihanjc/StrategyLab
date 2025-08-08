@@ -113,18 +113,3 @@ class InstrumentList:
             )
             instruments.append(instrument)
         return cls(instruments)
-
-
-def create_sample_instruments() -> InstrumentList:
-    """Create sample instruments for testing"""
-    instruments = [
-        Instrument("AAPL",  "equity", 1.0, "Apple Inc."),
-        Instrument("GOOGL", "equity", 1.0, "Alphabet Inc."),
-        Instrument("MSFT",  "equity", 1.0, "Microsoft Corp."),
-        Instrument("TSLA",  "equity", 1.0, "Tesla Inc."),
-        Instrument("SPY", "market_index", 1.0, "SPDR S&P 500 ETF"),
-        Instrument("QQQ", "market_index", 1.0, "Invesco QQQ Trust"),
-        Instrument("EURUSD", "forex", 100000.0, "EUR/USD Currency Pair"),
-        Instrument("GBPUSD", "forex", 100000.0, "GBP/USD Currency Pair"),
-    ]
-    return InstrumentList(instruments)

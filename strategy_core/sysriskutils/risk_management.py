@@ -9,20 +9,9 @@ from typing import Dict, List, Optional, Union, Tuple
 from datetime import datetime, timedelta
 import warnings
 
-try:
-    from ..sysobjects.positions import Position, PositionSeries
-    from ..sysobjects.instruments import Instrument, InstrumentList
-    from ..sysobjects.prices import AdjustedPrices, MultiplePrices
-except ImportError:
-    # Fallback for direct execution
-    import sys
-    from pathlib import Path
-    parent_dir = Path(__file__).parent.parent
-    sys.path.insert(0, str(parent_dir))
-    
-    from sysobjects.positions import Position, PositionSeries
-    from sysobjects.instruments import Instrument, InstrumentList
-    from sysobjects.prices import AdjustedPrices, MultiplePrices
+from ..sysobjects.positions import Position, PositionSeries
+from ..sysobjects.instruments import Instrument, InstrumentList
+from ..sysobjects.prices import AdjustedPrices, MultiplePrices
 
 
 class RiskManager:

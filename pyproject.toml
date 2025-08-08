@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "strategy-lab"
 version = "0.1.0"
 description = "Enhanced backtesting framework inspired by pysystemtrade"
-authors = [{name = "Strategy Lab", email = "info@strategylab.com"}]
+authors = [{name = "Strategy Lab", email = "ruihanjc@hotmail.com"}]
 license = {text = "MIT"}
 readme = "README.md"
 requires-python = ">=3.8"
