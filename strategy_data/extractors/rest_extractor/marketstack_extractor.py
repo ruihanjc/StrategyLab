@@ -22,7 +22,7 @@ class MarketStackExtractor(BaseRestExtractor, ABC):
         check_end, has_historical = ArcticReader().has_historical_range(self.service.lower(), self.ticker)
 
         if has_historical:
-            start_date = datetime.datetime(2020, 1, 1, 12, 0, 0).date()
+            start_date = check_end.date()
             end_date = datetime.datetime.today().date() - datetime.timedelta(days=1)
         else:
             start_date = datetime.datetime(2020, 1, 1, 12, 0, 0).date()
