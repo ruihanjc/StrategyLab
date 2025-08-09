@@ -1,0 +1,96 @@
+2025-08-09 14:15:04 - Starting standard_update_data job
+2025-08-09 14:15:04 - Script directory: /home/ruihanjc/src/StrategyLab
+2025-08-09 14:15:04 - Virtual environment: /home/ruihanjc/src/StrategyLab/StrategyLabVenv
+2025-08-09 14:15:04 - Log file: /home/ruihanjc/src/StrategyLab/logs/standard_update_20250809.log
+2025-08-09 14:15:04 - Activating virtual environment
+2025-08-09 14:15:04 - Python version: Python 3.12.3
+2025-08-09 14:15:04 - Python path: /home/ruihanjc/src/StrategyLab/StrategyLabVenv/bin/python
+2025-08-09 14:15:04 - PYTHONPATH set to: /home/ruihanjc/src/StrategyLab:
+2025-08-09 14:15:04 - Starting standard_update_data.py execution
+2025-08-09 14:15:04,549 - __main__ - INFO - Initializing configuration...
+2025-08-09 14:15:04,552 - __main__ - INFO - API Configuration loaded with timeout: 30
+2025-08-09 14:15:04,552 - __main__ - INFO - database configuration loaded
+2025-08-09 14:15:04,552 - __main__ - INFO - Parsing command line arguments...
+2025-08-09 14:15:04,552 - __main__ - INFO - Creating requester for service: [('equity', 'MarketStack', 'TSLA'), ('equity', 'MarketStack', 'AAPL'), ('equity', 'MarketStack', 'PLTR')]
+2025-08-09 14:15:04,552 - __main__ - INFO - Fetching data...
+2025-08-09 14:15:04,552 - market_data.database.arctic_connection - INFO - Initializing ArcticDB connection to: /home/ruihanjc/src/StrategyLab/arcticdb
+2025-08-09 14:15:04,553 - market_data.database.arctic_connection - INFO - ArcticDB connection established successfully
+2025-08-09 14:15:04,557 - __main__ - INFO - Already up to date for entry ('equity', 'MarketStack', 'TSLA')
+2025-08-09 14:15:04,557 - __main__ - INFO - Fetching data...
+2025-08-09 14:15:04,558 - __main__ - INFO - Already up to date for entry ('equity', 'MarketStack', 'AAPL')
+2025-08-09 14:15:04,558 - __main__ - INFO - Fetching data...
+2025-08-09 14:15:04,560 - __main__ - INFO - Already up to date for entry ('equity', 'MarketStack', 'PLTR')
+2025-08-09 14:15:04 - SUCCESS: standard_update_data completed successfully
+2025-08-09 14:15:04 - Job completed with exit status: 0
+2025-08-09 14:15:33 - Starting standard_update_data job
+2025-08-09 14:15:33 - Script directory: /home/ruihanjc/src/StrategyLab
+2025-08-09 14:15:33 - Virtual environment: /home/ruihanjc/src/StrategyLab/StrategyLabVenv
+2025-08-09 14:15:33 - Log file: /home/ruihanjc/src/StrategyLab/logs/standard_update_20250809.log
+2025-08-09 14:15:33 - Activating virtual environment
+2025-08-09 14:15:33 - Python version: Python 3.12.3
+2025-08-09 14:15:33 - Python path: /home/ruihanjc/src/StrategyLab/StrategyLabVenv/bin/python
+2025-08-09 14:15:33 - PYTHONPATH set to: /home/ruihanjc/src/StrategyLab:
+2025-08-09 14:15:33 - Starting standard_update_data.py execution
+2025-08-09 14:15:34,029 - __main__ - INFO - Initializing configuration...
+2025-08-09 14:15:34,031 - __main__ - INFO - API Configuration loaded with timeout: 30
+2025-08-09 14:15:34,031 - __main__ - INFO - database configuration loaded
+2025-08-09 14:15:34,031 - __main__ - INFO - Parsing command line arguments...
+2025-08-09 14:15:34,031 - __main__ - INFO - Creating requester for service: [('equity', 'MarketStack', 'TSLA'), ('equity', 'MarketStack', 'AAPL'), ('equity', 'MarketStack', 'PLTR')]
+2025-08-09 14:15:34,031 - __main__ - INFO - Fetching data...
+2025-08-09 14:15:34,031 - market_data.database.arctic_connection - INFO - Initializing ArcticDB connection to: /home/ruihanjc/src/StrategyLab/arcticdb
+2025-08-09 14:15:34,032 - market_data.database.arctic_connection - INFO - ArcticDB connection established successfully
+2025-08-09 14:15:34,035 - __main__ - INFO - Already up to date for entry ('equity', 'MarketStack', 'TSLA')
+2025-08-09 14:15:34,035 - __main__ - INFO - Fetching data...
+2025-08-09 14:15:34,036 - __main__ - INFO - Already up to date for entry ('equity', 'MarketStack', 'AAPL')
+2025-08-09 14:15:34,036 - __main__ - INFO - Fetching data...
+2025-08-09 14:15:34,037 - __main__ - INFO - Already up to date for entry ('equity', 'MarketStack', 'PLTR')
+2025-08-09 14:15:34 - SUCCESS: standard_update_data completed successfully
+2025-08-09 14:15:34 - Job completed with exit status: 0
+2025-08-09 14:23:31 - Starting standard_update_data job
+2025-08-09 14:23:31 - Script directory: /home/ruihanjc/src/StrategyLab
+2025-08-09 14:23:31 - Virtual environment: /home/ruihanjc/src/StrategyLab/StrategyLabVenv
+2025-08-09 14:23:31 - Log file: /home/ruihanjc/src/StrategyLab/logs/standard_update_20250809.log
+2025-08-09 14:23:31 - Activating virtual environment
+2025-08-09 14:23:31 - Python version: Python 3.12.3
+2025-08-09 14:23:31 - Python path: /home/ruihanjc/src/StrategyLab/StrategyLabVenv/bin/python
+2025-08-09 14:23:31 - PYTHONPATH set to: /home/ruihanjc/src/StrategyLab:
+2025-08-09 14:23:31 - Starting standard_update_data.py execution
+2025-08-09 14:23:31,871 - __main__ - INFO - Initializing configuration...
+2025-08-09 14:23:31,873 - __main__ - INFO - API Configuration loaded with timeout: 30
+2025-08-09 14:23:31,873 - __main__ - INFO - database configuration loaded
+2025-08-09 14:23:31,873 - __main__ - INFO - Parsing command line arguments...
+2025-08-09 14:23:31,874 - __main__ - INFO - Creating requester for service: [('equity', 'MarketStack', 'TSLA'), ('equity', 'MarketStack', 'AAPL'), ('equity', 'MarketStack', 'PLTR')]
+2025-08-09 14:23:31,874 - __main__ - INFO - Fetching data...
+2025-08-09 14:23:31,874 - market_data.database.arctic_connection - INFO - Initializing ArcticDB connection to: /home/ruihanjc/src/StrategyLab/arcticdb
+2025-08-09 14:23:31,874 - market_data.database.arctic_connection - INFO - ArcticDB connection established successfully
+2025-08-09 14:23:31,877 - __main__ - INFO - Already up to date for entry ('equity', 'MarketStack', 'TSLA')
+2025-08-09 14:23:31,877 - __main__ - INFO - Fetching data...
+2025-08-09 14:23:31,878 - __main__ - INFO - Already up to date for entry ('equity', 'MarketStack', 'AAPL')
+2025-08-09 14:23:31,878 - __main__ - INFO - Fetching data...
+2025-08-09 14:23:31,880 - __main__ - INFO - Already up to date for entry ('equity', 'MarketStack', 'PLTR')
+2025-08-09 14:23:31 - SUCCESS: standard_update_data completed successfully
+2025-08-09 14:23:31 - Job completed with exit status: 0
+2025-08-09 14:29:29 - Starting standard_update_data job
+2025-08-09 14:29:29 - Script directory: /home/ruihanjc/src/StrategyLab
+2025-08-09 14:29:29 - Virtual environment: /home/ruihanjc/src/StrategyLab/StrategyLabVenv
+2025-08-09 14:29:29 - Log file: /home/ruihanjc/src/StrategyLab/logs/standard_update_20250809.log
+2025-08-09 14:29:29 - Activating virtual environment
+2025-08-09 14:29:29 - Python version: Python 3.12.3
+2025-08-09 14:29:29 - Python path: /home/ruihanjc/src/StrategyLab/StrategyLabVenv/bin/python
+2025-08-09 14:29:29 - PYTHONPATH set to: /home/ruihanjc/src/StrategyLab:
+2025-08-09 14:29:29 - Starting standard_update_data.py execution
+2025-08-09 14:29:29,481 - __main__ - INFO - Initializing configuration...
+2025-08-09 14:29:29,483 - __main__ - INFO - API Configuration loaded with timeout: 30
+2025-08-09 14:29:29,483 - __main__ - INFO - database configuration loaded
+2025-08-09 14:29:29,483 - __main__ - INFO - Parsing command line arguments...
+2025-08-09 14:29:29,484 - __main__ - INFO - Creating requester for service: [('equity', 'MarketStack', 'TSLA'), ('equity', 'MarketStack', 'AAPL'), ('equity', 'MarketStack', 'PLTR')]
+2025-08-09 14:29:29,484 - __main__ - INFO - Fetching data...
+2025-08-09 14:29:29,484 - market_data.database.arctic_connection - INFO - Initializing ArcticDB connection to: /home/ruihanjc/src/StrategyLab/arcticdb
+2025-08-09 14:29:29,484 - market_data.database.arctic_connection - INFO - ArcticDB connection established successfully
+2025-08-09 14:29:29,488 - __main__ - INFO - Already up to date for entry ('equity', 'MarketStack', 'TSLA')
+2025-08-09 14:29:29,488 - __main__ - INFO - Fetching data...
+2025-08-09 14:29:29,489 - __main__ - INFO - Already up to date for entry ('equity', 'MarketStack', 'AAPL')
+2025-08-09 14:29:29,489 - __main__ - INFO - Fetching data...
+2025-08-09 14:29:29,490 - __main__ - INFO - Already up to date for entry ('equity', 'MarketStack', 'PLTR')
+2025-08-09 14:29:29 - SUCCESS: standard_update_data completed successfully
+2025-08-09 14:29:29 - Job completed with exit status: 0
