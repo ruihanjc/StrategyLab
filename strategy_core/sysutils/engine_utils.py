@@ -40,37 +40,34 @@ def load_price_data(instruments: InstrumentList, config):
 
     arcticdb = ArcticReader()
 
-    for instrument in instruments:
-        service = instrument.get_service()
-        raw_data = arcticdb.load_from_arcticdb(
-            service=service,
-            source_tickers=instruments.get_instruments_by_asset_class(service),
-            start_date=config.get('start_date'),
-            end_date=config.get('end_date')
-        )
+    raw_data = arcticdb.load_multiple_from_arcticdb(
+        instruments=instruments,
+        start_date=config.get('start_date'),
+        end_date=config.get('end_date')
+    )
 
-        for source_ticker in instruments.get_instruments_by_asset_class(service):
-            try:
-                if raw_data is not None and source_ticker['ticker'] in raw_data:
-                    df = raw_data[source_ticker['ticker']]
-                    if df is not None and not df.empty:
-                        required_cols = ['open', 'high', 'low', 'close']
-                        if all(col in df.columns for col in required_cols):
-                            price_data[source_ticker['ticker']] = MultiplePrices(df)
+    for source_ticker in instruments.get_instruments_by_asset_class(service):
+        try:
+            if raw_data is not None and source_ticker['ticker'] in raw_data:
+                df = raw_data[source_ticker['ticker']]
+                if df is not None and not df.empty:
+                    required_cols = ['open', 'high', 'low', 'close']
+                    if all(col in df.columns for col in required_cols):
+                        price_data[source_ticker['ticker']] = MultiplePrices(df)
+                    else:
+                        if 'close' in df.columns:
+                            price_data[source_ticker['ticker']] = df['close']
                         else:
-                            if 'close' in df.columns:
-                                price_data[source_ticker['ticker']] = df['close']
-                            else:
-                                print(f"Warning: No usable price data for {source_ticker['ticker']}")
+                            print(f"Warning: No usable price data for {source_ticker['ticker']}")
 
-            except Exception as e:
-                print(f"Error loading data for {source_ticker['ticker']}: {e}")
+        except Exception as e:
+            print(f"Error loading data for {source_ticker['ticker']}: {e}")
     return price_data
 
 
 def parse_rule(rule, data):
     match rule[0]:
         case "ewmac":
-            return TradingRule(ewmac,data, rule[1])
+            return TradingRule(ewmac, data, rule[1])
         case _:
             raise Exception("No such rule in current project")

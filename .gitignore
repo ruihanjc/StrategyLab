@@ -20,4 +20,6 @@ StrategyLabVenv/
 # others
 .idea
 
+logs/
+
 *.sh

@@ -2,6 +2,7 @@ import datetime
 import pandas as pd
 import os
 
+from collections import defaultdict
 from strategy_data.database.arctic_connection import get_arcticdb_connection
 
 
@@ -48,31 +49,64 @@ class ArcticReader:
             'date_range': f"{data['date'].min()} to {data['date'].max()}" if 'date' in data.columns else 'N/A'
         }
 
-    def load_from_arcticdb(self, service, source_tickers, start_date, end_date):
-        # Connect to local ArcticDB
+    def load_from_arcticdb(self, service, ticker, start_date, end_date):
+        try:
+            # Read versioned item from ArcticDB
+            lib = self.arctic.get_library(service)
+            item = lib.read(ticker)
+            df = item.data
+
+            # Filter by date
+            if isinstance(df.index, pd.DatetimeIndex):
+                df = df[(df.index >= start_date) & (df.index <= end_date)]
+            else:
+                # Convert string date column to datetime if needed
+                date_col = next((col for col in df.columns if 'date' in col.lower()), None)
+                if date_col:
+                    df[date_col] = pd.to_datetime(df[date_col])
+                    df = df[(df[date_col] >= start_date) & (df[date_col] <= end_date)]
+                    df.set_index(date_col, inplace=True)
+
+            return df
+        except Exception as e:
+            print(f"Error loading {ticker}: {str(e)}")
+
+    def load_multiple_from_arcticdb(self, instruments, start_date, end_date):
+        # Group instruments by asset class/service
+        grouped_instruments = defaultdict(list)
+
+        for instrument in instruments:
+            asset_class = instrument.asset_class
+            grouped_instruments[asset_class].append(instrument)
 
         data_dict = {}
-        for source_ticker in source_tickers:
+
+        # Process each asset class group
+        for asset_class, instrument_list in grouped_instruments.items():
             try:
-                # Read versioned item from ArcticDB
-                lib = self.arctic.get_library(service)
-                item = lib.read(source_ticker["ticker"])
-                df = item.data
+                lib = self.arctic.get_library(asset_class)
+                for instrument in instrument_list:
+                    try:
+                        # Read versioned item from ArcticDB
+                        item = lib.read(instrument.ticker)
+                        df = item.data
 
-                # Filter by date
-                if isinstance(df.index, pd.DatetimeIndex):
-                    df = df[(df.index >= start_date) & (df.index <= end_date)]
-                else:
-                    # Convert string date column to datetime if needed
-                    date_col = next((col for col in df.columns if 'date' in col))
-                    if date_col:
-                        df[date_col] = pd.to_datetime(df[date_col])
-                        df = df[(df[date_col] >= start_date) & (df[date_col] <= end_date)]
-                        df.set_index(date_col, inplace=True)
+                        # Filter by date
+                        if isinstance(df.index, pd.DatetimeIndex):
+                            df = df[(df.index >= start_date) & (df.index <= end_date)]
+                        else:
+                            # Convert string date column to datetime if needed
+                            date_col = next((col for col in df.columns if 'date' in col.lower()), None)
+                            if date_col:
+                                df[date_col] = pd.to_datetime(df[date_col])
+                                df = df[(df[date_col] >= start_date) & (df[date_col] <= end_date)]
+                                df.set_index(date_col, inplace=True)
 
-                data_dict[source_ticker["ticker"]] = df
-                print(f"Loaded {source_ticker["ticker"]} data: {len(df)} rows")
+                        data_dict[instrument.ticker] = df
+                    except Exception as e:
+                        print(f"Error loading {instrument.ticker} from {asset_class}: {str(e)}")
+
             except Exception as e:
-                print(f"Error loading {source_ticker["ticker"]}: {str(e)}")
+                print(f"Error accessing {asset_class} library: {str(e)}")
 
         return data_dict

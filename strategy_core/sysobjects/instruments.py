@@ -49,7 +49,7 @@ class InstrumentList:
     def get_instruments_by_asset_class(self, asset_class: str) -> List[Instrument]:
         """Filter instruments by asset class"""
         return [
-            instrument.ticker for instrument in self._instruments.values()
+            instrument for instrument in self._instruments.values()
             if instrument.asset_class == asset_class
         ]
 
