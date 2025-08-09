@@ -20,3 +20,4 @@ StrategyLabVenv/
 # others
 .idea
 
+*.sh

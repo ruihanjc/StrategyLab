@@ -1,17 +1,8 @@
 import datetime
-import arcticdb as adb
 import pandas as pd
-import argparse
-from pathlib import Path
 import os
-from datetime import date
-import sys
 
-from wheel.macosx_libfile import read_data
-
-from market_data.database.arctic_connection import get_arcticdb_connection
-
-from dateutil.utils import today
+from strategy_data.database.arctic_connection import get_arcticdb_connection
 
 
 class ArcticReader:
@@ -29,7 +20,7 @@ class ArcticReader:
         lib = self.arctic.get_library(library)
         return lib.list_symbols()
 
-    def get_historical_range(self, library, symbol):
+    def has_historical_range(self, library, symbol):
         """Read data from a symbol"""
         lib = self.arctic.get_library(library)
         if lib.has_symbol(symbol):
@@ -56,3 +47,32 @@ class ArcticReader:
             'columns': list(data.columns),
             'date_range': f"{data['date'].min()} to {data['date'].max()}" if 'date' in data.columns else 'N/A'
         }
+
+    def load_from_arcticdb(self, service, source_tickers, start_date, end_date):
+        # Connect to local ArcticDB
+
+        data_dict = {}
+        for source_ticker in source_tickers:
+            try:
+                # Read versioned item from ArcticDB
+                lib = self.arctic.get_library(service)
+                item = lib.read(source_ticker["ticker"])
+                df = item.data
+
+                # Filter by date
+                if isinstance(df.index, pd.DatetimeIndex):
+                    df = df[(df.index >= start_date) & (df.index <= end_date)]
+                else:
+                    # Convert string date column to datetime if needed
+                    date_col = next((col for col in df.columns if 'date' in col))
+                    if date_col:
+                        df[date_col] = pd.to_datetime(df[date_col])
+                        df = df[(df[date_col] >= start_date) & (df[date_col] <= end_date)]
+                        df.set_index(date_col, inplace=True)
+
+                data_dict[source_ticker["ticker"]] = df
+                print(f"Loaded {source_ticker["ticker"]} data: {len(df)} rows")
+            except Exception as e:
+                print(f"Error loading {source_ticker["ticker"]}: {str(e)}")
+
+        return data_dict

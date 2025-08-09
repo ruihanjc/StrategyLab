@@ -4,12 +4,13 @@ import pandas as pd
 from typing import Dict, Any
 import datetime
 
+from strategy_core.sysobjects import Instrument
 
 
 class BaseExtractor(ABC):
-    def __init__(self, config: Any):
-        self.service = config[0] #Service
-        self.ticker = config[2] #Ticker
+    def __init__(self, instrument: Instrument):
+        self.service = instrument.asset_class  # Service
+        self.ticker = instrument.ticker # Ticker
 
     @abstractmethod
     def run(self):
@@ -25,7 +26,6 @@ class BaseExtractor(ABC):
     def get_eod_data(self, ticker: str, start: datetime, to: datetime):
         """Get end of day data for a ticker"""
         pass
-
 
 
 class BaseRestExtractor(BaseExtractor, ABC):

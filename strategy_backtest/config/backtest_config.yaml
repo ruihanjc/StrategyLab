@@ -21,4 +21,5 @@ data settings:
 # Predefined strategy
 strategy:
   ewmac:
-    16_64: 0.5
+    params: [16, 64]
+    weight : 0.5

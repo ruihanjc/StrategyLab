@@ -7,11 +7,9 @@ Demonstrates complete workflow with integrated components
 # Standard library imports
 import logging
 import sys
-from pathlib import Path
 
 from strategy_core.sysobjects import Portfolio
 from strategy_core.sysobjects.engine import TradingEngine
-from strategy_core.sysobjects.rules.strategy import Strategy
 from strategy_core.sysutils.config_manager import ConfigManager
 from strategy_core.sysutils.engine_utils import *
 
@@ -36,14 +34,11 @@ def main(config_arguments=None):
 
         backtest_config = config.get_settings()
 
-        create_instruments_from_config(backtest_config.get("instruments"))
+        instruments = create_instruments_from_config(backtest_config.get("instruments"))
+        strategy = create_strategy_from_config(instruments, backtest_config)
 
-        portfolio = Portfolio()
-
-        strategy = Strategy()
-
+        portfolio = Portfolio(instruments)
         engine = TradingEngine()
-
 
     except Exception as e:
         logger.error(f"Application error: {str(e)}", exc_info=True)

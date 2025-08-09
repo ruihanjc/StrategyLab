@@ -1,9 +1,9 @@
 from arguments.argument_runtype import ArgumentRunType
-from market_data.configuration.config_manager import ConfigManager
 import logging
 import sys
-from market_data.arguments.requestor_factory import RequesterFactory
 from database.arcticdb_writer import ArcticWriter
+from strategy_data.arguments.requestor_factory import RequesterFactory
+from strategy_data.configuration.config_manager import ConfigManager
 
 
 def setup_logging():
@@ -49,14 +49,14 @@ def standard_update_data(config_arguments):
         # Create requester and fetch data
         logger.info(f"Creating requester for service: {update_list}")
 
-        for entry in update_list:
-            requester = RequesterFactory.create(entry, api_config)
+        for instrument in update_list:
+            requester = RequesterFactory.create(instrument, api_config)
 
             logger.info("Fetching data...")
             fetched_data = requester.run()
 
             if fetched_data is None:
-                logger.info(f"Already up to date for entry {entry}")
+                logger.info(f"Already up to date for instrument {instrument}")
                 continue
 
             # Store data in database
@@ -64,7 +64,7 @@ def standard_update_data(config_arguments):
             arctic_writer = ArcticWriter()
             if_ingested = arctic_writer.store_market_data(fetched_data)
 
-            logger.info(f"Storing fetched data for {entry}")
+            logger.info(f"Storing fetched data for {instrument}")
 
             if if_ingested:
                 logger.info("Data successfully stored in database")

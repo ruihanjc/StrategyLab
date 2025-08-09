@@ -1,6 +1,6 @@
 from abc import ABC
 
-from market_data.extractors.base_extractor import BaseRestExtractor
+from strategy_data.extractors.base_extractor import BaseRestExtractor
 import datetime
 
 

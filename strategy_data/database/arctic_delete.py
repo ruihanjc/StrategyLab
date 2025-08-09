@@ -1,17 +1,17 @@
-import arcticdb as adb
 from pathlib import Path
 import os
 import shutil
 import logging
 from datetime import datetime
 import time
-from market_data.database.arctic_connection import get_arcticdb_connection
+from strategy_data.database.arctic_connection import get_arcticdb_connection
 
 
 class ArcticDBCleaner:
     def __init__(self):
         project_dir = os.path.abspath(__file__ + "/../../../")
         self.arctic_path = os.path.join(project_dir, 'arcticdb')
+        self.arctic = get_arcticdb_connection(self.arctic_path)
         self.setup_logging()
 
     def setup_logging(self):
@@ -25,15 +25,6 @@ class ArcticDBCleaner:
             ]
         )
         self.logger = logging.getLogger(__name__)
-
-    def connect(self):
-        """Try to connect to ArcticDB"""
-        try:
-            self.arctic = adb.Arctic(self.arctic_uri)
-            return True
-        except Exception as e:
-            self.logger.error(f"Failed to connect to ArcticDB: {str(e)}")
-            return False
 
     def backup_before_delete(self):
         """Create backup before deletion"""
@@ -50,7 +41,7 @@ class ArcticDBCleaner:
     def list_contents(self):
         """List all libraries and symbols before deletion"""
         try:
-            if self.connect():
+            if self.arctic:
                 self.logger.info("\nCurrent ArcticDB Contents:")
                 libraries = self.arctic.list_libraries()
 

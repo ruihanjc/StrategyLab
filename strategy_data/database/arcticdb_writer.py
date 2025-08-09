@@ -1,6 +1,7 @@
 import os
 import pandas as pd
-from market_data.database.arctic_connection import get_arcticdb_connection
+
+from strategy_data.database.arctic_connection import get_arcticdb_connection
 
 
 class ArcticWriter:
@@ -36,8 +37,6 @@ class ArcticWriter:
                 fetched_data = pd.DataFrame([fetched_data])
             elif isinstance(fetched_data, list):
                 fetched_data = pd.DataFrame(fetched_data)
-            else:
-                fetched_data = fetched_data.copy()
 
             lib = self.arctic.get_library(service)
 

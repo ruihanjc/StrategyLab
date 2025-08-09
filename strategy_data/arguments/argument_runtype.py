@@ -1,5 +1,7 @@
 import argparse
 
+from strategy_core.sysobjects import Instrument
+
 
 class ArgumentRunType:
 
@@ -32,7 +34,7 @@ class ArgumentRunType:
 
             for service in update_config:
                 for source_ticker in update_config.get(service):
-                    all_should_update.append((service, source_ticker["source"], source_ticker["ticker"]))
+                    all_should_update.append(Instrument(source_ticker["source"], source_ticker["ticker"], service))
         else:
             # Validate required fields are now present
             required = ['service', 'source']
