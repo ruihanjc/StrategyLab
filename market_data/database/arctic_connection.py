@@ -47,7 +47,7 @@ class ArcticConnection:
             logger.info("ArcticDB connection reset")
 
 
-def get_arcticdb_connection(curPath=None):
+def get_arcticdb_connection(curPath):
     """Helper function to get ArcticDB connection"""
     return ArcticConnection.get_instance(curPath)
 

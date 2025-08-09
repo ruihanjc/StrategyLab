@@ -3,7 +3,7 @@ from market_data.configuration.config_manager import ConfigManager
 import logging
 import sys
 from market_data.arguments.requestor_factory import RequesterFactory
-from database import arcticdb_writer
+from database.arcticdb_writer import ArcticWriter
 
 
 def setup_logging():
@@ -56,20 +56,22 @@ def standard_update_data(config_arguments):
             fetched_data = requester.run()
 
             if fetched_data is None:
-                logger.error("No data fetched from the source")
-                return False
+                logger.info(f"Already up to date for entry {entry}")
+                continue
 
             # Store data in database
             logger.info("Initializing database storage...")
-            arcticdb_helper = arcticdb_writer.MarketDataStore(database_config)
+            arctic_writer = ArcticWriter()
+            if_ingested = arctic_writer.store_market_data(fetched_data)
 
             logger.info(f"Storing fetched data for {entry}")
 
-            if arcticdb_helper.store_market_data(fetched_data):
+            if if_ingested:
                 logger.info("Data successfully stored in database")
             else:
                 logger.error("Failed to store data in database")
 
+        return True
     except Exception as error:
         logger.error(f"Application error: {str(error)}", exc_info=True)
         raise

@@ -1,19 +1,15 @@
-import arcticdb as adb
+import os
 import pandas as pd
-from datetime import datetime
-from arcticdb import Arctic
-
 from market_data.database.arctic_connection import get_arcticdb_connection
 
 
-class MarketDataStore:
-    def __init__(self, arctic_path):
-        self.arctic = get_arcticdb_connection(arctic_path['local_storage'])
-        self._initialize_libraries()
+class ArcticWriter:
+    def __init__(self):
+        project_dir = os.path.abspath(__file__ + "/../../../")
+        self.arctic_path = os.path.join(project_dir, 'arcticdb')
+        self.arctic = get_arcticdb_connection(self.arctic_path)
 
     def _initialize_libraries(self):
-        """Initialize libraries by service type"""
-        # Service-based organization
         self.services = {
             'equity': 'Stock market equities',
             'futures': 'Futures contracts',
@@ -26,31 +22,27 @@ class MarketDataStore:
             if not self.arctic.has_library(service):
                 self.arctic.create_library(service)
 
-    def store_market_data(self, df):
-        """Store market data in appropriate service library"""
-        global service, ticker
-        if df is not None:
-            ticker = df['ticker'][0]
-            service = df['service'][0].lower()
+    def store_market_data(self, fetched_data):
+        service, ticker = '', ''
+        if fetched_data is not None:
+            ticker = fetched_data['ticker'][0]
+            service = fetched_data['service'][0].lower()
 
-        if service not in self.services:
+        if not self.arctic.has_library(service):
             raise ValueError(f"Unknown service type: {service}")
 
         try:
-            # Convert to DataFrame if needed
-            if isinstance(df, dict):
-                df = pd.DataFrame([df])
-            elif isinstance(df, list):
-                df = pd.DataFrame(df)
+            if isinstance(fetched_data, dict):
+                fetched_data = pd.DataFrame([fetched_data])
+            elif isinstance(fetched_data, list):
+                fetched_data = pd.DataFrame(fetched_data)
             else:
-                df = df.copy()
+                fetched_data = fetched_data.copy()
 
-            # Get the appropriate library
             lib = self.arctic.get_library(service)
 
-            # Store data
             symbol = f"{ticker}"
-            lib.write(symbol, self.normalize_dataframe(df))
+            lib.write(symbol, self.normalize_dataframe(fetched_data))
             return True
 
         except Exception as e:
@@ -58,13 +50,11 @@ class MarketDataStore:
             return False
 
     def get_service_stats(self):
-        """Get statistics about each service library"""
         stats = {}
         for service in self.services:
             lib = self.arctic.get_library(service)
             symbols = lib.list_symbols()
 
-            # Calculate total size and number of records
             total_records = 0
             symbols_info = []
 
@@ -87,9 +77,7 @@ class MarketDataStore:
         return stats
 
     @staticmethod
-    def normalize_dataframe(self, df):
-        """Normalize DataFrame to ensure proper data types"""
-        # Convert timestamp to pandas Timestamp
+    def normalize_dataframe(df):
         if 'timestamp' in df.columns:
             df['timestamp'] = pd.to_datetime(df['timestamp'])
 

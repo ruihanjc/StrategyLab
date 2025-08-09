@@ -23,7 +23,6 @@ from strategy_core.sysriskutils.risk_budgeter import RiskBudgeter
 from strategy_core.sysriskutils.risk_management import RiskManager, VolatilityTargeting, CorrelationMonitor, RiskReporter
 from strategy_core.sysriskutils.forecast_processing import ForecastScaler, ForecastCombiner, ForecastMapper, ForecastProcessor
 from strategy_core.sysriskutils.performance_analytics import PerformanceAnalyzer, PerformanceReporter
-from strategy_core.sysrules.rule_factory import TradingRuleManager
 
 
 class EnhancedBacktestSystem:
@@ -236,7 +235,7 @@ class EnhancedBacktestSystem:
                 instrument_forecasts = {}
 
                 # Create rule manager for this instrument
-                rule_manager = TradingRuleManager()
+                rule_manager = None
 
                 # Add rules from trading_rules config
                 for rule_name, rule_config in trading_rules.items():

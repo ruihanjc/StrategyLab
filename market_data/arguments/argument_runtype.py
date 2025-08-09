@@ -1,5 +1,6 @@
 import argparse
 
+
 class ArgumentRunType:
 
     def __init__(self):
@@ -55,4 +56,3 @@ class ArgumentRunType:
                 args = shlex.split(args)
             return self.parser.parse_args(args)
         return self.parser.parse_args()
-

@@ -9,12 +9,12 @@ from market_data.database.arctic_connection import get_arcticdb_connection
 
 
 class ArcticDBInitializer:
-    def __init__(self, arctic_path):
+    def __init__(self):
         self.logger = None
         self.setup_logging()
-        current_path = Path(os.getcwd())
-        self.arctic_path = current_path.parent.parent / 'arcticdb'
-        self.arctic = get_arcticdb_connection(arctic_path)
+        project_dir = os.path.abspath(__file__ + "/../../../")
+        self.arctic_path = os.path.join(project_dir, 'arcticdb')
+        self.arctic = get_arcticdb_connection(self.arctic_path)
         self.setup_logging()
 
     def setup_logging(self):
@@ -132,9 +132,7 @@ class ArcticDBInitializer:
 
 def arctic_init():
     # Use relative path from script location
-    current_dir = Path(os.getcwd())
-    arctic_dir = current_dir.parent.parent / 'arcticdb'
-    initializer = ArcticDBInitializer(arctic_dir)
+    initializer = ArcticDBInitializer()
     success = initializer.initialize()
 
     if success:

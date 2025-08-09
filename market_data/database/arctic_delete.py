@@ -8,10 +8,10 @@ import time
 from market_data.database.arctic_connection import get_arcticdb_connection
 
 
-
 class ArcticDBCleaner:
-    def __init__(self, arctic_path):
-        self.arctic = get_arcticdb_connection(arctic_path)
+    def __init__(self):
+        project_dir = os.path.abspath(__file__ + "/../../../")
+        self.arctic_path = os.path.join(project_dir, 'arcticdb')
         self.setup_logging()
 
     def setup_logging(self):

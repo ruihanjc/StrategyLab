@@ -21,7 +21,7 @@ class MarketStackExtractor(BaseRestExtractor, ABC):
         check_end, has_historical = ArcticReader().get_historical_range(self.service.lower(), self.ticker)
 
         if has_historical:
-            start_date = check_end
+            start_date = check_end.date()
             end_date = datetime.datetime.today().date() - datetime.timedelta(days=1)
         else:
             start_date = datetime.datetime(2020, 1, 1, 12, 0, 0)
@@ -30,7 +30,7 @@ class MarketStackExtractor(BaseRestExtractor, ABC):
         datapoints = []
         while start_date < end_date:
             temp_end = start_date + datetime.timedelta(days=90)
-            response = self.get_eod_data(self.ticker, start_date.date(), temp_end.date())
+            response = self.get_eod_data(self.ticker, start_date, temp_end)
             range_points = response['data']
             for values in range_points:
                 datapoints.append(
@@ -49,6 +49,9 @@ class MarketStackExtractor(BaseRestExtractor, ABC):
                 )
 
             start_date = temp_end + datetime.timedelta(days=1)
+
+        if not datapoints:
+            return
 
         return self.create_dataframe(datapoints)
 

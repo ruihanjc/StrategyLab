@@ -3,19 +3,18 @@ Main Portfolio class - orchestrates portfolio management
 Contains instruments and coordinates position sizing, optimization, and risk management
 """
 
-import pandas as pd
-import numpy as np
-from typing import Dict, List, Optional, Union, Tuple
-from datetime import datetime
 import logging
+from typing import Dict
 
+import pandas as pd
+
+from .forecasts import Forecast
 from .instruments import Instrument, InstrumentList
-from .positions import Position, PositionSeries
-from .forecasts import Forecast, ForecastCombination
 from .position_sizer import PositionSizer
+from .positions import PositionSeries
 from ..sysriskutils.portfolio_optimizer import PortfolioOptimizer
-from ..sysriskutils.volatility_estimator import VolatilityEstimator
 from ..sysriskutils.risk_budgeter import RiskBudgeter
+from ..sysriskutils.volatility_estimator import VolatilityEstimator
 
 
 class Portfolio:
@@ -34,8 +33,7 @@ class Portfolio:
                  instruments: InstrumentList,
                  initial_capital: float = 1000000,
                  volatility_target: float = 0.25,
-                 max_leverage: float = 1.0,
-                 base_currency: str = "USD"):
+                 max_leverage: float = 1.0):
         """
         Initialize Portfolio
         
@@ -56,17 +54,15 @@ class Portfolio:
         self.initial_capital = initial_capital
         self.volatility_target = volatility_target
         self.max_leverage = max_leverage
-        self.base_currency = base_currency
-        
+
         # Current portfolio state
         self.current_positions = PositionSeries({})
         self.current_weights = pd.DataFrame()
         self.current_capital = initial_capital
-        
+
         # Initialize utility components
         self.position_sizer = PositionSizer(
             volatility_target=volatility_target,
-            base_currency=base_currency
         )
         self.optimizer = PortfolioOptimizer(
             max_portfolio_leverage=max_leverage
@@ -75,7 +71,7 @@ class Portfolio:
         self.risk_budgeter = RiskBudgeter(
             max_leverage=max_leverage
         )
-        
+
         # Setup logging
         self.logger = logging.getLogger(f"{__name__}.Portfolio")
 
@@ -104,7 +100,7 @@ class Portfolio:
             Final position sizes for the portfolio
         """
         self.logger.info("Calculating portfolio position sizes...")
-        
+
         # Step 1: Calculate optimal weights if requested
         weights = None
         if optimize_weights and len(prices) > 1:
@@ -113,7 +109,7 @@ class Portfolio:
                 returns, self.volatility_target
             )
             self.current_weights = weights
-        
+
         # Step 2: Calculate raw positions using position sizer
         raw_positions = self.position_sizer.calculate_portfolio_positions(
             forecasts=forecasts,
@@ -121,7 +117,7 @@ class Portfolio:
             instruments=self.instruments,
             weights=weights
         )
-        
+
         # Step 3: Apply risk budgeting if requested
         if apply_risk_budget:
             final_positions = self.risk_budgeter.apply_risk_budgets(
@@ -129,10 +125,10 @@ class Portfolio:
             )
         else:
             final_positions = raw_positions
-        
+
         # Update current positions
         self.current_positions = final_positions
-        
+
         self.logger.info(f"Calculated positions for {len(final_positions.get_instruments())} instruments")
         return final_positions
 
@@ -158,19 +154,19 @@ class Portfolio:
             New position sizes after rebalancing
         """
         self.logger.info("Rebalancing portfolio...")
-        
+
         # Calculate new target positions
         new_positions = self.calculate_position_sizes(
             new_forecasts, prices
         )
-        
+
         # Check if rebalancing is needed
         if self._should_rebalance(new_positions, rebalance_threshold):
             self.logger.info("Rebalancing triggered")
             self.current_positions = new_positions
         else:
             self.logger.info("No rebalancing needed")
-        
+
         return self.current_positions
 
     def add_instrument(self, instrument: Instrument):
@@ -197,7 +193,7 @@ class Portfolio:
         # Close position in removed instrument
         if instrument_name in self.current_positions.get_instruments():
             self.current_positions.positions.pop(instrument_name, None)
-        
+
         self.instruments.remove_instrument(instrument_name)
         self.logger.info(f"Removed instrument {instrument_name} from portfolio")
 
@@ -211,7 +207,7 @@ class Portfolio:
             Portfolio summary information
         """
         positions_df = self.current_positions.get_portfolio_positions()
-        
+
         summary = {
             'total_instruments': len(self.instruments),
             'active_positions': len(positions_df.columns) if not positions_df.empty else 0,
@@ -219,9 +215,8 @@ class Portfolio:
             'current_capital': self.current_capital,
             'volatility_target': self.volatility_target,
             'max_leverage': self.max_leverage,
-            'base_currency': self.base_currency
         }
-        
+
         if not positions_df.empty:
             latest_positions = positions_df.iloc[-1]
             summary.update({
@@ -231,7 +226,7 @@ class Portfolio:
                 'largest_position': latest_positions.abs().max(),
                 'position_concentration': latest_positions.abs().max() / latest_positions.abs().sum()
             })
-        
+
         return summary
 
     def get_instrument_allocations(self) -> pd.Series:
@@ -244,17 +239,17 @@ class Portfolio:
             Instrument allocations
         """
         positions_df = self.current_positions.get_portfolio_positions()
-        
+
         if positions_df.empty:
             return pd.Series()
-        
+
         latest_positions = positions_df.iloc[-1]
         total_exposure = latest_positions.abs().sum()
-        
+
         if total_exposure > 0:
             allocations = latest_positions.abs() / total_exposure
             return allocations.sort_values(ascending=False)
-        
+
         return pd.Series()
 
     def _calculate_returns(self, prices: Dict[str, pd.Series]) -> pd.DataFrame:
@@ -272,11 +267,11 @@ class Portfolio:
             Returns for each instrument
         """
         returns_data = {}
-        
+
         for instrument_name, price_series in prices.items():
             if instrument_name in self.instruments:
                 returns_data[instrument_name] = price_series.pct_change().dropna()
-        
+
         returns_df = pd.DataFrame(returns_data)
         return returns_df.dropna()
 
@@ -298,27 +293,27 @@ class Portfolio:
         bool
             Whether rebalancing is needed
         """
-        if self.current_positions.is_empty():
+        if not self.current_positions:
             return True
-        
+
         current_df = self.current_positions.get_portfolio_positions()
         new_df = new_positions.get_portfolio_positions()
-        
+
         if current_df.empty or new_df.empty:
             return True
-        
+
         # Calculate position changes
         common_index = current_df.index.intersection(new_df.index)
         if len(common_index) == 0:
             return True
-        
+
         current_latest = current_df.loc[common_index[-1]]
         new_latest = new_df.loc[common_index[-1]]
-        
+
         # Calculate relative change
         position_changes = (new_latest - current_latest).abs()
         max_change = position_changes.max()
-        
+
         return max_change > threshold
 
     def update_capital(self, new_capital: float):
@@ -348,13 +343,13 @@ class Portfolio:
             Risk metrics
         """
         positions_df = self.current_positions.get_portfolio_positions()
-        
+
         if positions_df.empty:
             return {}
-        
+
         # Calculate portfolio volatilities
         volatilities = self.volatility_estimator.estimate_portfolio_volatilities(prices)
-        
+
         # Calculate portfolio-level metrics
         risk_metrics = {
             'individual_volatilities': volatilities,
@@ -362,24 +357,15 @@ class Portfolio:
             'leverage_utilization': self._calculate_leverage_utilization(),
             'asset_class_exposure': self._calculate_asset_class_exposure()
         }
-        
+
         return risk_metrics
 
     def _calculate_concentration(self) -> float:
-        """
-        Calculate portfolio concentration (Herfindahl index)
-        
-        Returns:
-        --------
-        float
-            Concentration metric (0 = perfectly diversified, 1 = concentrated)
-        """
         allocations = self.get_instrument_allocations()
-        
+
         if allocations.empty:
             return 0.0
-        
-        # Herfindahl index
+
         return (allocations ** 2).sum()
 
     def _calculate_leverage_utilization(self) -> float:
@@ -392,38 +378,30 @@ class Portfolio:
             Leverage utilization (current leverage / max leverage)
         """
         positions_df = self.current_positions.get_portfolio_positions()
-        
+
         if positions_df.empty:
             return 0.0
-        
+
         current_leverage = positions_df.iloc[-1].abs().sum()
         return current_leverage / self.max_leverage
 
     def _calculate_asset_class_exposure(self) -> Dict[str, float]:
-        """
-        Calculate exposure by asset class
-        
-        Returns:
-        --------
-        Dict[str, float]
-            Asset class exposures
-        """
         positions_df = self.current_positions.get_portfolio_positions()
-        
+
         if positions_df.empty:
             return {}
-        
+
         latest_positions = positions_df.iloc[-1]
         asset_class_exposure = {}
-        
+
         for instrument_name in latest_positions.index:
             if instrument_name in self.instruments:
                 instrument = self.instruments[instrument_name]
                 asset_class = instrument.asset_class
-                
+
                 if asset_class not in asset_class_exposure:
                     asset_class_exposure[asset_class] = 0.0
-                
+
                 asset_class_exposure[asset_class] += abs(latest_positions[instrument_name])
-        
+
         return asset_class_exposure

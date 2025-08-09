@@ -16,9 +16,9 @@ from dateutil.utils import today
 
 class ArcticReader:
     def __init__(self):
-        current_dir = Path(os.getcwd())
-        arctic_dir = current_dir / 'arcticdb'
-        self.arctic = get_arcticdb_connection(arctic_dir)
+        project_dir = os.path.abspath(__file__ + "/../../../")
+        self.arctic_path = os.path.join(project_dir, 'arcticdb')
+        self.arctic = get_arcticdb_connection(self.arctic_path)
 
     def list_libraries(self):
         """List all libraries"""
@@ -56,8 +56,3 @@ class ArcticReader:
             'columns': list(data.columns),
             'date_range': f"{data['date'].min()} to {data['date'].max()}" if 'date' in data.columns else 'N/A'
         }
-
-
-if __name__ == '__main__':
-    x = ArcticReader()
-    print(x.read_data('equity', 'TSLA', ''))

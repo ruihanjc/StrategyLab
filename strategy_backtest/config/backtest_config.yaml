@@ -1,0 +1,24 @@
+# General backtest settings
+initial_capital: 100000
+commission: 0.001  # 0.1%
+slippage: 0.0005   # 0.05%
+start_date: '2020-01-03'
+end_date: ''
+
+
+# Data settings
+instruments:
+  equity:
+    - source: "MarketStack"
+      ticker: "PLTR"
+
+data settings:
+  preprocessing:
+    handle_missing: true
+    method: 'ffill'
+    resample: null  # Options: null, 'D', 'W', 'M'w
+
+# Predefined strategy
+strategy:
+  ewmac:
+    16_64: 0.5
