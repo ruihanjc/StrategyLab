@@ -3,7 +3,7 @@
   Production Architecture & Components
 
   Core Infrastructure:
-  - MongoDB: Production database with 12+ collections for positions, orders, risk limits
+  - ArcticDB: Production database with 12+ collections for positions, orders, risk limits
   - Interactive Brokers: Live data feeds and order execution via ib-insync library
   - Process Control: Automated cron-based execution with process status monitoring
   - Risk Management: Multi-layer position limits and risk overlay system
@@ -18,27 +18,23 @@
 
   Key Production Setup Steps
 
-  1. Database Setup
 
-  # MongoDB installation and configuration
-  mongod --dbpath /data/db
-  # Creates 12+ collections: futures_contracts, IBClientTracker, locks, etc.
 
-  2. IB Connection Configuration
+  IB Connection Configuration
 
   # private_config.yaml (required)
   broker_account: 'UXXXXXX'  # IB account number
   ib_ipaddress: 'localhost'
   ib_port: 4001             # IB Gateway port
 
-  3. Production Scripts
+  Production Scripts
 
   - startup.py: Clears client IDs, initializes system
   - run_stack_handler.py: 8-stage order execution pipeline
   - run_systems.py: Overnight backtesting for signal generation
   - interactive_controls.py: Manual system control interface
 
-  4. Order Execution Pipeline
+  Order Execution Pipeline
 
   Three-level order stack:
   1. Instrument Stack: Strategy-level virtual orders
@@ -48,7 +44,7 @@
   Execution stages:
   - Check position breaks → Spawn contract orders → Generate force rolls → Create broker orders → Process fills → Handle completions → Stack cleanup → Additional sampling
 
-  5. Risk Management
+  Risk Management
 
   - Position Limits: Per instrument and per strategy
   - Risk Overlay: Dynamic position sizing based on portfolio risk
