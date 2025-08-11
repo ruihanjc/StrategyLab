@@ -23,5 +23,5 @@ dev = ["pytest", "black", "flake8", "mypy"]
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["strategy_backtest*", "market_data*"]
+include = ["strategy_backtest*", "strategy_data*]
 exclude = ["tests*"]

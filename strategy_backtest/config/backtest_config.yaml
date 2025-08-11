@@ -11,6 +11,8 @@ instruments:
   equity:
     - source: "MarketStack"
       ticker: "PLTR"
+    - source: "MarketStack"
+      ticker: "TSLA"
 
 data settings:
   preprocessing:

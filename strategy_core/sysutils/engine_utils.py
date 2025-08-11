@@ -1,4 +1,5 @@
 from strategy_core.sysobjects import InstrumentList, Instrument, MultiplePrices
+from strategy_core.sysobjects.strategy import Strategy
 from strategy_core.sysrules import ewmac
 from strategy_core.sysrules.trading_rule import TradingRule
 from strategy_data.database import ArcticReader
@@ -32,7 +33,11 @@ def create_strategy_from_config(instruments, config):
 
     price_datas = load_price_data(instruments, config)
     for rule in config.get("strategy").items():
-        rules.append(parse_rule(rule, price_datas[rule[0]]))
+        for ticker in price_datas:
+            # Pass both price data and ticker information
+            rules.append(parse_rule(rule, price_datas[ticker], ticker))
+
+    return Strategy(rules)
 
 
 def load_price_data(instruments: InstrumentList, config):
@@ -46,28 +51,31 @@ def load_price_data(instruments: InstrumentList, config):
         end_date=config.get('end_date')
     )
 
-    for source_ticker in instruments.get_instruments_by_asset_class(service):
+    for ticker, data in raw_data.items():
         try:
-            if raw_data is not None and source_ticker['ticker'] in raw_data:
-                df = raw_data[source_ticker['ticker']]
-                if df is not None and not df.empty:
-                    required_cols = ['open', 'high', 'low', 'close']
-                    if all(col in df.columns for col in required_cols):
-                        price_data[source_ticker['ticker']] = MultiplePrices(df)
+            df = data
+            if df is not None and not df.empty:
+                required_cols = ['open', 'high', 'low', 'close']
+                if all(col in df.columns for col in required_cols):
+                    price_data[ticker] = MultiplePrices(df)
+                else:
+                    if 'close' in df.columns:
+                        price_data[ticker] = df['close']
                     else:
-                        if 'close' in df.columns:
-                            price_data[source_ticker['ticker']] = df['close']
-                        else:
-                            print(f"Warning: No usable price data for {source_ticker['ticker']}")
+                        print(f"Warning: No usable price data for {ticker}")
 
         except Exception as e:
-            print(f"Error loading data for {source_ticker['ticker']}: {e}")
+            print(f"Error loading data for {ticker}: {e}")
     return price_data
 
 
-def parse_rule(rule, data):
+def parse_rule(rule, data, ticker=None):
     match rule[0]:
         case "ewmac":
-            return TradingRule(ewmac, data, rule[1])
+            # Import the actual function, not the module
+            from strategy_core.sysrules.ewmac import ewmac
+            # Create a wrapper data object that includes ticker info
+            rule_data = {'price_data': data, 'ticker': ticker}
+            return TradingRule(ewmac, rule[1], rule_data)
         case _:
             raise Exception("No such rule in current project")

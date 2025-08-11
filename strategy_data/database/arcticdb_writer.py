@@ -39,9 +39,29 @@ class ArcticWriter:
                 fetched_data = pd.DataFrame(fetched_data)
 
             lib = self.arctic.get_library(service)
-
             symbol = f"{ticker}"
-            lib.write(symbol, self.normalize_dataframe(fetched_data))
+            normalized_data = self.normalize_dataframe(fetched_data)
+            
+            # Check if symbol exists and append/merge data
+            if symbol in lib.list_symbols():
+                try:
+                    existing_data = lib.read(symbol).data
+                    # Merge new data with existing, removing duplicates based on date
+                    if 'date' in normalized_data.columns and 'date' in existing_data.columns:
+                        combined_data = pd.concat([existing_data, normalized_data], ignore_index=True)
+                        combined_data = combined_data.drop_duplicates(subset=['date', 'ticker'], keep='last')
+                        combined_data = combined_data.sort_values('date').reset_index(drop=True)
+                        lib.write(symbol, combined_data)
+                    else:
+                        # If no date column, just append
+                        lib.append(symbol, normalized_data)
+                except Exception as append_error:
+                    print(f"Error appending to existing data, overwriting instead: {str(append_error)}")
+                    lib.write(symbol, normalized_data)
+            else:
+                # New symbol, write normally
+                lib.write(symbol, normalized_data)
+            
             return True
 
         except Exception as e:

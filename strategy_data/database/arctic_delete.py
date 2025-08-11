@@ -98,9 +98,7 @@ def main():
     args = parser.parse_args()
 
     # Use relative path from script location
-    current_dir = Path(os.getcwd())
-    arctic_dir = current_dir.parent.parent / 'arcticdb'
-    cleaner = ArcticDBCleaner(arctic_dir)
+    cleaner = ArcticDBCleaner()
 
     if cleaner.cleanup(force=args.force):
         print("\nArcticDB cleanup completed successfully!")

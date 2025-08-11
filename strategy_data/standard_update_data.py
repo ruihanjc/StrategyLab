@@ -24,7 +24,6 @@ def standard_update_data(config_arguments):
         logger.info("Initializing configuration...")
         config = ConfigManager()
         api_config = config.get_api_config()
-        database_config = config.get_database_config()
         update_config = config.get_daily_update_config()
 
         logger.info(f"API Configuration loaded with timeout: {api_config['timeout']}")
@@ -64,7 +63,7 @@ def standard_update_data(config_arguments):
             arctic_writer = ArcticWriter()
             if_ingested = arctic_writer.store_market_data(fetched_data)
 
-            logger.info(f"Storing fetched data for {instrument}")
+            logger.info(f"Storing fetched data for {instrument} with number of entries: {len(fetched_data)}")
 
             if if_ingested:
                 logger.info("Data successfully stored in database")
