@@ -18,14 +18,26 @@ class ArcticDBInitializer:
         self.setup_logging()
 
     def setup_logging(self):
-        logging.basicConfig(
-            level=logging.INFO,
-            format='%(asctime)s - %(levelname)s - %(message)s',
-            handlers=[
-                logging.StreamHandler(),
-                logging.FileHandler('./logs/arctic_init.log')
-            ]
-        )
+        project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
+        logs_dir = os.path.join(project_dir, 'logs')
+        try:
+            os.makedirs(logs_dir, exist_ok=True)
+            log_filename = os.path.join(logs_dir, f'arctic_init_{datetime.now().strftime("%Y%m%d_%H%M%S")}.log')
+            logging.basicConfig(
+                level=logging.INFO,
+                format='%(asctime)s - %(levelname)s - %(message)s',
+                handlers=[
+                    logging.StreamHandler(),
+                    logging.FileHandler(log_filename)
+                ]
+            )
+        except PermissionError:
+            # Fall back to console-only logging if file logging fails
+            logging.basicConfig(
+                level=logging.INFO,
+                format='%(asctime)s - %(levelname)s - %(message)s',
+                handlers=[logging.StreamHandler()]
+            )
         self.logger = logging.getLogger(__name__)
 
     def initialize_connection(self):
@@ -125,7 +137,6 @@ class ArcticDBInitializer:
             self.logger.info(f"Existing libraries: {', '.join(existing)}")
 
         self.verify_libraries()
-        self.create_test_data()
 
         return True
 
@@ -141,3 +152,7 @@ def arctic_init():
     else:
         print("\nArcticDB initialization failed!")
         print("Check arctic_init.log for error details")
+
+
+if __name__ == "__main__":
+    arctic_init()

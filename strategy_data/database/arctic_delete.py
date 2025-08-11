@@ -9,6 +9,7 @@ from strategy_data.database.arctic_connection import get_arcticdb_connection
 
 class ArcticDBCleaner:
     def __init__(self):
+        self.logger = None
         project_dir = os.path.abspath(__file__ + "/../../../")
         self.arctic_path = os.path.join(project_dir, 'arcticdb')
         self.arctic = get_arcticdb_connection(self.arctic_path)
@@ -32,6 +33,13 @@ class ArcticDBCleaner:
             if os.path.exists(self.arctic_path):
                 backup_path = f"{self.arctic_path}_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
                 shutil.copytree(self.arctic_path, backup_path)
+                # Ensure backup is deletable by current user
+                os.chmod(backup_path, 0o755)
+                for root, dirs, files in os.walk(backup_path):
+                    for d in dirs:
+                        os.chmod(os.path.join(root, d), 0o755)
+                    for f in files:
+                        os.chmod(os.path.join(root, f), 0o644)
                 self.logger.info(f"Created backup at: {backup_path}")
                 return backup_path
         except Exception as e:
@@ -59,18 +67,6 @@ class ArcticDBCleaner:
             # List contents before deletion
             self.list_contents()
 
-            if not force:
-                confirmation = input("\nAre you sure you want to delete the database? (yes/no): ")
-                if confirmation.lower() != 'yes':
-                    self.logger.info("Cleanup cancelled by user")
-                    return False
-
-            # Create backup
-            backup_path = self.backup_before_delete()
-            if not backup_path and not force:
-                self.logger.error("Backup failed, aborting cleanup")
-                return False
-
             # Disconnect from ArcticDB
             self.arctic = None
             time.sleep(1)  # Give time for connection to close
@@ -89,7 +85,7 @@ class ArcticDBCleaner:
             return False
 
 
-def main():
+def arctic_delete():
     import argparse
 
     parser = argparse.ArgumentParser(description='ArcticDB Cleanup Tool')
@@ -109,4 +105,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    arctic_delete()

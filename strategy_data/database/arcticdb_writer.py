@@ -98,11 +98,11 @@ class ArcticWriter:
     @staticmethod
     def normalize_dataframe(df):
         if 'timestamp' in df.columns:
-            df['timestamp'] = pd.to_datetime(df['timestamp'])
+            df['timestamp'] = pd.to_datetime(df['timestamp'], utc=True).dt.tz_localize(None)
 
-        # Convert date to pandas Timestamp
+        # Convert date to pandas Timestamp (ensure timezone-naive)
         if 'date' in df.columns:
-            df['date'] = pd.to_datetime(df['date'])
+            df['date'] = pd.to_datetime(df['date'], utc=True).dt.tz_localize(None)
 
         # Ensure numeric columns are float
         numeric_columns = ['open', 'high', 'low', 'close']
