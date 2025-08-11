@@ -52,6 +52,9 @@ class Strategy:
                 rule_function = rule.get_rule()
                 rule_params = rule.params
                 
+                # Slice the price data to current point in time for point-in-time calculation
+                sliced_rule_data = self._slice_data_to_current_date(rule_data, current_date)
+                
                 # Extract instrument name from rule data
                 if isinstance(rule_data, dict) and 'ticker' in rule_data:
                     instrument_name = rule_data['ticker']
@@ -81,7 +84,7 @@ class Strategy:
                 if instrument_name in price_data:
                     # Execute the trading rule to get forecast
                     try:
-                        forecast_value = rule_function(rule_data, rule_params)
+                        forecast_value = rule_function(sliced_rule_data, rule_params)
                         
                         if forecast_value is not None:
                             # Create forecast series with single value
@@ -117,6 +120,84 @@ class Strategy:
                 continue
         
         return forecasts
+    
+    def _slice_data_to_current_date(self, rule_data, current_date):
+        """
+        Slice price data to only include data up to current_date to avoid look-ahead bias
+        
+        Parameters:
+        -----------
+        rule_data: dict or other
+            Rule data containing price information
+        current_date: datetime
+            Current date for point-in-time slicing
+            
+        Returns:
+        --------
+        dict or other
+            Sliced rule data
+        """
+        if not isinstance(rule_data, dict) or 'price_data' not in rule_data:
+            return rule_data
+            
+        try:
+            price_data = rule_data['price_data']
+            
+            # Handle MultiplePrices object
+            if hasattr(price_data, 'data') and hasattr(price_data.data, 'index'):
+                # Check if current_date is within the data range
+                if current_date < price_data.data.index[0]:
+                    # Current date is before this instrument's data starts
+                    # Return empty/minimal data to avoid processing
+                    empty_df = pd.DataFrame(index=[current_date], columns=price_data.data.columns)
+                    empty_df = empty_df.fillna(0)  # Only in this case we use 0 to signal no data
+                    sliced_rule_data = rule_data.copy()
+                    sliced_price_obj = type(price_data)(empty_df)
+                    sliced_rule_data['price_data'] = sliced_price_obj
+                    return sliced_rule_data
+                
+                # Slice the underlying DataFrame
+                sliced_df = price_data.data.loc[:current_date].copy()
+                
+                # Handle NaN values properly - forward fill, don't use 0
+                for col in sliced_df.columns:
+                    if sliced_df[col].dtype in ['float64', 'int64']:
+                        sliced_df[col] = sliced_df[col].ffill()
+                
+                # Create new price data object with sliced data
+                sliced_rule_data = rule_data.copy()
+                
+                # Create new MultiplePrices-like object with sliced data
+                sliced_price_obj = type(price_data)(sliced_df)
+                sliced_rule_data['price_data'] = sliced_price_obj
+                
+                return sliced_rule_data
+                
+            # Handle Series data
+            elif hasattr(price_data, 'index'):
+                # Check if current_date is within the data range
+                if len(price_data.index) > 0 and current_date < price_data.index[0]:
+                    # Current date is before this instrument's data starts
+                    empty_series = pd.Series([0], index=[current_date])  # Signal no data
+                    sliced_rule_data = rule_data.copy()
+                    sliced_rule_data['price_data'] = empty_series
+                    return sliced_rule_data
+                    
+                sliced_series = price_data.loc[:current_date].copy()
+                
+                # Forward fill NaN values for price series
+                sliced_series = sliced_series.ffill()
+                
+                sliced_rule_data = rule_data.copy()
+                sliced_rule_data['price_data'] = sliced_series
+                return sliced_rule_data
+                
+            else:
+                return rule_data
+                
+        except Exception as e:
+            self.logger.warning(f"Could not slice data to current date: {str(e)}")
+            return rule_data
     
     def add_trading_rule(self, trading_rule):
         """

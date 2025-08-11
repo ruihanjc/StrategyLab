@@ -8,7 +8,8 @@ Demonstrates complete workflow with integrated components
 import logging
 import sys
 import os
-from datetime import datetime
+
+from strategy_core.sysrules.ewmac import optimize_ewmac
 
 # Add project root to Python path
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -97,6 +98,8 @@ def main(config_arguments=None):
         logger.info(f"Win Rate: {performance.get('win_rate', 0):.2%}")
         logger.info(f"Final Capital: ${performance.get('final_capital', 0):,.2f}")
         logger.info("========================")
+
+        # optimize_ewmac(engine)
 
         # Plot results in CTA style
         if backtest_config.get("plot_results", True):

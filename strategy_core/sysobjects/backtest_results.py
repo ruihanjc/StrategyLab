@@ -2,11 +2,13 @@
 BacktestResults class for storing and analyzing backtest performance
 """
 
-import pandas as pd
-import numpy as np
-from typing import Dict, Optional
-from datetime import datetime
 import logging
+from datetime import datetime
+from typing import Dict
+
+import matplotlib
+import numpy as np
+import pandas as pd
 
 
 class BacktestResults:
@@ -103,8 +105,8 @@ class BacktestResults:
         try:
             if date not in self.daily_positions.index or date not in self.daily_prices.index:
                 return
-                
-            current_positions = self.daily_positions.loc[date].fillna(0)
+
+            self.daily_positions.loc[date].fillna(0)
             current_prices = self.daily_prices.loc[date].fillna(0)
             
             # Get previous day data for P&L calculation
@@ -376,8 +378,7 @@ class BacktestResults:
     def plot_cta_style(self, price_df=None, save_path=None, show_plot=True):
         """Plot results in CTA style exactly like simple_cta_backtest"""
         try:
-            import matplotlib
-            import numpy as np
+
             
             # Check if we can use an interactive backend
             interactive_available = False

@@ -1,6 +1,7 @@
-
-
 import pandas as pd
+import numpy as np
+import talib
+from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 
 
 def ewmac(price_data, params):
@@ -10,7 +11,7 @@ def ewmac(price_data, params):
     Parameters:
     -----------
     price_data: MultiplePrices or pd.Series
-        Price data for the instrument
+        Price data for the instrument (should be pre-sliced to current point in time)
     params: dict
         Parameters containing Lfast and Lslow
         
@@ -35,7 +36,7 @@ def ewmac(price_data, params):
         Lfast, Lslow = params[0], params[1]
     else:
         return 0.0
-    
+
     try:
         # Extract close price series - handle new dict format
         if isinstance(price_data, dict) and 'price_data' in price_data:
@@ -56,37 +57,148 @@ def ewmac(price_data, params):
             price_series = price_data
         else:
             return 0.0
-            
+
+        # Data should already be pre-sliced to the current point in time by the caller
+
         if price_series.empty or len(price_series) < max(Lfast, Lslow):
             return 0.0
-        
-        # Calculate EMAs
-        fast_ewma = price_series.ewm(span=Lfast, min_periods=1).mean()
-        slow_ewma = price_series.ewm(span=Lslow, min_periods=1).mean()
-        
-        # Calculate raw signal
-        raw_ewmac = fast_ewma - slow_ewma
-        
-        # Estimate volatility for scaling (simple approach)
-        returns = price_series.pct_change().dropna()
-        if len(returns) < 10:
-            vol = returns.std() if len(returns) > 1 else 0.01
+
+        # Handle NaN values properly for financial data
+        # Forward fill any NaN values (don't use 0!)
+        price_series_clean = price_series.ffill()
+
+        # Drop any remaining NaN values at the beginning
+        if price_series_clean.iloc[0] == 0.0:
+            price_series_clean = price_series_clean.iloc[1:].dropna()
         else:
-            vol = returns.rolling(window=min(32, len(returns))).std().iloc[-1]
-        
-        # Avoid division by zero
-        if pd.isna(vol) or vol == 0:
-            vol = 0.01
-            
-        # Scale by volatility and return latest forecast
-        scaled_forecast = raw_ewmac / (price_series * vol)
-        
-        # Return the latest value, scaled to reasonable forecast range
-        latest_forecast = scaled_forecast.iloc[-1] * 10  # Scale factor
-        
-        # Cap the forecast
-        return max(-20, min(20, latest_forecast))
-        
+            price_series_clean = price_series_clean.dropna()
+
+        price_series_clean = price_series_clean.iloc[1:]
+
+        # Check if we still have enough data after cleaning
+        if price_series_clean.empty or len(price_series_clean) < Lslow:
+            return 0.0
+
+        # Use TA-Lib for EMA calculations
+        price_array = price_series_clean.values.astype(float)
+
+        # Calculate EMAs using TA-Lib
+        fast_ema = talib.EMA(price_array, timeperiod=Lfast)
+        slow_ema = talib.EMA(price_array, timeperiod=Lslow)
+
+        # Get the latest values (most recent calculation)
+        if np.isnan(fast_ema[-1]) or np.isnan(slow_ema[-1]):
+            return 0.0
+
+        latest_fast = fast_ema[-1]
+        latest_slow = slow_ema[-1]
+
+        # Calculate raw EWMAC signal
+        raw_ewmac = latest_fast - latest_slow
+
+        scaled_forecast = 0.0
+
+        # Early exit conditions
+        if len(price_series_clean) <= 1:
+            return 0.0
+
+        # Calculate volatility scalar
+        price_changes = price_series_clean.pct_change().dropna()
+        if len(price_changes) == 0:
+            return 0.0
+
+        vol_scalar = price_changes.std() * np.sqrt(252)
+        denominator = latest_slow * vol_scalar
+
+        # Calculate scaled forecast if valid denominator
+        if vol_scalar > 0 and abs(denominator) > 1e-10:
+            scaled_forecast = raw_ewmac / denominator
+
+        # Apply scaling, ensure finite, and cap
+        forecast = scaled_forecast * 10
+        forecast = 0.0 if not np.isfinite(forecast) else forecast
+        return max(-20, min(20, forecast))
+
     except Exception as e:
         print(f"Error in ewmac calculation: {str(e)}")
         return 0.0
+
+
+def optimize_ewmac(engine, target_metric='sharpe_ratio', max_evals=50):
+    space = {
+        "engine": engine,
+        "Lfast": hp.quniform("Lfast", 16, 32, 1),
+        "Lslow": hp.quniform("Lslow", 28, 256, 1),
+    }
+
+    # 保存原始参数
+    original_params = {}
+    for i, rule in enumerate(engine.strategy.trading_rules):
+        if rule.get_rule().__name__ == 'ewmac':
+            original_params[i] = rule.params.copy()
+
+    def optimization_objective(params):
+        try:
+            lfast = int(params["Lfast"])
+            lslow = int(params["Lslow"])
+
+            if lfast >= lslow:
+                return {"loss": float('inf'), "status": STATUS_OK}
+
+            for rule in engine.strategy.trading_rules:
+                if rule.get_rule().__name__ == 'ewmac':
+                    rule.params.update({"Lfast": lfast, "Lslow": lslow})
+
+            results = engine.run()
+            metric_value = results.metrics.get(target_metric, 0.0)
+
+            if not np.isfinite(metric_value):
+                metric_value = -999.0
+
+            print(f"EWMAC: Lfast={lfast:2d}, Lslow={lslow:3d} -> {target_metric}={metric_value:.4f}")
+
+            return {"loss": -metric_value, "status": STATUS_OK}
+
+        except Exception as e:
+            return {"loss": float('inf'), "status": STATUS_OK}
+
+    print(f"Target metric: {target_metric}")
+    print("-" * 50)
+
+    trials = Trials()
+    best = fmin(
+        fn=optimization_objective,
+        space=space,
+        algo=tpe.suggest,
+        max_evals=max_evals,
+        trials=trials
+    )
+
+    for i, rule in enumerate(engine.strategy.trading_rules):
+        if i in original_params:
+            rule.params.update(original_params[i])
+
+    best_params = {
+        'Lfast': int(best['Lfast']),
+        'Lslow': int(best['Lslow'])
+    }
+
+    best_metric = -min(trials.losses())
+
+    print("-" * 50)
+    print(f"Best metric achieved: {target_metric}: {best_metric:.4f}")
+    print(f"Best params: {best_params}")
+    
+    # Debug: Show all trials to see if (16,64) was tested
+    print(f"\nAll {len(trials.trials)} trials tested:")
+    for i, trial in enumerate(trials.trials[:10]):  # Show first 10
+        lfast = int(trial['misc']['vals']['Lfast'][0])
+        lslow = int(trial['misc']['vals']['Lslow'][0])
+        loss = trial['result']['loss']
+        metric = -loss if loss != float('inf') else 'INVALID'
+        print(f"  Trial {i+1}: Lfast={lfast:2d}, Lslow={lslow:3d} -> {metric}")
+    
+    if len(trials.trials) > 10:
+        print(f"  ... and {len(trials.trials) - 10} more trials")
+
+    return trials, best_params

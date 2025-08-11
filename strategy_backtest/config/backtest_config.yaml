@@ -11,8 +11,6 @@ instruments:
   equity:
     - source: "MarketStack"
       ticker: "PLTR"
-    - source: "MarketStack"
-      ticker: "TSLA"
 
 data settings:
   preprocessing:
@@ -23,5 +21,5 @@ data settings:
 # Predefined strategy
 strategy:
   ewmac:
-    params: [16, 64]
-    weight : 0.5
+    params: [22, 247]
+    weight : 1
