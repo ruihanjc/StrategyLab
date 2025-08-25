@@ -61,3 +61,4 @@ plotly>=5.0.0
 matplotlib>=3.5.0
 wheel>=0.38.0
 python-dotenv>=1.0.0
+ib-insync>=0.9.80

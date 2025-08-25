@@ -515,37 +515,3 @@ class ForecastProcessor:
                 positions[instrument_name] = position
         
         return positions
-
-
-def create_sample_forecast_processing():
-    """Create sample forecast processing system for testing"""
-    from ..sysobjects.forecasts import create_sample_forecast_combination
-    from ..sysobjects.prices import create_sample_price_data
-    
-    # Create sample data
-    forecast_combination = create_sample_forecast_combination()
-    price_data = create_sample_price_data()
-    prices = {'AAPL': price_data.adjusted_prices('close')}
-    
-    # Create processing components
-    scaler = ForecastScaler()
-    combiner = ForecastCombiner()
-    mapper = ForecastMapper()
-    processor = ForecastProcessor(scaler, combiner, mapper)
-    
-    # Process forecasts
-    raw_forecasts = forecast_combination.forecasts
-    processed_forecasts = processor.process_forecasts(raw_forecasts, prices)
-    
-    # Generate positions
-    positions = processor.generate_positions_from_forecasts(processed_forecasts, prices)
-    
-    return {
-        'raw_forecasts': raw_forecasts,
-        'processed_forecasts': processed_forecasts,
-        'positions': positions,
-        'scaler': scaler,
-        'combiner': combiner,
-        'mapper': mapper,
-        'processor': processor
-    }

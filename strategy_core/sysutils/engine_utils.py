@@ -29,14 +29,22 @@ def create_instruments_from_config(instrument_settings):
 
 def create_strategy_from_config(instruments, config):
     rules = []
+    rule_weights = {}
 
     price_datas = load_price_data(instruments, config)
-    for rule in config.get("strategy").items():
+    for rule_name, rule_config in config.get("strategy").items():
         for ticker in price_datas:
+            # Extract weight from rule config
+            weight = rule_config.get("weight", 1.0)
+            rule_key = f"{rule_name}_{ticker}"
+            rule_weights[rule_key] = weight
+            
             # Pass both price data and ticker information
-            rules.append(parse_rule(rule, price_datas[ticker], ticker))
+            rules.append(parse_rule((rule_name, rule_config), price_datas[ticker], ticker))
 
-    return Strategy(rules)
+    strategy = Strategy(rules)
+    strategy.rule_weights = rule_weights
+    return strategy
 
 
 def load_price_data(instruments: InstrumentList, config):
@@ -69,12 +77,19 @@ def load_price_data(instruments: InstrumentList, config):
 
 
 def parse_rule(rule, data, ticker=None):
-    match rule[0]:
+    rule_name, rule_config = rule
+    params = rule_config.get("params", [])
+    
+    match rule_name:
         case "ewmac":
             # Import the actual function, not the module
             from strategy_core.sysrules.ewmac import ewmac
             # Create a wrapper data object that includes ticker info
             rule_data = {'price_data': data, 'ticker': ticker}
-            return TradingRule(ewmac, rule[1], rule_data)
+            return TradingRule(ewmac, params, rule_data)
+        case "breakout":
+            from strategy_core.sysrules.breakout import breakout
+            rule_data = {'price_data': data, 'ticker': ticker}
+            return TradingRule(breakout, params, rule_data)
         case _:
             raise Exception("No such rule in current project")

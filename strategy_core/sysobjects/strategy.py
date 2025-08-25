@@ -41,10 +41,11 @@ class Strategy:
         Dict[str, Forecast]
             Forecasts for each instrument
         """
-        forecasts = {}
+        raw_forecasts = {}
         
         self.logger.debug(f"Generating signals for {len(self.trading_rules)} rules")
         
+        # First, generate individual rule forecasts
         for rule in self.trading_rules:
             try:
                 # Get the rule's data and parameters
@@ -100,17 +101,11 @@ class Strategy:
                             # Create Forecast object
                             forecast = Forecast(forecast_series)
                             
-                            # Combine forecasts for the same instrument if multiple rules exist
-                            if instrument_name in forecasts:
-                                # Simple average combination for now
-                                existing_forecast = forecasts[instrument_name]
-                                combined_value = (existing_forecast.iloc[-1] + forecast.iloc[-1]) / 2
-                                combined_series = pd.Series([combined_value], index=[current_date])
-                                forecasts[instrument_name] = Forecast(combined_series)
-                            else:
-                                forecasts[instrument_name] = forecast
+                            # Store raw forecasts by rule_instrument key
+                            rule_key = f"{rule_function.__name__}_{instrument_name}"
+                            raw_forecasts[rule_key] = forecast
                                 
-                            self.logger.debug(f"Generated forecast for {instrument_name}: {forecast.iloc[-1]:.2f}")
+                            self.logger.debug(f"Generated forecast for {rule_key}: {forecast.iloc[-1]:.2f}")
                         
                     except Exception as e:
                         self.logger.error(f"Error in rule execution for {instrument_name}: {str(e)}")
@@ -119,7 +114,68 @@ class Strategy:
                 self.logger.error(f"Error executing trading rule {rule_function.__name__}: {str(e)}")
                 continue
         
-        return forecasts
+        # Now combine forecasts using weights
+        return self._combine_forecasts_with_weights(raw_forecasts)
+    
+    def _combine_forecasts_with_weights(self, raw_forecasts: Dict[str, Forecast]) -> Dict[str, Forecast]:
+        """Combine raw forecasts using configured weights"""
+        if not hasattr(self, 'rule_weights'):
+            # No weights configured, use simple average
+            return self._simple_average_combination(raw_forecasts)
+        
+        # Group forecasts by instrument
+        instrument_forecasts = {}
+        for rule_key, forecast in raw_forecasts.items():
+            instrument = rule_key.split('_', 1)[1]  # Extract instrument from rule_key
+            if instrument not in instrument_forecasts:
+                instrument_forecasts[instrument] = {}
+            instrument_forecasts[instrument][rule_key] = forecast
+        
+        # Combine forecasts for each instrument using weights
+        final_forecasts = {}
+        for instrument, forecasts in instrument_forecasts.items():
+            if len(forecasts) == 1:
+                # Single forecast, no combination needed
+                final_forecasts[instrument] = list(forecasts.values())[0]
+            else:
+                # Multiple forecasts, combine with weights
+                from ..sysriskutils.forecast_processing import ForecastCombiner
+                combiner = ForecastCombiner()
+                
+                # Extract weights for this instrument's rules
+                weights = {}
+                for rule_key in forecasts.keys():
+                    if rule_key in self.rule_weights:
+                        weights[rule_key] = self.rule_weights[rule_key]
+                    else:
+                        weights[rule_key] = 1.0
+                
+                # Combine forecasts
+                combined_forecast = combiner.combine_forecasts(forecasts, weights)
+                final_forecasts[instrument] = combined_forecast
+        
+        return final_forecasts
+    
+    def _simple_average_combination(self, raw_forecasts: Dict[str, Forecast]) -> Dict[str, Forecast]:
+        """Simple average combination when no weights are available"""
+        instrument_forecasts = {}
+        for rule_key, forecast in raw_forecasts.items():
+            instrument = rule_key.split('_', 1)[1]
+            if instrument not in instrument_forecasts:
+                instrument_forecasts[instrument] = []
+            instrument_forecasts[instrument].append(forecast)
+        
+        final_forecasts = {}
+        for instrument, forecasts in instrument_forecasts.items():
+            if len(forecasts) == 1:
+                final_forecasts[instrument] = forecasts[0]
+            else:
+                # Simple average
+                combined_value = sum(f.iloc[-1] for f in forecasts) / len(forecasts)
+                combined_series = pd.Series([combined_value], index=[forecasts[0].index[-1]])
+                final_forecasts[instrument] = Forecast(combined_series)
+        
+        return final_forecasts
     
     def _slice_data_to_current_date(self, rule_data, current_date):
         """

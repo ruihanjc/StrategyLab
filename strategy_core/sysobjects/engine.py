@@ -61,104 +61,127 @@ class BacktestEngine(TradingEngine):
 
     def run(self) -> BacktestResults:
         """
-        Run the backtest over the specified date range - CTA style
+        Run the backtest over the specified date range - per-instrument approach
         
         Returns:
         --------
         BacktestResults
             Complete backtest results and performance metrics
         """
-        self.logger.info(f"Starting CTA-style backtest from {self.start_date} to {self.end_date}")
+        self.logger.info(f"Starting multi-instrument backtest from {self.start_date} to {self.end_date}")
 
-        # Get price data as DataFrame
-        price_df = self._prepare_price_dataframe()
-        if price_df.empty:
+        # Prepare per-instrument data structures
+        instrument_data = self._prepare_per_instrument_data()
+        if not instrument_data:
             raise ValueError("No price data available for backtest")
 
-        self.logger.info(f"Backtesting over {len(price_df)} trading days")
+        # Get common date range across all instruments
+        common_dates = self._get_common_date_range(instrument_data)
+        self.logger.info(f"Backtesting over {len(common_dates)} trading days")
 
-        # Initialize position and forecast columns for each instrument
+        # Initialize results tracking
+        portfolio_results = pd.DataFrame(index=common_dates)
+        portfolio_results['portfolio_value'] = float(self.portfolio.initial_capital)
+
+        # Initialize position and forecast tracking per instrument
         for instrument in self.portfolio.instruments:
             ticker = instrument.ticker
-            price_df[f'pos_{ticker}'] = 0.0
-            price_df[f'forecast_{ticker}'] = 0.0
+            portfolio_results[f'pos_{ticker}'] = 0.0
+            portfolio_results[f'forecast_{ticker}'] = 0.0
 
-        # Strategy execution loop - CTA style
-
-        for i, (current_date, row) in enumerate(price_df.iterrows()):
+        # Strategy execution loop - per instrument
+        for i, current_date in enumerate(common_dates):
             if i < self.load_bars:
                 continue
 
             try:
-                # Get historical data up to current point
-                historical_data = price_df.loc[:current_date].copy()
+                # Generate signals for each instrument independently
+                instrument_forecasts = {}
+                instrument_positions = {}
 
-                # Get current prices for all instruments
-                current_prices = self._extract_current_prices(historical_data, current_date)
-
-                # Generate signals using strategy for all instruments
-                forecasts = self.generate_signals(current_date, current_prices)
-
-                # Process forecasts and positions for each instrument
                 for instrument in self.portfolio.instruments:
                     ticker = instrument.ticker
+                    
+                    if ticker not in instrument_data:
+                        continue
 
-                    # Check if this instrument has valid data on this data
-                    # Only process instruments that have valid data
-                    if ticker in current_prices and pd.notna(current_prices[ticker]) and current_prices[ticker] > 0:
-                        # Get forecast for this instrument
-                        forecast_value = 0.0
-                        if ticker in forecasts:
-                            forecast_obj = forecasts[ticker]
-                            if hasattr(forecast_obj, 'iloc') and len(forecast_obj) > 0:
-                                forecast_value = forecast_obj.iloc[-1]
-                            elif isinstance(forecast_obj, (int, float)):
-                                forecast_value = forecast_obj
+                    # Get historical data up to current date for this instrument
+                    historical_data = instrument_data[ticker].loc[:current_date]
+                    
+                    if len(historical_data) < self.load_bars:
+                        continue
 
-                        # Store forecast
-                        price_df.loc[current_date, f'forecast_{ticker}'] = forecast_value
+                    # Get current price for this instrument
+                    current_price = historical_data.iloc[-1]['close'] if not historical_data.empty else None
+                    
+                    if current_price is None or current_price <= 0:
+                        continue
 
-                        # Convert forecast to position using portfolio logic
-                        if forecast_value != 0:
-                            position = self._forecast_to_position(forecast_value, current_prices, ticker)
-                            price_df.loc[current_date, f'pos_{ticker}'] = position
+                    # Generate forecast using instrument-specific data
+                    current_prices = {ticker: current_price}
+                    forecasts = self.generate_signals(current_date, current_prices)
+                    
+                    forecast_value = 0.0
+                    if ticker in forecasts:
+                        forecast_obj = forecasts[ticker]
+                        if hasattr(forecast_obj, 'iloc') and len(forecast_obj) > 0:
+                            forecast_value = forecast_obj.iloc[-1]
+                        elif isinstance(forecast_obj, (int, float)):
+                            forecast_value = forecast_obj
+
+                    instrument_forecasts[ticker] = forecast_value
+
+                    # Convert forecast to position using instrument-specific data
+                    if forecast_value != 0:
+                        position = self._forecast_to_position_per_instrument(
+                            forecast_value, historical_data, instrument
+                        )
+                        instrument_positions[ticker] = position
                     else:
-                        # No valid data - keep position at 0 and don't generate signals
-                        price_df.loc[current_date, f'forecast_{ticker}'] = 0.0
-                        price_df.loc[current_date, f'pos_{ticker}'] = 0.0
+                        instrument_positions[ticker] = 0.0
 
-                # Forward fill positions for all instruments
+                # Update portfolio results
+                for ticker, forecast in instrument_forecasts.items():
+                    portfolio_results.loc[current_date, f'forecast_{ticker}'] = forecast
+                
+                for ticker, position in instrument_positions.items():
+                    portfolio_results.loc[current_date, f'pos_{ticker}'] = position
+
+                # Forward fill positions
                 for instrument in self.portfolio.instruments:
                     ticker = instrument.ticker
-                    price_df.loc[:current_date, f'pos_{ticker}'] = price_df.loc[:current_date, f'pos_{ticker}'].ffill()
+                    portfolio_results.loc[:current_date, f'pos_{ticker}'] = portfolio_results.loc[:current_date, f'pos_{ticker}'].ffill()
 
             except Exception as e:
                 self.logger.error(f"Error processing {current_date}: {str(e)}")
-                print(f"Error processing {current_date}: {str(e)}")
                 continue
 
-        # Fill any remaining NaN positions for all instruments
+        # Fill any remaining NaN positions
         for instrument in self.portfolio.instruments:
             ticker = instrument.ticker
-            price_df[f'pos_{ticker}'] = price_df[f'pos_{ticker}'].fillna(0)
+            portfolio_results[f'pos_{ticker}'] = portfolio_results[f'pos_{ticker}'].fillna(0)
 
-        # Calculate performance after calculation
-        results_df, stats = self._calculate_results(price_df)
+        # Calculate portfolio performance
+        portfolio_results = self._calculate_portfolio_performance(portfolio_results, instrument_data)
+        
+        # Calculate statistics
+        stats = self._calculate_portfolio_stats(portfolio_results)
 
-        # Create BacktestResults object with the calculated data
+        # Create BacktestResults object
         self.results = BacktestResults(
             start_date=self.start_date,
             end_date=self.end_date,
             initial_capital=self.portfolio.initial_capital
         )
 
-        # Populate results with calculated data
-        self._populate_backtest_results(results_df, stats)
+        # Populate results
+        self._populate_backtest_results(portfolio_results, stats)
 
-        # Store the price DataFrame for plotting
-        self.results.price_data = price_df
+        # Store data for plotting
+        self.results.price_data = portfolio_results
+        self.results.instrument_data = instrument_data
 
-        self.logger.info("CTA-style backtest completed successfully")
+        self.logger.info("Multi-instrument backtest completed successfully")
         return self.results
 
     def get_current_prices(self, timestamp: datetime) -> Dict:
@@ -193,63 +216,80 @@ class BacktestEngine(TradingEngine):
 
         return sorted(list(all_dates))
 
-    def _prepare_price_dataframe(self) -> pd.DataFrame:
-        """Prepare price data for multiple instruments"""
+    def _prepare_per_instrument_data(self) -> Dict[str, pd.DataFrame]:
+        """Prepare separate OHLC data for each instrument"""
         if not self.data_handler:
-            return pd.DataFrame()
+            return {}
 
-        # For multiple instruments, we need to create a combined approach
-        # We'll use the first instrument's dates as the master calendar
-        # and track positions/forecasts per instrument separately
-
-        primary_instrument = list(self.portfolio.instruments)[0]
-        price_data = self.data_handler.get(primary_instrument.ticker)
-
-        if price_data is None:
-            return pd.DataFrame()
-
-        # Extract OHLC data for primary instrument
-        if hasattr(price_data, 'data'):
-            df = price_data.data.copy()
-        elif hasattr(price_data, 'close'):
-            df = pd.DataFrame({
-                'open': price_data.open,
-                'high': price_data.high,
-                'low': price_data.low,
-                'close': price_data.close,
-                'volume': price_data.volume if hasattr(price_data, 'volume') else 0
-            })
-        else:
-            df = price_data.copy()
-
-        # Add columns for each instrument's close prices
+        instrument_data = {}
+        
         for instrument in self.portfolio.instruments:
             ticker = instrument.ticker
-            if ticker != primary_instrument.ticker:  # Skip primary as it's already included
-                inst_data = self.data_handler.get(ticker)
-                if inst_data is not None:
-                    if hasattr(inst_data, 'close'):
-                        close_series = inst_data.close
-                    elif hasattr(inst_data, 'data') and 'close' in inst_data.data.columns:
-                        close_series = inst_data.data['close']
-                    else:
-                        close_series = inst_data
+            price_data = self.data_handler.get(ticker)
+            
+            if price_data is None:
+                self.logger.warning(f"No data available for {ticker}")
+                continue
 
-                    # Align dates and add to main DataFrame with proper NaN handling
-                    df[f'{ticker}_close'] = close_series
-                    
-                    # Forward fill NaN values for this instrument (don't use 0 for prices!)
-                    df[f'{ticker}_close'] = df[f'{ticker}_close'].ffill()
+            # Extract OHLC data for this instrument
+            if hasattr(price_data, 'data'):
+                df = price_data.data.copy()
+            elif hasattr(price_data, 'close'):
+                df = pd.DataFrame({
+                    'open': price_data.open,
+                    'high': price_data.high,
+                    'low': price_data.low,
+                    'close': price_data.close,
+                    'volume': price_data.volume if hasattr(price_data, 'volume') else 0
+                })
+            else:
+                # Assume it's a Series of close prices
+                df = pd.DataFrame({'close': price_data})
+                df['open'] = df['close']
+                df['high'] = df['close']
+                df['low'] = df['close']
+                df['volume'] = 0
 
-        # Clean data - remove invalid prices
-        df = df[(df['close'] > 0) & (df['high'] > 0) & (df['low'] > 0)]
-        df = df.dropna(subset=['close'])  # Only require primary instrument to have valid data
+            # Clean data - remove invalid prices
+            df = df[(df['close'] > 0) & (df['high'] > 0) & (df['low'] > 0)]
+            df = df.dropna(subset=['close'])
+            
+            # Forward fill any remaining NaN values
+            df = df.ffill()
 
-        # Filter by date range
-        mask = (df.index >= self.start_date) & (df.index <= self.end_date)
-        df = df[mask]
+            # Filter by date range
+            mask = (df.index >= self.start_date) & (df.index <= self.end_date)
+            df = df[mask]
+            
+            if not df.empty:
+                instrument_data[ticker] = df
+                self.logger.info(f"Loaded {len(df)} trading days for {ticker}")
+            else:
+                self.logger.warning(f"No valid data for {ticker} in date range")
 
-        return df
+        return instrument_data
+    
+    def _get_common_date_range(self, instrument_data: Dict[str, pd.DataFrame]) -> pd.DatetimeIndex:
+        """Get common trading dates across all instruments"""
+        if not instrument_data:
+            return pd.DatetimeIndex([])
+        
+        # Get intersection of all instruments' date ranges
+        common_dates = None
+        for ticker, data in instrument_data.items():
+            if common_dates is None:
+                common_dates = set(data.index)
+            else:
+                common_dates = common_dates.intersection(set(data.index))
+        
+        if common_dates:
+            return pd.DatetimeIndex(sorted(common_dates))
+        else:
+            # If no common dates, use union and forward fill
+            all_dates = set()
+            for data in instrument_data.values():
+                all_dates = all_dates.union(set(data.index))
+            return pd.DatetimeIndex(sorted(all_dates))
 
     def _extract_current_prices(self, historical_data: pd.DataFrame, current_date) -> Dict:
         """Extract current prices for all instruments"""
@@ -274,19 +314,29 @@ class BacktestEngine(TradingEngine):
 
         return current_prices
 
-    def _forecast_to_position(self, forecast_value: float, current_prices: Dict, instrument_name: str) -> float:
-        """Convert forecast to position using portfolio logic"""
+    def _forecast_to_position_per_instrument(self, forecast_value: float, historical_data: pd.DataFrame, instrument) -> float:
+        """Convert forecast to position using per-instrument data"""
         try:
-            # Use simplified position sizing from portfolio
-            # forecast_value is typically -20 to +20, convert to position size
+            # Use instrument-specific volatility and characteristics
+            if len(historical_data) < 25:
+                return 0.0
+            
+            # Calculate instrument volatility using its own price data
+            returns = historical_data['close'].pct_change().dropna()
+            if len(returns) < 20:
+                return 0.0
+                
+            instrument_vol = returns.rolling(window=min(25, len(returns))).std().iloc[-1] * np.sqrt(252)
+            
+            if pd.isna(instrument_vol) or instrument_vol <= 0:
+                return 0.0
 
             # Get volatility target from portfolio
             vol_target = self.portfolio.volatility_target
 
-            # Simple position sizing: forecast/20 * volatility_target * leverage_factor
-            # This gives us a position between -vol_target and +vol_target
-            leverage_factor = 2.0  # Adjust based on your risk preference
-            position = (forecast_value / 20.0) * vol_target * leverage_factor
+            # Position sizing: forecast/forecast_cap * vol_target/instrument_vol * capital_multiplier
+            forecast_cap = 20.0
+            position = (forecast_value / forecast_cap) * (vol_target / instrument_vol)
 
             # Apply maximum leverage constraint
             max_position = self.portfolio.max_leverage
@@ -295,8 +345,97 @@ class BacktestEngine(TradingEngine):
             return position
 
         except Exception as e:
-            self.logger.error(f"Error converting forecast to position: {str(e)}")
+            self.logger.error(f"Error converting forecast to position for {instrument.ticker}: {str(e)}")
             return 0.0
+    
+    def _calculate_portfolio_performance(self, portfolio_results: pd.DataFrame, instrument_data: Dict[str, pd.DataFrame]) -> pd.DataFrame:
+        """Calculate portfolio performance using per-instrument data"""
+        
+        # Initialize portfolio value tracking
+        portfolio_results['portfolio_return'] = 0.0
+        
+        for i in range(1, len(portfolio_results)):
+            current_date = portfolio_results.index[i]
+            prev_date = portfolio_results.index[i-1]
+            
+            total_return = 0.0
+            
+            # Calculate returns for each instrument
+            for instrument in self.portfolio.instruments:
+                ticker = instrument.ticker
+                
+                if ticker not in instrument_data:
+                    continue
+                    
+                # Get position from previous day
+                prev_position = portfolio_results.loc[prev_date, f'pos_{ticker}']
+                
+                if pd.isna(prev_position) or prev_position == 0:
+                    continue
+                
+                # Get current and previous prices for this instrument
+                if current_date in instrument_data[ticker].index and prev_date in instrument_data[ticker].index:
+                    current_price = instrument_data[ticker].loc[current_date, 'close']
+                    prev_price = instrument_data[ticker].loc[prev_date, 'close']
+                    
+                    if pd.notna(current_price) and pd.notna(prev_price) and prev_price > 0:
+                        # Calculate instrument return
+                        instrument_return = (current_price - prev_price) / prev_price
+                        
+                        # Weight by position size
+                        weighted_return = instrument_return * prev_position
+                        total_return += weighted_return
+            
+            portfolio_results.loc[current_date, 'portfolio_return'] = total_return
+            
+            # Update portfolio value
+            portfolio_results.loc[current_date, 'portfolio_value'] = (
+                portfolio_results.loc[prev_date, 'portfolio_value'] * (1.0 + total_return)
+            )
+        
+        return portfolio_results
+    
+    def _calculate_portfolio_stats(self, portfolio_results: pd.DataFrame) -> Dict:
+        """Calculate portfolio statistics"""
+        stats = {}
+        
+        returns = portfolio_results['portfolio_return'].dropna()
+        portfolio_values = portfolio_results['portfolio_value'].dropna()
+        
+        if len(portfolio_values) == 0:
+            return {'return': 0, 'yearReturn': 0, 'MaxDrawDown': 0, 'sharpe_ratio': 0, 'win_rate': 0}
+        
+        # Total and annualized returns
+        final_value = portfolio_values.iloc[-1]
+        initial_value = self.portfolio.initial_capital
+        stats['return'] = (final_value - initial_value) / initial_value
+        
+        # Annualized return
+        years = (portfolio_results.index[-1] - portfolio_results.index[0]).days / 365.25
+        if years > 0:
+            if years <= 1:
+                stats['yearReturn'] = stats['return'] / years
+            else:
+                stats['yearReturn'] = (final_value / initial_value) ** (1 / years) - 1
+        else:
+            stats['yearReturn'] = 0
+        
+        # Maximum drawdown
+        cummax = portfolio_values.cummax()
+        drawdown = portfolio_values / cummax - 1
+        stats['MaxDrawDown'] = drawdown.min()
+        
+        # Sharpe ratio
+        if len(returns) > 1 and returns.std() > 0:
+            stats['sharpe_ratio'] = returns.mean() / returns.std() * np.sqrt(252)
+        else:
+            stats['sharpe_ratio'] = 0
+        
+        # Win rate
+        trading_returns = returns[returns.abs() > 0.0001]
+        stats['win_rate'] = (trading_returns > 0).mean() if len(trading_returns) > 0 else 0
+        
+        return stats
 
     def _calculate_results(self, price_df: pd.DataFrame) -> tuple:
         def get_max_drawdown(array):
@@ -419,14 +558,12 @@ class BacktestEngine(TradingEngine):
             'max_drawdown': stats['MaxDrawDown'],
             'sharpe_ratio': stats['sharpe_ratio'],
             'win_rate': stats['win_rate'],
-            'return_drawdown_ratio': stats['return_drawdown_ratio'],
-            'final_capital': results_df['strategy_balance'].iloc[-1]
+            'final_capital': results_df['portfolio_value'].iloc[-1]
         }
 
         # Store daily data
-        self.results.daily_capital = results_df['strategy_balance']
-        self.results.daily_returns = (
-                results_df['strategy_balance'] / results_df['strategy_balance'].shift(1) - 1).fillna(0)
+        self.results.daily_capital = results_df['portfolio_value']
+        self.results.daily_returns = results_df['portfolio_return']
 
         # Store positions and forecasts for all instruments
         positions_data = {}

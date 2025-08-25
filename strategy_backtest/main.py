@@ -59,7 +59,7 @@ def main(config_arguments=None):
 
         # Create portfolio
         logger.info("Creating portfolio...")
-        initial_capital = backtest_config.get("initial_capital", 1000000)
+        initial_capital = backtest_config.get("initial_capital")
         portfolio = Portfolio(instruments, initial_capital=initial_capital)
 
         # Get date range from config
@@ -98,29 +98,29 @@ def main(config_arguments=None):
         logger.info("========================")
 
         # optimize_ewmac(engine)
-
-        # Plot results in CTA style
-        if backtest_config.get("plot_results", True):
-            logger.info("Generating plots...")
-            try:
-                # Use the CTA-style plotting with the price data from the engine
-                plot_path = "strategy_backtest/results/backtest_results.png"
-                # Show the plot interactively AND save it
-                results.plot_cta_style(results.price_data, save_path=plot_path, show_plot=True)
-                logger.info("Interactive plot displayed and saved to backtest_results.png")
-            except Exception as e:
-                logger.warning(f"Error generating plots: {str(e)}")
-
-        # Save results if requested
-        if backtest_config.get("save_results", False):
-            results_file = backtest_config.get("results_file", "backtest_results.pkl")
-            try:
-                import pickle
-                with open(results_file, 'wb') as f:
-                    pickle.dump(results, f)
-                logger.info(f"Results saved to {results_file}")
-            except Exception as e:
-                logger.error(f"Error saving results: {str(e)}")
+        #
+        # # Plot results in CTA style
+        # if backtest_config.get("plot_results", True):
+        #     logger.info("Generating plots...")
+        #     try:
+        #         # Use the CTA-style plotting with the price data from the engine
+        #         plot_path = "strategy_backtest/results/backtest_results.png"
+        #         # Show the plot interactively AND save it
+        #         results.plot_cta_style(results.price_data, save_path=plot_path, show_plot=True)
+        #         logger.info("Interactive plot displayed and saved to backtest_results.png")
+        #     except Exception as e:
+        #         logger.warning(f"Error generating plots: {str(e)}")
+        #
+        # # Save results if requested
+        # if backtest_config.get("save_results", False):
+        #     results_file = backtest_config.get("results_file", "backtest_results.pkl")
+        #     try:
+        #         import pickle
+        #         with open(results_file, 'wb') as f:
+        #             pickle.dump(results, f)
+        #         logger.info(f"Results saved to {results_file}")
+        #     except Exception as e:
+        #         logger.error(f"Error saving results: {str(e)}")
 
         return True
 
