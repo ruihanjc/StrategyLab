@@ -6,19 +6,17 @@ Demonstrates complete workflow with integrated components
 
 # Standard library imports
 import logging
-import sys
 import os
-
-from strategy_core.sysrules.ewmac import optimize_ewmac
-
-# Add project root to Python path
-project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, project_root)
+import sys
 
 from strategy_core.sysobjects import Portfolio
 from strategy_core.sysobjects.engine import BacktestEngine
 from strategy_core.sysutils.config_manager import ConfigManager
 from strategy_core.sysutils.engine_utils import *
+
+# Add project root to Python path
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, project_root)
 
 
 def setup_logging():
@@ -53,7 +51,7 @@ def main(config_arguments=None):
         # Create strategy
         logger.info("Creating strategy...")
         strategy = create_strategy_from_config(instruments, backtest_config)
-        
+
         # Validate strategy
         if not strategy.validate_strategy(price_data):
             logger.error("Strategy validation failed")
@@ -67,7 +65,7 @@ def main(config_arguments=None):
         # Get date range from config
         start_date = backtest_config.get("start_date")
         end_date = backtest_config.get("end_date")
-        
+
         logger.info(f"Backtest period: {start_date} to {end_date}")
 
         # Create and run backtest engine
@@ -86,7 +84,7 @@ def main(config_arguments=None):
 
         # Display results
         logger.info("Backtest completed successfully!")
-        
+
         # Print performance summary
         performance = results.get_performance_summary()
         logger.info("=== BACKTEST RESULTS ===")

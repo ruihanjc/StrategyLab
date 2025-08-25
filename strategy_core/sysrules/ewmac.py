@@ -6,7 +6,7 @@ from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 
 def ewmac(price_data, params):
     """
-    EWMAC trading rule - Exponentially Weighted Moving Average Crossover
+    EWMAC trading rule - Equal Weighted Moving Average Crossover
     
     Parameters:
     -----------

@@ -1,7 +1,6 @@
 from strategy_core.sysobjects import InstrumentList, Instrument, MultiplePrices
 from strategy_core.sysobjects.strategy import Strategy
-from strategy_core.sysrules import ewmac
-from strategy_core.sysrules.trading_rule import TradingRule
+from strategy_core.sysobjects.trading_rule import TradingRule
 from strategy_data.database import ArcticReader
 
 

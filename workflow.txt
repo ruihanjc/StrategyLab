@@ -61,9 +61,10 @@
 
   Data Sources & Formats
 
-  CSV Data (Default for Backtesting)
+  CSV Data (Default for backtesting)
+  ArcticDB Data
 
-  from sysdata.sim.csv_futures_sim_data import csvFuturesSimData
+  from strategy_data.sim.csv_futures_sim_data import csvFuturesSimData
   data = csvFuturesSimData()  # Loads 249 instruments
 
   Data Structure:

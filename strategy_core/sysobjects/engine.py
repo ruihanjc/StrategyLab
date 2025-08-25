@@ -57,6 +57,7 @@ class BacktestEngine(TradingEngine):
         self.start_date = pd.Timestamp(start_date)
         self.end_date = pd.Timestamp(end_date)
         self.results = None
+        self.load_bars = 70
 
     def run(self) -> BacktestResults:
         """
@@ -83,10 +84,9 @@ class BacktestEngine(TradingEngine):
             price_df[f'forecast_{ticker}'] = 0.0
 
         # Strategy execution loop - CTA style
-        loadBars = 70  # Minimum bars needed for strategy
 
         for i, (current_date, row) in enumerate(price_df.iterrows()):
-            if i < loadBars:
+            if i < self.load_bars:
                 continue
 
             try:
@@ -103,13 +103,9 @@ class BacktestEngine(TradingEngine):
                 for instrument in self.portfolio.instruments:
                     ticker = instrument.ticker
 
-                    # Check if this instrument has valid data on this date
-                    has_valid_data = False
-                    if ticker in current_prices and pd.notna(current_prices[ticker]) and current_prices[ticker] > 0:
-                        has_valid_data = True
-                    
+                    # Check if this instrument has valid data on this data
                     # Only process instruments that have valid data
-                    if has_valid_data:
+                    if ticker in current_prices and pd.notna(current_prices[ticker]) and current_prices[ticker] > 0:
                         # Get forecast for this instrument
                         forecast_value = 0.0
                         if ticker in forecasts:
@@ -138,6 +134,7 @@ class BacktestEngine(TradingEngine):
 
             except Exception as e:
                 self.logger.error(f"Error processing {current_date}: {str(e)}")
+                print(f"Error processing {current_date}: {str(e)}")
                 continue
 
         # Fill any remaining NaN positions for all instruments
@@ -145,8 +142,8 @@ class BacktestEngine(TradingEngine):
             ticker = instrument.ticker
             price_df[f'pos_{ticker}'] = price_df[f'pos_{ticker}'].fillna(0)
 
-        # Calculate performance using CTA-style calculation
-        results_df, stats = self._calculate_cta_results(price_df)
+        # Calculate performance after calculation
+        results_df, stats = self._calculate_results(price_df)
 
         # Create BacktestResults object with the calculated data
         self.results = BacktestResults(
@@ -301,9 +298,7 @@ class BacktestEngine(TradingEngine):
             self.logger.error(f"Error converting forecast to position: {str(e)}")
             return 0.0
 
-    def _calculate_cta_results(self, price_df: pd.DataFrame) -> tuple:
-        """Calculate backtest results using CTA-style method for multiple instruments"""
-
+    def _calculate_results(self, price_df: pd.DataFrame) -> tuple:
         def get_max_drawdown(array):
             array = pd.Series(array)
             cummax = array.cummax()
