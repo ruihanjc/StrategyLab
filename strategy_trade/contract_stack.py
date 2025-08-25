@@ -1,11 +1,12 @@
 from typing import Dict, List
 from .order import Order
 
+
 class ContractStack:
     """
     Manages a collection of orders for specific, tradable contracts.
     """
-    
+
     def __init__(self):
         # Using contract ID as the key for uniqueness
         self._orders: Dict[str, Order] = {}
