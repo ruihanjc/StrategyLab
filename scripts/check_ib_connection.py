@@ -1,6 +1,6 @@
 import sys
 import os
-from strategy_trade.ib_connection import IBConnection
+from strategy_brokers.ib_connection import IBConnection
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -14,8 +14,8 @@ def main():
         account_summary = ib.accountSummary(account_number)
 
         print("Account Summary:")
-        for tag, value, currency in account_summary:
-            print(f"{tag}: {value} {currency}")
+        for account in account_summary:
+            print(f"{account.tag}: {account.value} {account.currency}")
 
     except Exception as e:
         print(f"An error occurred: {e}")

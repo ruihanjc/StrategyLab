@@ -1,5 +1,6 @@
 from ib_insync import Contract, Stock, Future, Forex
 from strategy_data.database.arctic_connection import ArcticConnection
+import os
 
 
 def create_contract(symbol: str) -> Contract:
@@ -8,7 +9,9 @@ def create_contract(symbol: str) -> Contract:
     """
 
     # Connect to ArcticDB and get metadata
-    conn = ArcticConnection()
+    project_dir = os.path.abspath(__file__ + "/../../")
+    arctic_path = os.path.join(project_dir, 'arcticdb')
+    conn = ArcticConnection().get_instance(arctic_path)
     metadata_lib = conn.get_library('metadata')
     df = metadata_lib.read('instrument_contracts').data
 

@@ -2,7 +2,6 @@
 import pandas as pd
 from datetime import datetime
 import os
-from pathlib import Path
 import logging
 
 from strategy_data.database.arctic_connection import get_arcticdb_connection

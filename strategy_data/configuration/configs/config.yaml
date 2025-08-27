@@ -29,6 +29,8 @@ update_services:
       ticker: "AAPL"
     - source: "MarketStack"
       ticker: "PLTR"
+    - source: "MarketStack"
+      ticker: "SPY"
   
 data_sources:
   default: "market_stack"
