@@ -3,11 +3,25 @@ from enum import Enum
 from typing import Optional
 
 class OrderStatus(Enum):
-    PENDING = "Pending"
+    PENDING_SUBMIT = "PendingSubmit"
+    PENDING_CANCEL = "PendingCancel"
+    PRE_SUBMITTED = "PreSubmitted"
     SUBMITTED = "Submitted"
-    FILLED = "Filled"
+    API_CANCELLED = "ApiCancelled"
     CANCELLED = "Cancelled"
-    REJECTED = "Rejected"
+    FILLED = "Filled"
+    INACTIVE = "Inactive"
+
+IB_ORDER_STATUS_MAP = {
+    "PendingSubmit": OrderStatus.PENDING_SUBMIT,
+    "PendingCancel": OrderStatus.PENDING_CANCEL,
+    "PreSubmitted": OrderStatus.PRE_SUBMITTED,
+    "Submitted": OrderStatus.SUBMITTED,
+    "ApiCancelled": OrderStatus.API_CANCELLED,
+    "Cancelled": OrderStatus.CANCELLED,
+    "Filled": OrderStatus.FILLED,
+    "Inactive": OrderStatus.INACTIVE,
+}
 
 class OrderType(Enum):
     MARKET = "MKT"
@@ -21,7 +35,7 @@ class Order:
     instrument: str
     quantity: int
     order_type: OrderType
-    status: OrderStatus = field(default=OrderStatus.PENDING)
+    status: OrderStatus = field(default=OrderStatus.PRE_SUBMITTED)
     limit_price: Optional[float] = None
     order_id: Optional[int] = None
 

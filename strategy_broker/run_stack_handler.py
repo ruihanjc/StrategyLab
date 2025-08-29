@@ -1,29 +1,30 @@
-from .instrument_stack import InstrumentStack
-from .contract_stack import ContractStack
-from .broker_stack import BrokerStack
-from .order import Order, OrderType
-from .ib_connection import IBConnection
+from strategy_broker.instrument_stack import InstrumentStack
+from strategy_broker.contract_stack import ContractStack
+from strategy_broker.broker_stack import BrokerStack
+from strategy_broker.order import Order, OrderType
+from ib_connection import IBConnection
+
 
 def run_stack_handler():
     """
     Main handler for the order execution pipeline.
     """
-    
+
     # 1. Initialize the connection and stacks
     ib_conn = IBConnection()
     instrument_stack = InstrumentStack()
     contract_stack = ContractStack()
     broker_stack = BrokerStack(ib_conn)
-    
+
     # --- This is where you would get signals from your strategies ---
     # For demonstration, we'll create a sample order
     sample_order = Order(instrument="SPY", quantity=10, order_type=OrderType.MARKET)
     instrument_stack.add_order(sample_order)
-    
+
     print("--- Instrument Stack ---")
     for order in instrument_stack.get_all_orders():
         print(order)
-    
+
     # 2. Spawn contract orders from instrument stack
     print("\n--- Contract Stack ---")
     for instrument_order in instrument_stack.get_all_orders():
@@ -46,7 +47,7 @@ def run_stack_handler():
     print("\n--- Broker Stack ---")
     for contract_order in contract_stack.get_all_orders():
         broker_stack.submit_order(contract_order)
-    
+
     print("\n--- Live Orders at Broker ---")
     for order in broker_stack.get_live_orders():
         print(order)
@@ -62,6 +63,7 @@ def run_stack_handler():
     # 7. Stack cleanup
     # (To be implemented)
     print("\n--- Stack Cleanup (TBI) ---")
+
 
 if __name__ == "__main__":
     run_stack_handler()

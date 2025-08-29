@@ -1,8 +1,6 @@
-import sys
-import os
-from strategy_trade.ib_connection import IBConnection
+from strategy_broker.ib_connection import IBConnection
+from ib_insync import Forex
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 def main():
     ib_conn = IBConnection(config_path='private_config.yaml')
@@ -14,8 +12,25 @@ def main():
         account_summary = ib.accountSummary(account_number)
 
         print("Account Summary:")
-        for tag, value, currency in account_summary:
-            print(f"{tag}: {value} {currency}")
+        for account in account_summary:
+            print(f"{account.tag}: {account.value} {account.currency}")
+
+        forex = Forex("AUDUSD")
+
+        ib.reqMarketDataType(1)
+
+        bars = ib.reqHistoricalData(
+            forex,
+            endDateTime="",
+            durationStr="1 Y",
+            barSizeSetting="1 day",
+            whatToShow="TRADES",
+            useRTH=True,
+            formatDate=2,
+            timeout=20,
+        )
+
+        requested_data = ib.reqHistoricalData(forex, "", "100 D", "1 MIN", "TRADES", 1, 1, False, [])
 
     except Exception as e:
         print(f"An error occurred: {e}")

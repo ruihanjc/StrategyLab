@@ -1,11 +1,12 @@
 from typing import Dict, List
-from .order import Order
+from order import Order
+
 
 class InstrumentStack:
     """
     Manages a collection of strategy-level virtual orders (instrument stack).
     """
-    
+
     def __init__(self):
         self._orders: Dict[str, Order] = {}
 
