@@ -1,7 +1,7 @@
-from strategy_brokers.instrument_stack import InstrumentStack
-from strategy_brokers.contract_stack import ContractStack
-from strategy_brokers.broker_stack import BrokerStack
-from strategy_brokers.order import Order, OrderType
+from strategy_broker.instrument_stack import InstrumentStack
+from strategy_broker.contract_stack import ContractStack
+from strategy_broker.broker_stack import BrokerStack
+from strategy_broker.order import Order, OrderType
 from ib_connection import IBConnection
 
 

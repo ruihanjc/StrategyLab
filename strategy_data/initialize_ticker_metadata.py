@@ -1,7 +1,7 @@
 import pandas as pd
 import sys
 import os
-from strategy_data.database.arctic_connection import ArcticConnection
+from strategy_data.database.arctic_connection import get_arcticdb_connection
 
 
 def initialize_instrument_metadata():
@@ -20,11 +20,11 @@ def initialize_instrument_metadata():
     # Connect to ArcticDB
     project_dir = os.path.abspath(__file__ + "/../../")
     arctic_path = os.path.join(project_dir, 'arcticdb')
-    conn = ArcticConnection().get_instance(arctic_path)
+    conn = get_arcticdb_connection(arctic_path)
     metadata_lib = conn.get_library('metadata')
 
     # Write to the library
-    metadata_lib.write('instrument_contracts', df)
+    metadata_lib.append('instrument_contracts', df)
 
     print(
         "Instrument metadata initialized and stored in ArcticDB library 'metadata' with symbol 'instrument_contracts'.")
