@@ -18,6 +18,10 @@ strategy_backtest:
 - Backtesting tool to check the return from a certain rule, the rule resides in strategy_core If you want to add one on your own.
 - Run the main.py file to initialize a backtest.
 
+
+strategy_brokers:
+- Package used to create clients that I can use to trade.
+
 strategy_trading:
 - Paper trading engine that uses IBKR's api and strategy_core's classes to identify signals, buy or sell when signal notified.
 
