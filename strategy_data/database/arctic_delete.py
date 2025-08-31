@@ -1,8 +1,11 @@
 import os
 import shutil
 import logging
+import sys
 from datetime import datetime
 import time
+
+from strategy_core.sysobjects import Instrument
 from strategy_data.database.arctic_connection import get_arcticdb_connection
 
 
@@ -83,6 +86,16 @@ class ArcticDBCleaner:
             self.logger.error(f"Cleanup failed: {str(e)}")
             return False
 
+    def delete_ticker(self, instrument: Instrument):
+        try:
+            library = self.arctic.get_library(instrument.asset_class)
+            library.delete(instrument.ticker)
+            return True
+
+        except Exception as e:
+            self.logger.error(f"Ticker deleted failed: {str(e)}")
+            return False
+
 
 def arctic_delete():
     import argparse
@@ -103,5 +116,12 @@ def arctic_delete():
         print("Check the log file for details")
 
 
+def arctic_delete_ticker(source: str, ticker: str, asset_class: str):
+    delete_instrument = Instrument(source, ticker, asset_class)
+    cleaner = ArcticDBCleaner()
+
+    cleaner.delete_ticker(delete_instrument)
+
+
 if __name__ == "__main__":
-    arctic_delete()
+    arctic_delete_ticker("MarketStack", "TSLA", "equity")

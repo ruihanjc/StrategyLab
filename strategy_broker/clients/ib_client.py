@@ -1,10 +1,8 @@
-import logging
-
-from ib_insync import ib
+from abc import abstractmethod
 from strategy_broker.ib_connection import IBConnection
 from ib_insync import Contract
 
-
+import logging
 
 
 IB_ERROR_TYPES = {
@@ -43,12 +41,16 @@ def setup_logging():
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     )
 
+
+def broker_error(msg, log):
+    log.warning(msg)
+
+
 class IBClient(object):
 
-    def __init__(self):
-
+    def __init__(self, account_type : str):
         setup_logging()
-        self.ib = IBConnection().connect()
+        self.ib = IBConnection().connect(account_type)
         self.logger = logging.getLogger(__name__)
 
     @property
@@ -60,7 +62,7 @@ class IBClient(object):
         return self.ib.client.clientId
 
     def error_handler(
-        self, reqid: int, error_code: int, error_string: str, ib_contract: Contract
+            self, req_id: int, error_code: int, error_string: str, ib_contract: Contract
     ):
         """
         Error handler called from server
@@ -73,29 +75,37 @@ class IBClient(object):
         :return: success
         """
 
-        msg = "Reqid %d: %d %s for %s" % (
-            reqid,
+        msg = "RequestId %d: %d %s for %s" % (
+            req_id,
             error_code,
             error_string,
             str(ib_contract),
         )
 
-        iserror = error_code in IB_IS_ERROR
-        if iserror:
+        is_error = error_code in IB_IS_ERROR
+
+        if is_error:
             # Serious requires some action
-            myerror_type = IB_ERROR_TYPES.get(error_code, "generic")
-            self.broker_error(msg=msg,  log=self.logger, myerror_type=myerror_type)
+            my_error_type = IB_ERROR_TYPES.get(error_code, "generic")
+            msg = f"This request had a error type: {my_error_type}"
+            broker_error(msg=msg, log=self.logger)
 
         else:
             # just a general message
             self.broker_message(msg=msg, log=self.logger)
 
-    def broker_error(self, msg, log, myerror_type):
-        log.warning(msg)
-
-    def broker_message(self, log, msg):
+    @staticmethod
+    def broker_message(log, msg):
         log.debug(msg)
 
+    @staticmethod
     def refresh(self):
         self.ib.sleep(0.00001)
 
+    @abstractmethod
+    def get_ib_data(self, asset_class, duration):
+        pass
+
+    @abstractmethod
+    def process_bars_data(self, bars, ticker):
+        pass

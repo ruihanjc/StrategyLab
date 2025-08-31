@@ -14,7 +14,7 @@ instruments:
     - source: "MarketStack"
       ticker: "TSLA"
 
-data settings:
+data_settings:
   preprocessing:
     handle_missing: true
     method: 'ffill'
