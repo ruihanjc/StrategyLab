@@ -1,12 +1,12 @@
 from strategy_broker.ib_connection import IBConnection
-from ib_insync import Forex
+from ib_insync import *
 
 
 def main():
-    ib_conn = IBConnection(config_path='private_config.yaml')
+    ib_conn = IBConnection()
     try:
-        ib = ib_conn.connect()
-        account_number = ib_conn.config['broker_account']
+        ib = ib_conn.connect("IBKR_DUMMY_ACCOUNT")
+        account_number = ib_conn.config["IBKR_DUMMY_ACCOUNT"]['broker_account']
 
         # Fetching account summary
         account_summary = ib.accountSummary(account_number)
@@ -16,21 +16,20 @@ def main():
             print(f"{account.tag}: {account.value} {account.currency}")
 
         forex = Forex("AUDUSD")
+        stock = Stock("TSLA", exchange="SMART", currency="USD")
 
         ib.reqMarketDataType(1)
 
         bars = ib.reqHistoricalData(
-            forex,
+            stock,
             endDateTime="",
-            durationStr="1 Y",
+            durationStr="4 Y",
             barSizeSetting="1 day",
             whatToShow="TRADES",
             useRTH=True,
             formatDate=2,
             timeout=20,
         )
-
-        requested_data = ib.reqHistoricalData(forex, "", "100 D", "1 MIN", "TRADES", 1, 1, False, [])
 
     except Exception as e:
         print(f"An error occurred: {e}")

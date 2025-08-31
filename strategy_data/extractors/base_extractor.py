@@ -1,16 +1,17 @@
 from abc import ABC, abstractmethod
+from typing import Dict, List
+from strategy_core.sysobjects import Instrument
+from strategy_data.database import ArcticReader
+
 import requests
 import pandas as pd
-from typing import Dict, Any
 import datetime
-
-from strategy_core.sysobjects import Instrument
 
 
 class BaseExtractor(ABC):
     def __init__(self, instrument: Instrument):
         self.service = instrument.asset_class  # Service
-        self.ticker = instrument.ticker # Ticker
+        self.ticker = instrument.ticker  # Ticker
 
     @abstractmethod
     def run(self):
@@ -22,17 +23,46 @@ class BaseExtractor(ABC):
         """Process the raw data into DataFrame"""
         pass
 
+    def get_history(self) -> (datetime, datetime, str, bool):
+        check_end, has_history = ArcticReader().has_historical_range(self.service.lower(), self.ticker)
+
+        if has_history:
+            start_date = check_end.date()
+            end_date = datetime.date.today()
+        else:
+            start_date = datetime.date(2020, 1, 1)
+            end_date = datetime.date.today()
+
+        return start_date, end_date, has_history
+
+
+class BaseClientExtractor(BaseExtractor, ABC):
+    def __init__(self, instrument: Instrument):
+        super().__init__(instrument)
+
     @abstractmethod
-    def get_eod_data(self, ticker: str, start: datetime, to: datetime):
-        """Get end of day data for a ticker"""
+    def get_client(self):
         pass
+
+    @staticmethod
+    def get_duration(start_date: datetime.date, end_date: datetime.date, has_history : bool) -> (str, bool):
+        if has_history:
+            days = (end_date - start_date).days.__str__()
+            return f"{days} D", True
+
+        years = 0
+        while end_date > start_date:
+            years += 1
+            end_date = datetime.date(end_date.year - 1, end_date.month, end_date.day)
+
+        return f"{years} Y", False
 
 
 class BaseRestExtractor(BaseExtractor, ABC):
     """Base class for all REST extractors"""
 
-    def __init__(self, config: Any, api_config: dict[str, str]) -> None:
-        super().__init__(config)
+    def __init__(self, instrument: Instrument, api_config: dict[str, str]) -> None:
+        super().__init__(instrument)
         self.api_config = api_config
 
     @staticmethod
@@ -52,3 +82,8 @@ class BaseRestExtractor(BaseExtractor, ABC):
         df = pd.DataFrame(records)
         df['date'] = pd.to_datetime(df['date'])
         return df.sort_values('date')
+
+    @abstractmethod
+    def get_eod_data(self, ticker: str, start: datetime, to: datetime):
+        """Get end of day data for a ticker"""
+        pass

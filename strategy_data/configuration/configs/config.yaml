@@ -23,7 +23,7 @@ api:
   
 update_services:
   equity:
-    - source: "MarketStack"
+    - source: "IBKR"
       ticker: "TSLA"
     - source: "MarketStack"
       ticker: "AAPL"

@@ -1,7 +1,8 @@
+from dotenv import load_dotenv
+
 import os
 import yaml
 import re
-from dotenv import load_dotenv
 
 
 class ConfigManager:
