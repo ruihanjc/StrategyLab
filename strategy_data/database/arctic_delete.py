@@ -124,4 +124,4 @@ def arctic_delete_ticker(source: str, ticker: str, asset_class: str):
 
 
 if __name__ == "__main__":
-    arctic_delete_ticker("MarketStack", "TSLA", "equity")
+    arctic_delete_ticker("", "AUDUSD", "equity")

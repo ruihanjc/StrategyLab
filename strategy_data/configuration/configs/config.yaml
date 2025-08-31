@@ -31,7 +31,11 @@ update_services:
       ticker: "PLTR"
     - source: "MarketStack"
       ticker: "SPY"
-  
+
+  forex:
+    - source: "YahooFinance"
+      ticker: "AUDUSD"
+
 data_sources:
   default: "market_stack"
   available:

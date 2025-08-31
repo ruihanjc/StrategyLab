@@ -70,7 +70,6 @@ def main():
                             if data['date'][0] > pd.Timestamp(start_date):
                                 start_date = data['date'][1]
 
-                            print(start_date)
                             data = data[(data['date'] >= pd.Timestamp(start_date)) &
                                         (data['date'] <= pd.Timestamp(end_date))]
 
