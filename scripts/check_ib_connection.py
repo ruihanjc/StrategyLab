@@ -1,7 +1,6 @@
 from strategy_broker.ib_connection import IBConnection
 from ib_insync import *
 
-
 def main():
     ib_conn = IBConnection()
     try:

@@ -62,3 +62,5 @@ matplotlib>=3.5.0
 wheel>=0.38.0
 python-dotenv>=1.0.0
 ib-insync>=0.9.80
+yfinance>=0.2.0
+scipy>=1.9.0

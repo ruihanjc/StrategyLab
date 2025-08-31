@@ -1,6 +1,8 @@
+import datetime
 import os
 import pandas as pd
 
+from strategy_core.sysobjects import Instrument
 from strategy_data.database.arctic_connection import get_arcticdb_connection
 
 
@@ -41,7 +43,7 @@ class ArcticWriter:
             lib = self.arctic.get_library(service)
             symbol = f"{ticker}"
             normalized_data = self.normalize_dataframe(fetched_data)
-            
+
             # Check if symbol exists and append/merge data
             if symbol in lib.list_symbols():
                 try:
@@ -61,7 +63,7 @@ class ArcticWriter:
             else:
                 # New symbol, write normally
                 lib.write(symbol, normalized_data)
-            
+
             return True
 
         except Exception as e:
@@ -121,3 +123,25 @@ class ArcticWriter:
                 df[col] = df[col].astype(str)
 
         return df
+
+
+if __name__ == "__main__":
+    writer = ArcticWriter()
+    datapoints = []
+    prices = [0.63804, 0.62748, 0.63606, 0.63012]
+    datapoints.append({
+        'ticker': "AUDUSD",
+        'service': "forex",
+        'source': "YahooFinance",
+        'date': datetime.date(2022, 10,9),
+        'open': float(prices[2]),
+        'high': float(prices[0]),
+        'low': float(prices[1]),
+        'close': float(prices[3]),
+        'timestamp': datetime.date.today()
+    })
+
+    df = pd.DataFrame(datapoints)
+    df['date'] = pd.to_datetime(df['date'])
+
+    writer.store_market_data(df.sort_values('date'))

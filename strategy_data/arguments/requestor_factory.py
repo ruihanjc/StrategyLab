@@ -3,6 +3,7 @@ from ..extractors import *
 from ..extractors.client_extractor.ibkr_equity_extractor import IBKREquityExtractor
 from ..extractors.rest_extractor.alphavantage_extractor import AlphaVantageExtractor
 from ..extractors.rest_extractor.marketstack_extractor import MarketStackExtractor
+from ..extractors.rest_extractor.yfinance_extractor import YahooFinanceExtractor
 
 
 class RequesterFactory:
@@ -18,6 +19,12 @@ class RequesterFactory:
                         return AlphaVantageExtractor(instrument, api_config)
                     case "IBKR":
                         return IBKREquityExtractor(instrument)
+                    case _:
+                        raise RuntimeError("Failed to choose equity extractor")
+            case "forex":
+                match instrument.source:
+                    case "YahooFinance":
+                        return YahooFinanceExtractor(instrument, api_config)
                     case _:
                         raise RuntimeError("Failed to choose equity extractor")
             case _:
