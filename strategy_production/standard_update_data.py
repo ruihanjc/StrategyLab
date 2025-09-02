@@ -54,7 +54,7 @@ def standard_update_data(config_arguments):
             logger.info("Fetching data...")
             fetched_data = requester.run()
 
-            if fetched_data is None:
+            if fetched_data is None or len(fetched_data) == 0:
                 logger.info(f"Already up to date for instrument {instrument}")
                 continue
 

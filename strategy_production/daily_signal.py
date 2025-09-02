@@ -10,7 +10,7 @@ import os
 import sys
 
 from strategy_core.sysobjects import Portfolio
-from strategy_core.sysobjects.engine import BacktestEngine
+from strategy_core.sysobjects.engine import ProductionEngine
 from strategy_core.sysutils.config_manager import ConfigManager
 from strategy_core.sysutils.engine_utils import *
 
@@ -27,16 +27,40 @@ def setup_logging():
     )
 
 
-def main(config_arguments=None):
-    # Setup logging first
+def generate_daily_signals(end_date=None, lookback_days=252):
+    """
+    Generate daily trading signals using the production engine
+    
+    Parameters:
+    -----------
+    end_date: str or None
+        End date for signal generation (defaults to today)
+    lookback_days: int
+        Number of days to look back for data (default: 252 trading days)
+    """
     setup_logging()
     logger = logging.getLogger(__name__)
 
     try:
+        # Set dates
+        if end_date is None:
+            end_date = datetime.now().strftime('%Y-%m-%d')
+        
+        # Calculate start date based on lookback
+        end_dt = datetime.strptime(end_date, '%Y-%m-%d')
+        start_dt = end_dt - timedelta(days=lookback_days * 1.5)  # Extra buffer for weekends/holidays
+        start_date = start_dt.strftime('%Y-%m-%d')
+
+        logger.info(f"Generating signals for period: {start_date} to {end_date}")
+
         # Initialize configuration
         logger.info("Initializing configuration...")
         config = ConfigManager("strategy_backtest", "backtest")
         backtest_config = config.get_settings()
+
+        # Override dates in config
+        backtest_config['start_date'] = start_date
+        backtest_config['end_date'] = end_date
 
         # Create instruments from configuration
         logger.info("Creating instruments...")
@@ -65,15 +89,11 @@ def main(config_arguments=None):
                             initial_capital=initial_capital,
                             position_sizing_config=position_sizing_config)
 
-        # Get date range from config
-        start_date = backtest_config.get("start_date")
-        end_date = backtest_config.get("end_date")
+        logger.info(f"Signal generation period: {start_date} to {end_date}")
 
-        logger.info(f"Backtest period: {start_date} to {end_date}")
-
-        # Create and run backtest engine
-        logger.info("Creating backtest engine...")
-        engine = BacktestEngine(
+        # Create and run production engine
+        logger.info("Creating production engine for signal generation...")
+        engine = ProductionEngine(
             portfolio=portfolio,
             strategy=strategy,
             data_handler=price_data,
@@ -81,34 +101,16 @@ def main(config_arguments=None):
             end_date=end_date
         )
 
-        # Run the backtest
-        logger.info("Starting backtest execution...")
+        # Run signal generation
+        logger.info("Generating trading signals...")
         results = engine.run()
 
-        # Display results
-        logger.info("Backtest completed successfully!")
-
-        # Print performance summary
+        # Log completion
+        logger.info("Daily signal generation completed successfully!")
+        
+        # Log key metrics for verification
         performance = results.get_performance_summary()
-        logger.info("=== BACKTEST RESULTS ===")
-        logger.info(f"Total Return: {performance.get('total_return', 0):.2%}")
-        logger.info(f"Annualized Return: {performance.get('annualized_return', 0):.2%}")
-        logger.info(f"Annualized Volatility: {performance.get('annualized_volatility', 0):.2%}")
-        logger.info(f"Sharpe Ratio: {performance.get('sharpe_ratio', 0):.2f}")
-        logger.info(f"Maximum Drawdown: {performance.get('max_drawdown', 0):.2%}")
-        logger.info(f"Win Rate: {performance.get('win_rate', 0):.2%}")
-        logger.info(f"Final Capital: ${performance.get('final_capital', 0):,.2f}")
-        
-        # Print yearly performance
-        yearly_performance = performance.get('yearly_performance', {})
-        if yearly_performance:
-            logger.info("\n=== YEAR-BY-YEAR PERFORMANCE ===")
-            for year, year_metrics in yearly_performance.items():
-                logger.info(f"{year}: Return: {year_metrics.get('total_return', 0):.2%}, "
-                           f"Sharpe: {year_metrics.get('sharpe_ratio', 0):.2f}, "
-                           f"Volatility: {year_metrics.get('volatility', 0):.2%}")
-        
-        logger.info("========================")
+        logger.info(f"Signal generation complete - Final positions generated for {len(instruments)} instruments")
 
         # optimize_ewmac(engine)
         #
@@ -143,9 +145,18 @@ def main(config_arguments=None):
 
 
 if __name__ == '__main__':
+    # Parse command line arguments
+    end_date = None
+    lookback_days = 252
+    
+    if len(sys.argv) > 1:
+        end_date = sys.argv[1]
+    if len(sys.argv) > 2:
+        lookback_days = int(sys.argv[2])
+    
     try:
-        success = main(sys.argv)
+        success = generate_daily_signals(end_date=end_date, lookback_days=lookback_days)
         sys.exit(0 if success else 1)
     except Exception as e:
-        logging.error(f"Application failed: {str(e)}", exc_info=True)
+        logging.error(f"Daily signal generation failed: {str(e)}", exc_info=True)
         sys.exit(1)

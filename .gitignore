@@ -24,3 +24,6 @@ logs/
 
 *.sh
 strategy_broker/config/private_config.yaml
+scripts/
+strategy_production/order_signal/
+strategy_backtest/backtest_signal/
