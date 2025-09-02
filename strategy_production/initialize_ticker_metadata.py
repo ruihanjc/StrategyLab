@@ -1,5 +1,4 @@
 import pandas as pd
-import sys
 import os
 from strategy_data.database.arctic_connection import get_arcticdb_connection
 

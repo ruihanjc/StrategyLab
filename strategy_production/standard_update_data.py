@@ -1,7 +1,7 @@
-from arguments.argument_runtype import ArgumentRunType
+from strategy_data.arguments.argument_runtype import ArgumentRunType
 import logging
 import sys
-from database.arcticdb_writer import ArcticWriter
+from strategy_data.database.arcticdb_writer import ArcticWriter
 from strategy_data.arguments.requestor_factory import RequesterFactory
 from strategy_data.configuration.config_manager import ConfigManager
 
