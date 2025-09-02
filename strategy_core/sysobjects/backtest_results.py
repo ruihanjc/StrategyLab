@@ -193,6 +193,10 @@ class BacktestResults:
             'final_capital': self.daily_capital.iloc[-1] if not self.daily_capital.empty else self.initial_capital
         }
         
+        # Calculate yearly metrics
+        yearly_metrics = self._calculate_yearly_metrics()
+        self.metrics['yearly_performance'] = yearly_metrics
+        
         self.logger.info(f"Backtest completed - Total Return: {total_return:.2%}, Sharpe: {sharpe_ratio:.2f}")
     
     def _calculate_returns(self):
@@ -200,10 +204,56 @@ class BacktestResults:
         if not self.daily_capital.empty:
             self.daily_returns = self.daily_capital.pct_change().fillna(0)
     
+    def _calculate_yearly_metrics(self):
+        """Calculate year-by-year performance metrics"""
+        if self.daily_returns.empty:
+            self._calculate_returns()
+        
+        if self.daily_returns.empty:
+            return {}
+        
+        yearly_metrics = {}
+        
+        # Group returns by year
+        yearly_returns = self.daily_returns.groupby(self.daily_returns.index.year)
+        
+        for year, year_returns in yearly_returns:
+            if len(year_returns) == 0:
+                continue
+                
+            # Calculate yearly metrics
+            year_total_return = (1 + year_returns).prod() - 1
+            year_volatility = year_returns.std() * np.sqrt(252)
+            year_sharpe = (year_total_return * 252 / len(year_returns)) / year_volatility if year_volatility > 0 else 0
+            
+            # Drawdown for the year
+            year_cumulative = (1 + year_returns).cumprod()
+            year_running_max = year_cumulative.cummax()
+            year_drawdown = (year_cumulative - year_running_max) / year_running_max
+            year_max_drawdown = year_drawdown.min()
+            
+            # Win/loss metrics for the year
+            year_win_rate = (year_returns > 0).mean()
+            year_positive_days = (year_returns > 0).sum()
+            year_negative_days = (year_returns < 0).sum()
+            
+            yearly_metrics[year] = {
+                'total_return': year_total_return,
+                'annualized_return': year_total_return * 252 / len(year_returns),
+                'volatility': year_volatility,
+                'sharpe_ratio': year_sharpe,
+                'max_drawdown': year_max_drawdown,
+                'win_rate': year_win_rate,
+                'positive_days': year_positive_days,
+                'negative_days': year_negative_days,
+                'trading_days': len(year_returns)
+            }
+        
+        return yearly_metrics
+    
     def get_performance_summary(self) -> Dict:
         """Get summary of performance metrics"""
-        if not self.metrics:
-            self.calculate_final_metrics()
+        self.calculate_final_metrics()
         return self.metrics.copy()
     
     def get_equity_curve(self) -> pd.Series:

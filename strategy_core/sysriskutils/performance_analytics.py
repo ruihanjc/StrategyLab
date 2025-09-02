@@ -116,6 +116,10 @@ class PerformanceAnalyzer:
         individual_performance = self._calculate_individual_performance(positions, prices, costs)
         metrics['individual_performance'] = individual_performance
         
+        # Calculate yearly performance
+        yearly_performance = self.calculate_yearly_performance(returns)
+        metrics['yearly_performance'] = yearly_performance
+        
         return {
             'returns': returns,
             'equity_curve': equity_curve,
@@ -473,6 +477,50 @@ class PerformanceAnalyzer:
                     }
         
         return individual_performance
+    
+    def calculate_yearly_performance(self, returns: pd.Series) -> Dict:
+        """Calculate year-by-year performance metrics"""
+        if returns.empty:
+            return {}
+        
+        yearly_metrics = {}
+        
+        # Group returns by year
+        yearly_returns = returns.groupby(returns.index.year)
+        
+        for year, year_returns in yearly_returns:
+            if len(year_returns) == 0:
+                continue
+                
+            # Calculate yearly metrics
+            year_total_return = (1 + year_returns).prod() - 1
+            year_volatility = year_returns.std() * np.sqrt(self.trading_days_per_year)
+            year_sharpe = ((year_total_return * self.trading_days_per_year / len(year_returns)) - self.risk_free_rate) / year_volatility if year_volatility > 0 else 0
+            
+            # Drawdown for the year
+            year_cumulative = (1 + year_returns).cumprod()
+            year_running_max = year_cumulative.cummax()
+            year_drawdown = (year_cumulative - year_running_max) / year_running_max
+            year_max_drawdown = year_drawdown.min()
+            
+            # Win/loss metrics for the year
+            year_win_rate = (year_returns > 0).mean()
+            year_positive_days = (year_returns > 0).sum()
+            year_negative_days = (year_returns < 0).sum()
+            
+            yearly_metrics[year] = {
+                'total_return': year_total_return,
+                'annualized_return': year_total_return * self.trading_days_per_year / len(year_returns),
+                'volatility': year_volatility,
+                'sharpe_ratio': year_sharpe,
+                'max_drawdown': year_max_drawdown,
+                'win_rate': year_win_rate,
+                'positive_days': year_positive_days,
+                'negative_days': year_negative_days,
+                'trading_days': len(year_returns)
+            }
+        
+        return yearly_metrics
 
 
 class PerformanceReporter:
@@ -559,6 +607,21 @@ class PerformanceReporter:
                 report.append(f"    Total Trades: {inst_metric.get('total_trades', 0)}")
                 report.append(f"    Turnover: {inst_metric.get('turnover', 0):.2f}")
         
+        # Yearly performance breakdown
+        yearly_performance = metrics.get('yearly_performance', {})
+        if yearly_performance:
+            report.append("\n" + "=" * 60)
+            report.append("YEAR-BY-YEAR PERFORMANCE:")
+            for year, year_metrics in yearly_performance.items():
+                report.append(f"\n{year}:")
+                report.append(f"  Total Return: {year_metrics.get('total_return', 0):.2%}")
+                report.append(f"  Annualized Return: {year_metrics.get('annualized_return', 0):.2%}")
+                report.append(f"  Volatility: {year_metrics.get('volatility', 0):.2%}")
+                report.append(f"  Sharpe Ratio: {year_metrics.get('sharpe_ratio', 0):.2f}")
+                report.append(f"  Max Drawdown: {year_metrics.get('max_drawdown', 0):.2%}")
+                report.append(f"  Win Rate: {year_metrics.get('win_rate', 0):.2%}")
+                report.append(f"  Trading Days: {year_metrics.get('trading_days', 0)}")
+        
         # Individual instrument performance
         individual_performance = metrics.get('individual_performance', {})
         if individual_performance:
@@ -605,6 +668,52 @@ class PerformanceReporter:
         
         return pd.DataFrame(list(summary_metrics.items()), 
                           columns=['Metric', 'Value'])
+    
+    def generate_yearly_summary_table(self,
+                                    positions: PositionSeries,
+                                    prices: Dict[str, pd.Series],
+                                    costs: Dict[str, pd.Series] = None) -> pd.DataFrame:
+        """Generate yearly performance summary table"""
+        
+        performance = self.analyzer.analyze_performance(positions, prices, costs)
+        
+        if not performance or 'yearly_performance' not in performance['metrics']:
+            return pd.DataFrame()
+        
+        yearly_data = performance['metrics']['yearly_performance']
+        
+        if not yearly_data:
+            return pd.DataFrame()
+        
+        # Create DataFrame with yearly metrics
+        yearly_df = pd.DataFrame.from_dict(yearly_data, orient='index')
+        
+        # Format percentage columns
+        pct_columns = ['total_return', 'annualized_return', 'volatility', 'max_drawdown', 'win_rate']
+        for col in pct_columns:
+            if col in yearly_df.columns:
+                yearly_df[f'{col}_formatted'] = yearly_df[col].apply(lambda x: f"{x:.2%}")
+        
+        # Format Sharpe ratio
+        if 'sharpe_ratio' in yearly_df.columns:
+            yearly_df['sharpe_ratio_formatted'] = yearly_df['sharpe_ratio'].apply(lambda x: f"{x:.2f}")
+        
+        # Select and rename columns for display
+        display_columns = {
+            'total_return_formatted': 'Total Return',
+            'annualized_return_formatted': 'Ann. Return', 
+            'volatility_formatted': 'Volatility',
+            'sharpe_ratio_formatted': 'Sharpe Ratio',
+            'max_drawdown_formatted': 'Max Drawdown',
+            'win_rate_formatted': 'Win Rate',
+            'trading_days': 'Trading Days'
+        }
+        
+        result_df = yearly_df[[col for col in display_columns.keys() if col in yearly_df.columns]].copy()
+        result_df = result_df.rename(columns=display_columns)
+        result_df.index.name = 'Year'
+        
+        return result_df
     
     def plot_performance(self, 
                         positions: PositionSeries,
@@ -1092,6 +1201,96 @@ class PerformanceReporter:
         
         plt.tight_layout()
         _show_or_save_plot('candlestick_signals')
+    
+    def plot_yearly_performance(self, 
+                               positions: PositionSeries,
+                               prices: Dict[str, pd.Series],
+                               costs: Dict[str, pd.Series] = None):
+        """Plot year-by-year performance analysis"""
+        import matplotlib.pyplot as plt
+        
+        performance = self.analyzer.analyze_performance(positions, prices, costs)
+        
+        if not performance or 'yearly_performance' not in performance['metrics']:
+            print("No yearly performance data available")
+            return
+        
+        yearly_data = performance['metrics']['yearly_performance']
+        
+        if not yearly_data:
+            print("No yearly data to plot")
+            return
+        
+        years = list(yearly_data.keys())
+        returns = [yearly_data[year]['total_return'] * 100 for year in years]
+        sharpe_ratios = [yearly_data[year]['sharpe_ratio'] for year in years]
+        volatilities = [yearly_data[year]['volatility'] * 100 for year in years]
+        drawdowns = [yearly_data[year]['max_drawdown'] * 100 for year in years]
+        
+        # Create yearly performance plots
+        fig, axes = plt.subplots(2, 2, figsize=(15, 10))
+        fig.suptitle('Year-by-Year Performance Analysis', fontsize=16)
+        
+        # Plot 1: Annual Returns
+        ax1 = axes[0, 0]
+        colors = ['green' if r > 0 else 'red' for r in returns]
+        bars = ax1.bar(years, returns, color=colors, alpha=0.7)
+        ax1.set_title('Annual Returns by Year')
+        ax1.set_ylabel('Return (%)')
+        ax1.grid(True, alpha=0.3)
+        ax1.axhline(y=0, color='black', linestyle='-', alpha=0.5)
+        
+        # Add value labels on bars
+        for bar, value in zip(bars, returns):
+            height = bar.get_height()
+            ax1.text(bar.get_x() + bar.get_width()/2., height + (0.5 if height >= 0 else -0.5),
+                    f'{value:.1f}%', ha='center', va='bottom' if height >= 0 else 'top')
+        
+        # Plot 2: Sharpe Ratios
+        ax2 = axes[0, 1]
+        colors = ['green' if s > 0 else 'red' for s in sharpe_ratios]
+        bars = ax2.bar(years, sharpe_ratios, color=colors, alpha=0.7)
+        ax2.set_title('Annual Sharpe Ratios by Year')
+        ax2.set_ylabel('Sharpe Ratio')
+        ax2.grid(True, alpha=0.3)
+        ax2.axhline(y=0, color='black', linestyle='-', alpha=0.5)
+        ax2.axhline(y=1, color='blue', linestyle='--', alpha=0.5, label='Good (1.0)')
+        ax2.legend()
+        
+        # Add value labels on bars
+        for bar, value in zip(bars, sharpe_ratios):
+            height = bar.get_height()
+            ax2.text(bar.get_x() + bar.get_width()/2., height + (0.05 if height >= 0 else -0.05),
+                    f'{value:.2f}', ha='center', va='bottom' if height >= 0 else 'top')
+        
+        # Plot 3: Volatility
+        ax3 = axes[1, 0]
+        bars = ax3.bar(years, volatilities, color='orange', alpha=0.7)
+        ax3.set_title('Annual Volatility by Year')
+        ax3.set_ylabel('Volatility (%)')
+        ax3.grid(True, alpha=0.3)
+        
+        # Add value labels on bars
+        for bar, value in zip(bars, volatilities):
+            height = bar.get_height()
+            ax3.text(bar.get_x() + bar.get_width()/2., height + 0.2,
+                    f'{value:.1f}%', ha='center', va='bottom')
+        
+        # Plot 4: Max Drawdown
+        ax4 = axes[1, 1]
+        bars = ax4.bar(years, drawdowns, color='red', alpha=0.7)
+        ax4.set_title('Maximum Drawdown by Year')
+        ax4.set_ylabel('Max Drawdown (%)')
+        ax4.grid(True, alpha=0.3)
+        
+        # Add value labels on bars
+        for bar, value in zip(bars, drawdowns):
+            height = bar.get_height()
+            ax4.text(bar.get_x() + bar.get_width()/2., height - 0.2,
+                    f'{value:.1f}%', ha='center', va='top')
+        
+        plt.tight_layout()
+        _show_or_save_plot('yearly_performance')
 
 
 def create_sample_performance_analysis():

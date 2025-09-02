@@ -95,6 +95,16 @@ def main(config_arguments=None):
         logger.info(f"Maximum Drawdown: {performance.get('max_drawdown', 0):.2%}")
         logger.info(f"Win Rate: {performance.get('win_rate', 0):.2%}")
         logger.info(f"Final Capital: ${performance.get('final_capital', 0):,.2f}")
+        
+        # Print yearly performance
+        yearly_performance = performance.get('yearly_performance', {})
+        if yearly_performance:
+            logger.info("\n=== YEAR-BY-YEAR PERFORMANCE ===")
+            for year, year_metrics in yearly_performance.items():
+                logger.info(f"{year}: Return: {year_metrics.get('total_return', 0):.2%}, "
+                           f"Sharpe: {year_metrics.get('sharpe_ratio', 0):.2f}, "
+                           f"Volatility: {year_metrics.get('volatility', 0):.2%}")
+        
         logger.info("========================")
 
         # optimize_ewmac(engine)
