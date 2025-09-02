@@ -48,9 +48,9 @@ def broker_error(msg, log):
 
 class IBClient(object):
 
-    def __init__(self, account_type : str):
+    def __init__(self):
         setup_logging()
-        self.ib = IBConnection().connect(account_type)
+        self.ib = IBConnection().connect()
         self.logger = logging.getLogger(__name__)
 
     @property

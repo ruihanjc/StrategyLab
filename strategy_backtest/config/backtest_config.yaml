@@ -5,14 +5,22 @@ slippage: 0.0005   # 0.05%
 start_date: '2020-01-03'
 end_date: ''
 
+# Position sizing and trading thresholds
+position_sizing:
+  min_position_threshold: 0.05  # Minimum position size to execute trade (1% of capital)
+  min_forecast_threshold: 2   # Minimum forecast strength to generate position
+  no_trade_buffer: 0.2          # Buffer zone around current position (10% of position)
+
 
 # Data settings
 instruments:
   equity:
     - source: "MarketStack"
       ticker: "PLTR"
-    - source: "MarketStack"
+    - source: "IBKR"
       ticker: "TSLA"
+
+
 
 data_settings:
   preprocessing:

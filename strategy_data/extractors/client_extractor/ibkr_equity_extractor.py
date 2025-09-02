@@ -16,7 +16,7 @@ class IBKREquityExtractor(BaseClientExtractor, ABC):
             raise
 
     def get_client(self):
-        return ib_equity_client.IBEquityClient("IBKR_DUMMY_ACCOUNT")
+        return ib_equity_client.IBEquityClient()
 
     def process_data(self):
         client = self.get_client()

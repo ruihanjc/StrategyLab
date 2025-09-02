@@ -60,7 +60,10 @@ def main(config_arguments=None):
         # Create portfolio
         logger.info("Creating portfolio...")
         initial_capital = backtest_config.get("initial_capital")
-        portfolio = Portfolio(instruments, initial_capital=initial_capital)
+        position_sizing_config = backtest_config.get("position_sizing", {})
+        portfolio = Portfolio(instruments, 
+                            initial_capital=initial_capital,
+                            position_sizing_config=position_sizing_config)
 
         # Get date range from config
         start_date = backtest_config.get("start_date")

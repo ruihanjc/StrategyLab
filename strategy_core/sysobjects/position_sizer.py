@@ -18,9 +18,15 @@ class PositionSizer:
 
     def __init__(self,
                  volatility_target: float = 0.25,
-                 capital_multiplier: float = 1.0):
+                 capital_multiplier: float = 1.0,
+                 min_position_threshold: float = 0.01,
+                 min_forecast_threshold: float = 0.5,
+                 no_trade_buffer: float = 0.1):
         self.volatility_target = volatility_target
         self.capital_multiplier = capital_multiplier
+        self.min_position_threshold = min_position_threshold
+        self.min_forecast_threshold = min_forecast_threshold
+        self.no_trade_buffer = no_trade_buffer
 
     def calculate_position_size(self,
                                 forecast: Forecast,
@@ -75,6 +81,69 @@ class PositionSizer:
                 position_series.loc[date] = position
 
         return Position(position_series, instrument=instrument.name)
+    
+    def apply_no_trade_zone(self, 
+                           new_position: Position, 
+                           current_position: Position = None,
+                           forecast: Forecast = None) -> Position:
+        """
+        Apply no-trade zone logic to position sizing
+        
+        Parameters:
+        -----------
+        new_position: Position
+            Target position from strategy
+        current_position: Position
+            Current held position
+        forecast: Forecast
+            Original forecast for filtering weak signals
+            
+        Returns:
+        --------
+        Position
+            Position after applying no-trade zone filters
+        """
+        filtered_position = new_position.copy()
+        
+        if current_position is None:
+            current_position = Position(pd.Series(0.0, index=new_position.index), 
+                                      instrument=new_position.instrument)
+        
+        # Align positions
+        aligned_new, aligned_current = new_position.align(current_position)
+        aligned_new = aligned_new.ffill().fillna(0)
+        aligned_current = aligned_current.ffill().fillna(0)
+        
+        # Apply filters
+        for date in aligned_new.index:
+            new_pos = aligned_new.loc[date]
+            current_pos = aligned_current.loc[date]
+            
+            # Filter 1: Minimum forecast threshold
+            if forecast is not None:
+                if date in forecast.index:
+                    forecast_val = abs(forecast.loc[date])
+                    if forecast_val < self.min_forecast_threshold:
+                        filtered_position.iloc[filtered_position.index.get_loc(date)] = current_pos
+                        continue
+            
+            # Filter 2: Minimum position size threshold
+            if abs(new_pos) < self.min_position_threshold:
+                filtered_position.iloc[filtered_position.index.get_loc(date)] = current_pos
+                continue
+            
+            # Filter 3: No-trade buffer zone
+            position_change = abs(new_pos - current_pos)
+            buffer_threshold = abs(current_pos) * self.no_trade_buffer
+            
+            if position_change < buffer_threshold and abs(current_pos) > 0:
+                # Stay in current position if change is within buffer
+                filtered_position.iloc[filtered_position.index.get_loc(date)] = current_pos
+            else:
+                # Trade to new position
+                filtered_position.iloc[filtered_position.index.get_loc(date)] = new_pos
+        
+        return filtered_position
 
     def calculate_portfolio_positions(self,
                                       forecasts: Dict[str, Forecast],

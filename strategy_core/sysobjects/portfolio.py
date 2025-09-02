@@ -33,7 +33,8 @@ class Portfolio:
                  instruments: InstrumentList,
                  initial_capital: float = 1000000,
                  volatility_target: float = 0.25,
-                 max_leverage: float = 1.0):
+                 max_leverage: float = 1.0,
+                 position_sizing_config: Dict = None):
         """
         Initialize Portfolio
         
@@ -47,13 +48,19 @@ class Portfolio:
             Target portfolio volatility
         max_leverage: float
             Maximum portfolio leverage
-        base_currency: str
-            Base currency for portfolio
+        position_sizing_config: Dict
+            Position sizing configuration including thresholds
         """
         self.instruments = instruments
         self.initial_capital = initial_capital
         self.volatility_target = volatility_target
         self.max_leverage = max_leverage
+        
+        # Position sizing configuration
+        pos_config = position_sizing_config or {}
+        self.min_position_threshold = pos_config.get('min_position_threshold', 0.01)
+        self.min_forecast_threshold = pos_config.get('min_forecast_threshold', 0.5)
+        self.no_trade_buffer = pos_config.get('no_trade_buffer', 0.1)
 
         # Current portfolio state
         self.current_positions = PositionSeries({})
@@ -63,6 +70,9 @@ class Portfolio:
         # Initialize utility components
         self.position_sizer = PositionSizer(
             volatility_target=volatility_target,
+            min_position_threshold=self.min_position_threshold,
+            min_forecast_threshold=self.min_forecast_threshold,
+            no_trade_buffer=self.no_trade_buffer
         )
         self.optimizer = PortfolioOptimizer(
             max_portfolio_leverage=max_leverage
@@ -118,13 +128,27 @@ class Portfolio:
             weights=weights
         )
 
-        # Step 3: Apply risk budgeting if requested
+        # Step 3: Apply no-trade zone logic
+        filtered_positions = {}
+        for instrument_name in raw_positions.get_instruments():
+            new_position = raw_positions.get_position(instrument_name)
+            current_position = self.current_positions.get_position(instrument_name)
+            forecast = forecasts.get(instrument_name)
+            
+            filtered_position = self.position_sizer.apply_no_trade_zone(
+                new_position, current_position, forecast
+            )
+            filtered_positions[instrument_name] = filtered_position
+        
+        no_trade_positions = PositionSeries(filtered_positions)
+
+        # Step 4: Apply risk budgeting if requested
         if apply_risk_budget:
             final_positions = self.risk_budgeter.apply_risk_budgets(
-                raw_positions, self.instruments
+                no_trade_positions, self.instruments
             )
         else:
-            final_positions = raw_positions
+            final_positions = no_trade_positions
 
         # Update current positions
         self.current_positions = final_positions

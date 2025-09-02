@@ -7,8 +7,8 @@ import datetime
 
 class IBEquityClient(IBClient):
 
-    def __init__(self, account_type: str):
-        super().__init__(account_type)
+    def __init__(self):
+        super().__init__()
         self.barSizeSetting = "1 day"
         self.whatToShow = "TRADES"
         self.timeout = 20

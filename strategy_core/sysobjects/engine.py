@@ -105,8 +105,14 @@ class BacktestEngine(TradingEngine):
                     if ticker not in instrument_data:
                         continue
 
+                    # Check if this instrument has data for current date
+                    ticker_data = instrument_data[ticker]
+                    if current_date not in ticker_data.index:
+                        # Instrument doesn't have data for this date, skip
+                        continue
+                    
                     # Get historical data up to current date for this instrument
-                    historical_data = instrument_data[ticker].loc[:current_date]
+                    historical_data = ticker_data.loc[:current_date]
                     
                     if len(historical_data) < self.load_bars:
                         continue
@@ -132,13 +138,16 @@ class BacktestEngine(TradingEngine):
                     instrument_forecasts[ticker] = forecast_value
 
                     # Convert forecast to position using instrument-specific data
-                    if forecast_value != 0:
-                        position = self._forecast_to_position_per_instrument(
-                            forecast_value, historical_data, instrument
-                        )
-                        instrument_positions[ticker] = position
-                    else:
-                        instrument_positions[ticker] = 0.0
+                    raw_position = self._forecast_to_position_per_instrument(
+                        forecast_value, historical_data, instrument
+                    )
+                    
+                    # Apply no-trade zone filters
+                    filtered_position = self._apply_no_trade_filters(
+                        raw_position, forecast_value, ticker, current_date
+                    )
+                    
+                    instrument_positions[ticker] = filtered_position
 
                 # Update portfolio results
                 for ticker, forecast in instrument_forecasts.items():
@@ -180,6 +189,9 @@ class BacktestEngine(TradingEngine):
         # Store data for plotting
         self.results.price_data = portfolio_results
         self.results.instrument_data = instrument_data
+
+        # Save signals to file
+        self._save_signals_to_file(portfolio_results)
 
         self.logger.info("Multi-instrument backtest completed successfully")
         return self.results
@@ -270,26 +282,21 @@ class BacktestEngine(TradingEngine):
         return instrument_data
     
     def _get_common_date_range(self, instrument_data: Dict[str, pd.DataFrame]) -> pd.DatetimeIndex:
-        """Get common trading dates across all instruments"""
+        """Get union of all trading dates across instruments (allows staggered starts)"""
         if not instrument_data:
             return pd.DatetimeIndex([])
         
-        # Get intersection of all instruments' date ranges
-        common_dates = None
+        # Use union of all instruments' date ranges to allow staggered starts
+        all_dates = set()
         for ticker, data in instrument_data.items():
-            if common_dates is None:
-                common_dates = set(data.index)
-            else:
-                common_dates = common_dates.intersection(set(data.index))
+            # Filter dates within our backtest range
+            filtered_dates = data.index[(data.index >= self.start_date) & (data.index <= self.end_date)]
+            all_dates = all_dates.union(set(filtered_dates))
         
-        if common_dates:
-            return pd.DatetimeIndex(sorted(common_dates))
-        else:
-            # If no common dates, use union and forward fill
-            all_dates = set()
-            for data in instrument_data.values():
-                all_dates = all_dates.union(set(data.index))
+        if all_dates:
             return pd.DatetimeIndex(sorted(all_dates))
+        else:
+            return pd.DatetimeIndex([])
 
     def _extract_current_prices(self, historical_data: pd.DataFrame, current_date) -> Dict:
         """Extract current prices for all instruments"""
@@ -347,6 +354,41 @@ class BacktestEngine(TradingEngine):
         except Exception as e:
             self.logger.error(f"Error converting forecast to position for {instrument.ticker}: {str(e)}")
             return 0.0
+    
+    def _apply_no_trade_filters(self, raw_position: float, forecast_value: float, 
+                              ticker: str, current_date) -> float:
+        """Apply no-trade zone filters to position"""
+        
+        # Get current position from portfolio results
+        current_position = 0.0
+        # For the first calculation, we don't have previous position data
+        # so we'll track it in a simple dict for now
+        if not hasattr(self, '_previous_positions'):
+            self._previous_positions = {}
+        
+        current_position = self._previous_positions.get(ticker, 0.0)
+        
+        # Filter 1: Minimum forecast threshold
+        if abs(forecast_value) < self.portfolio.min_forecast_threshold:
+            return current_position
+        
+        # Filter 2: Minimum position size threshold  
+        if abs(raw_position) < self.portfolio.min_position_threshold:
+            return current_position
+        
+        # Filter 3: No-trade buffer zone
+        position_change = abs(raw_position - current_position)
+        buffer_threshold = abs(current_position) * self.portfolio.no_trade_buffer
+        
+        if position_change < buffer_threshold and abs(current_position) > 0:
+            filtered_position = current_position
+        else:
+            filtered_position = raw_position
+        
+        # Update previous position
+        self._previous_positions[ticker] = filtered_position
+        
+        return filtered_position
     
     def _calculate_portfolio_performance(self, portfolio_results: pd.DataFrame, instrument_data: Dict[str, pd.DataFrame]) -> pd.DataFrame:
         """Calculate portfolio performance using per-instrument data"""
@@ -576,6 +618,170 @@ class BacktestEngine(TradingEngine):
 
         self.results.daily_positions = pd.DataFrame(positions_data, index=results_df.index)
         self.results.daily_forecasts = pd.DataFrame(forecasts_data, index=results_df.index)
+    
+    def _save_signals_to_file(self, portfolio_results: pd.DataFrame):
+        """Save trading signals to a text file"""
+        import os
+        from datetime import datetime
+        
+        # Create results directory if it doesn't exist
+        results_dir = "strategy_backtest/results"
+        os.makedirs(results_dir, exist_ok=True)
+        
+        # Create filename with timestamp
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        signals_file = os.path.join(results_dir, f"signals_{timestamp}.txt")
+        
+        try:
+            with open(signals_file, 'w') as f:
+                f.write("=== TRADING SIGNALS LOG ===\n")
+                f.write(f"Backtest Period: {self.start_date.strftime('%Y-%m-%d')} to {self.end_date.strftime('%Y-%m-%d')}\n")
+                f.write(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
+                
+                # Extract forecast and position columns
+                forecast_cols = [col for col in portfolio_results.columns if col.startswith('forecast_')]
+                position_cols = [col for col in portfolio_results.columns if col.startswith('pos_')]
+                
+                # Write header
+                f.write("Date".ljust(12))
+                for instrument in self.portfolio.instruments:
+                    ticker = instrument.ticker
+                    f.write(f"{ticker}_Signal".ljust(15))
+                    f.write(f"{ticker}_Position".ljust(15))
+                f.write("Portfolio_Value".ljust(15))
+                f.write("\n")
+                f.write("-" * (12 + len(self.portfolio.instruments) * 30 + 15) + "\n")
+                
+                # Write signals data - only record when positions change
+                prev_positions = {}
+                for instrument in self.portfolio.instruments:
+                    prev_positions[instrument.ticker] = 0.0
+                
+                for date, row in portfolio_results.iterrows():
+                    # Check if any position changed
+                    position_changed = False
+                    current_positions = {}
+                    
+                    for instrument in self.portfolio.instruments:
+                        ticker = instrument.ticker
+                        position_val = row.get(f'pos_{ticker}', 0.0)
+                        current_positions[ticker] = position_val
+                        
+                        # Check if position changed significantly (avoid floating point noise)
+                        if abs(position_val - prev_positions[ticker]) > 0.0001:
+                            position_changed = True
+                    
+                    # Only record if position changed or it's the first/last day
+                    if position_changed or date == portfolio_results.index[0] or date == portfolio_results.index[-1]:
+                        f.write(f"{date.strftime('%Y-%m-%d')}".ljust(12))
+                        
+                        for instrument in self.portfolio.instruments:
+                            ticker = instrument.ticker
+                            
+                            # Get forecast/signal
+                            forecast_val = row.get(f'forecast_{ticker}', 0.0)
+                            position_val = current_positions[ticker]
+                            
+                            # Format signal strength and check for no-trade zone
+                            if abs(forecast_val) < 0.01:
+                                signal_str = "NEUTRAL"
+                            elif forecast_val > 0:
+                                signal_str = f"LONG({forecast_val:.3f})"
+                            else:
+                                signal_str = f"SHORT({forecast_val:.3f})"
+                            
+                            # Check if position was filtered by no-trade zone
+                            portfolio_config = getattr(self.portfolio, 'min_position_threshold', 0.01)
+                            forecast_threshold = getattr(self.portfolio, 'min_forecast_threshold', 0.5)
+                            
+                            # Calculate what the raw position would have been
+                            raw_position = 0.0
+                            if abs(forecast_val) > 0.01:  # Only calculate if there's a meaningful forecast
+                                try:
+                                    # Estimate raw position using same logic as engine
+                                    ticker_data = getattr(self, 'instrument_data', {}).get(ticker)
+                                    if ticker_data is not None and date in ticker_data.index:
+                                        historical_data = ticker_data.loc[:date]
+                                        if len(historical_data) >= 25:
+                                            returns = historical_data['close'].pct_change().dropna()
+                                            if len(returns) >= 20:
+                                                instrument_vol = returns.rolling(window=25).std().iloc[-1] * np.sqrt(252)
+                                                if not pd.isna(instrument_vol) and instrument_vol > 0:
+                                                    vol_target = self.portfolio.volatility_target
+                                                    forecast_cap = 20.0
+                                                    raw_position = (forecast_val / forecast_cap) * (vol_target / instrument_vol)
+                                                    raw_position = max(-self.portfolio.max_leverage, min(self.portfolio.max_leverage, raw_position))
+                                except:
+                                    pass
+                            
+                            # Add filter indicators
+                            if abs(forecast_val) < forecast_threshold:
+                                signal_str += "*WEAK"
+                            elif abs(raw_position) >= portfolio_config and abs(position_val) < portfolio_config:
+                                signal_str += "*SMALL"
+                            elif abs(raw_position) > abs(position_val) + 0.001:  # Position was reduced by buffer
+                                signal_str += "*BUFFER"
+                            
+                            f.write(f"{signal_str}".ljust(15))
+                            f.write(f"{position_val:.4f}".ljust(15))
+                        
+                        # Portfolio value
+                        portfolio_val = row.get('portfolio_value', 0.0)
+                        f.write(f"{portfolio_val:.2f}".ljust(15))
+                        f.write("\n")
+                    
+                    # Update previous positions
+                    prev_positions = current_positions.copy()
+                
+                # Add summary section
+                f.write("\n" + "=" * 80 + "\n")
+                f.write("SIGNAL SUMMARY\n")
+                f.write("=" * 80 + "\n\n")
+                
+                for instrument in self.portfolio.instruments:
+                    ticker = instrument.ticker
+                    forecast_col = f'forecast_{ticker}'
+                    position_col = f'pos_{ticker}'
+                    
+                    if forecast_col in portfolio_results.columns:
+                        forecasts = portfolio_results[forecast_col].dropna()
+                        positions = portfolio_results[position_col].dropna()
+                        
+                        if not forecasts.empty:
+                            long_signals = (forecasts > 0.01).sum()
+                            short_signals = (forecasts < -0.01).sum()
+                            neutral_signals = (abs(forecasts) <= 0.01).sum()
+                            
+                            # No-trade zone analysis
+                            forecast_threshold = getattr(self.portfolio, 'min_forecast_threshold', 0.5)
+                            position_threshold = getattr(self.portfolio, 'min_position_threshold', 0.01)
+                            
+                            weak_forecasts = (abs(forecasts) < forecast_threshold).sum()
+                            small_positions = (abs(positions) < position_threshold).sum()
+                            actual_trades = len(positions) - (positions == 0).sum()
+                            
+                            avg_long_strength = forecasts[forecasts > 0.01].mean() if long_signals > 0 else 0
+                            avg_short_strength = forecasts[forecasts < -0.01].mean() if short_signals > 0 else 0
+                            avg_position = positions.mean() if not positions.empty else 0
+                            max_position = positions.max() if not positions.empty else 0
+                            min_position = positions.min() if not positions.empty else 0
+                            
+                            f.write(f"{ticker}:\n")
+                            f.write(f"  Total Signals: {len(forecasts)}\n")
+                            f.write(f"  Long Signals: {long_signals} (avg strength: {avg_long_strength:.3f})\n")
+                            f.write(f"  Short Signals: {short_signals} (avg strength: {avg_short_strength:.3f})\n")
+                            f.write(f"  Neutral Signals: {neutral_signals}\n")
+                            f.write(f"  Weak Forecasts (< {forecast_threshold}): {weak_forecasts}\n")
+                            f.write(f"  Small Positions (< {position_threshold}): {small_positions}\n")
+                            f.write(f"  Actual Trades: {actual_trades}\n")
+                            f.write(f"  Average Position: {avg_position:.4f}\n")
+                            f.write(f"  Max Position: {max_position:.4f}\n")
+                            f.write(f"  Min Position: {min_position:.4f}\n\n")
+            
+            self.logger.info(f"Signals saved to {signals_file}")
+            
+        except Exception as e:
+            self.logger.error(f"Error saving signals to file: {str(e)}")
 
 
 class LiveTradingEngine(TradingEngine):
