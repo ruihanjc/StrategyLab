@@ -2,8 +2,6 @@ from abc import ABC
 from strategy_broker.clients import ib_equity_client
 from strategy_data.extractors.base_extractor import BaseClientExtractor
 
-import datetime
-
 
 class IBKREquityExtractor(BaseClientExtractor, ABC):
     def __init__(self, config) -> None:
@@ -21,6 +19,11 @@ class IBKREquityExtractor(BaseClientExtractor, ABC):
     def process_data(self):
         client = self.get_client()
 
-        start_date, end_date, has_history = self.get_history()
+        # get_history returns: start_date, end_date, has_history
+        _, _, has_history = self.get_history()
 
-        return client.get_ib_data(self.ticker, self.get_duration(start_date, end_date, has_history))
+        # If there is history, we are NOT backfilling.
+        # If there is NO history, we ARE backfilling.
+        should_backfill = not has_history
+
+        return client.get_ib_data(self.ticker, self.service, backfill=should_backfill)

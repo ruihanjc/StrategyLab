@@ -63,7 +63,7 @@ def standard_update_data(config_arguments):
             arctic_writer = ArcticWriter()
             if_ingested = arctic_writer.store_market_data(fetched_data)
 
-            logger.info(f"Storing fetched data for {instrument} with number of entries: {len(fetched_data)}")
+            logger.info(f"Storing fetched data for {instrument}")
 
             if if_ingested:
                 logger.info("Data successfully stored in database")
