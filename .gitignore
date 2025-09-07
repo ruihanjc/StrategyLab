@@ -17,6 +17,8 @@ strategy_venv/
 strategylab_venv/
 StrategyLabVenv/
 
+*__pycache__*
+
 # others
 .idea
 
