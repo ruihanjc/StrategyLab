@@ -623,7 +623,8 @@ class ProductionEngine(TradingEngine):
         """Save trading signals to production order_signal directory - full history if empty, latest only if exists"""
         
         # Create results directory if it doesn't exist
-        results_dir = "order_signal"
+        project_dir = os.path.abspath(__file__ + "/../../../")
+        results_dir = os.path.join(project_dir,"strategy_production/order_signal")
         os.makedirs(results_dir, exist_ok=True)
         
         # Use a consistent filename
