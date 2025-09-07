@@ -503,7 +503,7 @@ class BacktestEngine(TradingEngine):
         """Save trading signals to backtest results directory"""
         
         # Create results directory if it doesn't exist
-        results_dir = "strategy_backtest/results"
+        results_dir = "backtest_signal"
         os.makedirs(results_dir, exist_ok=True)
         
         # Create filename with timestamp
