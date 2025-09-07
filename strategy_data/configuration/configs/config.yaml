@@ -23,7 +23,7 @@ api:
   
 update_services:
   equity:
-    - source: "IBKR"
+    - source: "MarketStack"
       ticker: "TSLA"
     - source: "MarketStack"
       ticker: "AAPL"
@@ -31,6 +31,8 @@ update_services:
       ticker: "PLTR"
     - source: "MarketStack"
       ticker: "SPY"
+    - source: "IBKR"
+      ticker: "NVDA"
 
   forex:
     - source: "YahooFinance"

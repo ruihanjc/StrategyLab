@@ -239,13 +239,25 @@ class Strategy:
                     sliced_rule_data['price_data'] = empty_series
                     return sliced_rule_data
                     
-                sliced_series = price_data.loc[:current_date].copy()
+                sliced_data = price_data.loc[:current_date].copy()
                 
-                # Forward fill NaN values for price series
-                sliced_series = sliced_series.ffill()
+                # Forward fill NaN values for price data (handle both Series and DataFrame)
+                if isinstance(sliced_data, pd.DataFrame):
+                    # Handle DataFrame - check each column
+                    for col in sliced_data.columns:
+                        if sliced_data[col].dtype in ['float64', 'int64', 'float32', 'int32'] or pd.api.types.is_numeric_dtype(sliced_data[col]):
+                            sliced_data[col] = sliced_data[col].astype('float64').ffill()
+                        else:
+                            sliced_data[col] = sliced_data[col].infer_objects(copy=False).ffill()
+                else:
+                    # Handle Series
+                    if sliced_data.dtype in ['float64', 'int64', 'float32', 'int32'] or pd.api.types.is_numeric_dtype(sliced_data):
+                        sliced_data = sliced_data.astype('float64').ffill()
+                    else:
+                        sliced_data = sliced_data.infer_objects(copy=False).ffill()
                 
                 sliced_rule_data = rule_data.copy()
-                sliced_rule_data['price_data'] = sliced_series
+                sliced_rule_data['price_data'] = sliced_data
                 return sliced_rule_data
                 
             else:

@@ -37,7 +37,7 @@ def generate_daily_signals():
 
     try:
         # Use default configuration
-        config_path = "strategy_backtest/config/backtest_config.yaml"
+        config_path = "../strategy_backtest/config/backtest_config.yaml"
         end_date = datetime.now().strftime('%Y-%m-%d')
 
         # Initialize configuration

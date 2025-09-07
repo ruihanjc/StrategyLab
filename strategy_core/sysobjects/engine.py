@@ -620,115 +620,197 @@ class ProductionEngine(TradingEngine):
     """
 
     def _save_signals_to_file(self, portfolio_results: pd.DataFrame):
-        """Save trading signals to production order_signal directory"""
+        """Save trading signals to production order_signal directory - full history if empty, latest only if exists"""
         
         # Create results directory if it doesn't exist
-        results_dir = "strategy_production/order_signal"
+        results_dir = "order_signal"
         os.makedirs(results_dir, exist_ok=True)
         
-        # Create filename with timestamp
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        signals_file = os.path.join(results_dir, f"signals_{timestamp}.txt")
+        # Use a consistent filename
+        signals_file = os.path.join(results_dir, "signals.txt")
         
         try:
-            with open(signals_file, 'w') as f:
-                f.write("=== PRODUCTION TRADING SIGNALS LOG ===\n")
-                f.write(f"Backtest Period: {self.start_date.strftime('%Y-%m-%d')} to {self.end_date.strftime('%Y-%m-%d')}\n")
-                f.write(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
-                
-                # Extract forecast and position columns
-                forecast_cols = [col for col in portfolio_results.columns if col.startswith('forecast_')]
-                position_cols = [col for col in portfolio_results.columns if col.startswith('pos_')]
-                
-                # Write header
-                f.write("Date".ljust(12))
-                for instrument in self.portfolio.instruments:
-                    ticker = instrument.ticker
-                    f.write(f"{ticker}_Signal".ljust(15))
-                    f.write(f"{ticker}_Position".ljust(15))
-                f.write("Portfolio_Value".ljust(15))
-                f.write("\n")
-                f.write("-" * (12 + len(self.portfolio.instruments) * 30 + 15) + "\n")
-                
-                # Write signals data - only record when positions change
-                prev_positions = {}
-                for instrument in self.portfolio.instruments:
-                    prev_positions[instrument.ticker] = 0.0
-                
-                for date, row in portfolio_results.iterrows():
-                    # Check if any position changed
-                    position_changed = False
-                    current_positions = {}
-                    
+            # Check if file exists and has content
+            file_exists = os.path.exists(signals_file) and os.path.getsize(signals_file) > 0
+            
+            if not file_exists:
+                # File is empty or doesn't exist - write full history
+                with open(signals_file, 'w') as f:
+                    f.write("=== PRODUCTION TRADING SIGNALS LOG ===\n")
+                    f.write("Date".ljust(12))
                     for instrument in self.portfolio.instruments:
                         ticker = instrument.ticker
-                        position_val = row.get(f'pos_{ticker}', 0.0)
-                        current_positions[ticker] = position_val
-                        
-                        # Check if position changed significantly (avoid floating point noise)
-                        if abs(position_val - prev_positions[ticker]) > 0.0001:
-                            position_changed = True
+                        f.write(f"{ticker}_Signal".ljust(15))
+                        f.write(f"{ticker}_Position".ljust(15))
+                    f.write("Portfolio_Value".ljust(15))
+                    f.write("Generated".ljust(20))
+                    f.write("\n")
+                    f.write("-" * (12 + len(self.portfolio.instruments) * 30 + 15 + 20) + "\n")
                     
-                    # Only record if position changed or it's the first/last day
-                    if position_changed or date == portfolio_results.index[0] or date == portfolio_results.index[-1]:
-                        f.write(f"{date.strftime('%Y-%m-%d')}".ljust(12))
+                    # Write all signals data - only record when positions change
+                    prev_positions = {}
+                    for instrument in self.portfolio.instruments:
+                        prev_positions[instrument.ticker] = 0.0
+                    
+                    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    
+                    for date, row in portfolio_results.iterrows():
+                        # Check if any position changed
+                        position_changed = False
+                        current_positions = {}
                         
                         for instrument in self.portfolio.instruments:
                             ticker = instrument.ticker
+                            position_val = row.get(f'pos_{ticker}', 0.0)
+                            current_positions[ticker] = position_val
                             
-                            # Get forecast/signal
-                            forecast_val = row.get(f'forecast_{ticker}', 0.0)
-                            position_val = current_positions[ticker]
-                            
-                            # Format signal strength and check for no-trade zone
-                            if abs(forecast_val) < 0.01:
-                                signal_str = "NEUTRAL "
-                            elif forecast_val > 0:
-                                signal_str = f"LONG({forecast_val:.3f})"
-                            else:
-                                signal_str = f"SHORT({forecast_val:.3f})"
-                            
-                            # Check if position was filtered by no-trade zone
-                            portfolio_config = getattr(self.portfolio, 'min_position_threshold', 0.01)
-                            forecast_threshold = getattr(self.portfolio, 'min_forecast_threshold', 0.5)
-                            
-                            # Calculate what the raw position would have been
-                            raw_position = 0.0
-                            if abs(forecast_val) > 0.01:  # Only calculate if there's a meaningful forecast
-                                try:
-                                    # Estimate raw position using same logic as engine
-                                    ticker_data = getattr(self, 'instrument_data', {}).get(ticker)
-                                    if ticker_data is not None and date in ticker_data.index:
-                                        historical_data = ticker_data.loc[:date]
-                                        if len(historical_data) >= 25:
-                                            returns = historical_data['close'].pct_change().dropna()
-                                            if len(returns) >= 20:
-                                                instrument_vol = returns.rolling(window=25).std().iloc[-1] * np.sqrt(252)
-                                                if not pd.isna(instrument_vol) and instrument_vol > 0:
-                                                    vol_target = self.portfolio.volatility_target
-                                                    forecast_cap = 20.0
-                                                    raw_position = (forecast_val / forecast_cap) * (vol_target / instrument_vol)
-                                                    raw_position = max(-self.portfolio.max_leverage, min(self.portfolio.max_leverage, raw_position))
-                                except:
-                                    pass
-                            
-                            # Add filter indicators
-                            if abs(forecast_val) < forecast_threshold:
-                                signal_str += "*WEAK "
-                            elif abs(raw_position) >= portfolio_config and abs(position_val) < portfolio_config:
-                                signal_str += "*SMALL "
-                            elif abs(raw_position) > abs(position_val) + 0.001:  # Position was reduced by buffer
-                                signal_str += "*BUFFER "
-                            
-                            f.write(f"{signal_str}".ljust(15))
-                            f.write(f"{position_val:.4f}".ljust(15))
+                            # Check if position changed significantly (avoid floating point noise)
+                            if abs(position_val - prev_positions[ticker]) > 0.0001:
+                                position_changed = True
                         
-                        # Portfolio value
-                        portfolio_val = row.get('portfolio_value', 0.0)
-                        f.write(f"{portfolio_val:.2f}".ljust(15))
-                        f.write("\n")
+                        # Only record if position changed or it's the first/last day
+                        if position_changed or date == portfolio_results.index[0] or date == portfolio_results.index[-1]:
+                            f.write(f"{date.strftime('%Y-%m-%d')}".ljust(12))
+                            
+                            for instrument in self.portfolio.instruments:
+                                ticker = instrument.ticker
+                                
+                                # Get forecast/signal
+                                forecast_val = row.get(f'forecast_{ticker}', 0.0)
+                                position_val = current_positions[ticker]
+                                
+                                # Format signal strength and check for no-trade zone
+                                if abs(forecast_val) < 0.01:
+                                    signal_str = "NEUTRAL "
+                                elif forecast_val > 0:
+                                    signal_str = f"LONG({forecast_val:.3f})"
+                                else:
+                                    signal_str = f"SHORT({forecast_val:.3f})"
+                                
+                                # Check if position was filtered by no-trade zone
+                                portfolio_config = getattr(self.portfolio, 'min_position_threshold', 0.01)
+                                forecast_threshold = getattr(self.portfolio, 'min_forecast_threshold', 0.5)
+                                
+                                # Calculate what the raw position would have been
+                                raw_position = 0.0
+                                if abs(forecast_val) > 0.01:  # Only calculate if there's a meaningful forecast
+                                    try:
+                                        # Estimate raw position using same logic as engine
+                                        ticker_data = getattr(self, 'instrument_data', {}).get(ticker)
+                                        if ticker_data is not None and date in ticker_data.index:
+                                            historical_data = ticker_data.loc[:date]
+                                            if len(historical_data) >= 25:
+                                                returns = historical_data['close'].pct_change().dropna()
+                                                if len(returns) >= 20:
+                                                    instrument_vol = returns.rolling(window=25).std().iloc[-1] * np.sqrt(252)
+                                                    if not pd.isna(instrument_vol) and instrument_vol > 0:
+                                                        vol_target = self.portfolio.volatility_target
+                                                        forecast_cap = 20.0
+                                                        raw_position = (forecast_val / forecast_cap) * (vol_target / instrument_vol)
+                                                        raw_position = max(-self.portfolio.max_leverage, min(self.portfolio.max_leverage, raw_position))
+                                    except:
+                                        pass
+                                
+                                # Add filter indicators
+                                if abs(forecast_val) < forecast_threshold:
+                                    signal_str += "*WEAK "
+                                elif abs(raw_position) >= portfolio_config > abs(position_val):
+                                    signal_str += "*SMALL "
+                                elif abs(raw_position) > abs(position_val) + 0.001:  # Position was reduced by buffer
+                                    signal_str += "*BUFFER "
+                                
+                                f.write(f"{signal_str}".ljust(15))
+                                f.write(f"{position_val:.4f}".ljust(15))
+                            
+                            # Portfolio value and timestamp
+                            portfolio_val = row.get('portfolio_value', 0.0)
+                            f.write(f"{portfolio_val:.2f}".ljust(15))
+                            f.write(f"{timestamp}".ljust(20))
+                            f.write("\n")
+                        
+                        # Update previous positions
+                        prev_positions = current_positions.copy()
+            else:
+                # File exists with content - check if latest signal already exists
+                latest_date = portfolio_results.index[-1]
+                latest_date_str = latest_date.strftime('%Y-%m-%d')
+                
+                # Read the last line to check if this date already exists
+                with open(signals_file, 'r') as f:
+                    lines = f.readlines()
+                    last_line = lines[-1].strip() if lines else ""
                     
-                    # Update previous positions
-                    prev_positions = current_positions.copy()
+                # Check if the last line already contains today's date
+                if last_line.startswith(latest_date_str):
+                    # Signal for this date already exists, skip writing
+                    self.logger.info(f"Signal for {latest_date_str} already exists, skipping duplicate")
+                    return
+                
+                # File exists but doesn't have today's signal - append it
+                with open(signals_file, 'a') as f:
+                    latest_row = portfolio_results.iloc[-1]
+                    
+                    # Write the latest signal line
+                    f.write(f"{latest_date_str}".ljust(12))
+                    
+                    for instrument in self.portfolio.instruments:
+                        ticker = instrument.ticker
+                        
+                        # Get forecast/signal
+                        forecast_val = latest_row.get(f'forecast_{ticker}', 0.0)
+                        position_val = latest_row.get(f'pos_{ticker}', 0.0)
+                        
+                        # Format signal strength and check for no-trade zone
+                        if abs(forecast_val) < 0.01:
+                            signal_str = "NEUTRAL "
+                        elif forecast_val > 0:
+                            signal_str = f"LONG({forecast_val:.3f})"
+                        else:
+                            signal_str = f"SHORT({forecast_val:.3f})"
+                        
+                        # Check if position was filtered by no-trade zone
+                        portfolio_config = getattr(self.portfolio, 'min_position_threshold', 0.01)
+                        forecast_threshold = getattr(self.portfolio, 'min_forecast_threshold', 0.5)
+                        
+                        # Calculate what the raw position would have been
+                        raw_position = 0.0
+                        if abs(forecast_val) > 0.01:  # Only calculate if there's a meaningful forecast
+                            try:
+                                # Estimate raw position using same logic as engine
+                                ticker_data = getattr(self, 'instrument_data', {}).get(ticker)
+                                if ticker_data is not None and latest_date in ticker_data.index:
+                                    historical_data = ticker_data.loc[:latest_date]
+                                    if len(historical_data) >= 25:
+                                        returns = historical_data['close'].pct_change().dropna()
+                                        if len(returns) >= 20:
+                                            instrument_vol = returns.rolling(window=25).std().iloc[-1] * np.sqrt(252)
+                                            if not pd.isna(instrument_vol) and instrument_vol > 0:
+                                                vol_target = self.portfolio.volatility_target
+                                                forecast_cap = 20.0
+                                                raw_position = (forecast_val / forecast_cap) * (vol_target / instrument_vol)
+                                                raw_position = max(-self.portfolio.max_leverage, min(self.portfolio.max_leverage, raw_position))
+                            except:
+                                pass
+                        
+                        # Add filter indicators
+                        if abs(forecast_val) < forecast_threshold:
+                            signal_str += "*WEAK "
+                        elif abs(raw_position) >= portfolio_config > abs(position_val):
+                            signal_str += "*SMALL "
+                        elif abs(raw_position) > abs(position_val) + 0.001:  # Position was reduced by buffer
+                            signal_str += "*BUFFER "
+                        
+                        f.write(f"{signal_str}".ljust(15))
+                        f.write(f"{position_val:.4f}".ljust(15))
+                    
+                    # Portfolio value
+                    portfolio_val = latest_row.get('portfolio_value', 0.0)
+                    f.write(f"{portfolio_val:.2f}".ljust(15))
+                    
+                    # Timestamp
+                    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    f.write(f"{timestamp}".ljust(20))
+                    f.write("\n")
+                
         except Exception as e:
             self.logger.error(f"Error saving signals to file: {str(e)}")
