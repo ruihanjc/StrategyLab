@@ -37,7 +37,8 @@ def generate_daily_signals():
 
     try:
         # Use default configuration
-        config_path = "../strategy_backtest/config/backtest_config.yaml"
+        project_dir = os.path.abspath(__file__ + "/../../")
+        config_path = os.path.join(project_dir, "strategy_backtest/config/backtest_config.yaml")
         end_date = datetime.now().strftime('%Y-%m-%d')
 
         # Initialize configuration
