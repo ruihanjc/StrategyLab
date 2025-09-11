@@ -50,7 +50,7 @@ class IBEquityClient(IBClient):
                 'volume': bar.volume,
                 'ticker': ticker,
                 'timestamp': datetime.date.today(),
-                'service': 'equity'
+                'service': 'Equity'
             })
 
         df = pd.DataFrame(data)
