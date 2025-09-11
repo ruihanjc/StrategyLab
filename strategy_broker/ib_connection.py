@@ -2,6 +2,7 @@ from ib_insync import IB
 import yaml
 import os
 import re
+import time
 
 from ibapi.wrapper import *
 
@@ -16,14 +17,21 @@ class IBConnection():
             self.config = yaml.safe_load(content)
 
         self.ib = IB()
+        self._client_id = None
+
+    def _generate_client_id(self):
+        if self._client_id is None:
+            self._client_id = int((time.time() * 1000) % 10000) + os.getpid() % 1000
+        return self._client_id
 
     def connect(self):
         if not self.ib.isConnected():
             account_config = self.config["IBKR_ACCOUNT"]
+            client_id = self._generate_client_id()
             self.ib.connect(
                 account_config['ib_ipaddress'],
                 account_config['ib_port'],
-                clientId=1
+                clientId=client_id
             )
         return self.ib
 

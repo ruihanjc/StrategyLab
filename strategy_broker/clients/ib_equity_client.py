@@ -14,7 +14,7 @@ class IBEquityClient(IBClient):
         self.timeout = 20
         self.formatDate = 2
 
-    def get_ib_data(self, ticker: str, durationStr: (str, bool)):
+    def get_ib_data(self, ticker: str, durationStr):
         try:
             stock = Stock(ticker, exchange="SMART", currency="USD")
 
@@ -50,7 +50,8 @@ class IBEquityClient(IBClient):
                 'volume': bar.volume,
                 'ticker': ticker,
                 'timestamp': datetime.date.today(),
-                'service': 'Equity'
+                'service': 'Equity',
+                'source' : 'IBKR'
             })
 
         df = pd.DataFrame(data)

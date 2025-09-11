@@ -20,7 +20,9 @@ class IBKREquityExtractor(BaseClientExtractor, ABC):
 
     def process_data(self):
         client = self.get_client()
-
-        start_date, end_date, has_history = self.get_history()
-
-        return client.get_ib_data(self.ticker, self.get_duration(start_date, end_date, has_history))
+        try:
+            start_date, end_date, has_history = self.get_history()
+            return client.get_ib_data(self.ticker, self.get_duration(start_date, end_date, has_history))
+        finally:
+            if hasattr(client, 'ib_connection'):
+                client.ib_connection.disconnect()

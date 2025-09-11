@@ -1,4 +1,4 @@
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 from strategy_broker.ib_connection import IBConnection
 from ib_insync import Contract
 
@@ -46,16 +46,24 @@ def broker_error(msg, log):
     log.warning(msg)
 
 
-class IBClient(object):
+class IBClient(object, ABC):
 
     def __init__(self):
         setup_logging()
-        self.ib = IBConnection().connect()
+        self.ib_connection = IBConnection()
+        self.ib = self.ib_connection.connect()
         self.logger = logging.getLogger(__name__)
 
+    def __del__(self):
+        try:
+            if hasattr(self, 'ib_connection'):
+                self.ib_connection.disconnect()
+        except:
+            pass
+
     @property
-    def ib_connection(self) -> IBConnection:
-        return self.ib
+    def ib_conn(self) -> IBConnection:
+        return self.ib_connection
 
     @property
     def client_id(self) -> int:
