@@ -46,7 +46,7 @@ def broker_error(msg, log):
     log.warning(msg)
 
 
-class IBClient(object, ABC):
+class IBClient(object):
 
     def __init__(self):
         setup_logging()
