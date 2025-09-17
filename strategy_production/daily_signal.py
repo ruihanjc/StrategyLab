@@ -9,6 +9,7 @@ import logging
 import os
 import sys
 import yaml
+import json
 
 from strategy_core.sysobjects import Portfolio
 from strategy_core.sysobjects.engine import ProductionEngine
@@ -37,7 +38,8 @@ def generate_daily_signals():
 
     try:
         # Use default configuration
-        config_path = "strategy_backtest/config/backtest_config.yaml"
+        project_dir = os.path.abspath(__file__ + "/../../")
+        config_path = os.path.join(project_dir, "strategy_backtest/config/backtest_config.yaml")
         end_date = datetime.now().strftime('%Y-%m-%d')
 
         # Initialize configuration
@@ -100,6 +102,21 @@ def generate_daily_signals():
         # Log key metrics for verification
         performance = results.get_performance_summary()
         logger.info(f"Signal generation complete - Final positions generated for {len(instruments)} instruments")
+
+        # --- Save target positions to file for execution ---
+        logger.info("Saving target positions for execution...")
+        target_positions = results.daily_positions.iloc[-1].to_dict()
+        
+        # Define the output path
+        output_dir = os.path.join(project_dir, "strategy_production/order_signal")
+        os.makedirs(output_dir, exist_ok=True)
+        output_path = os.path.join(output_dir, "target_positions.json")
+        
+        with open(output_path, 'w') as f:
+            json.dump(target_positions, f, indent=4)
+            
+        logger.info(f"Target positions saved to {output_path}")
+        # --- End of save ---
 
         return True
 

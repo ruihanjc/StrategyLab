@@ -19,6 +19,8 @@ instruments:
       ticker: "PLTR"
     - source: "IBKR"
       ticker: "TSLA"
+    - source: "IBKR"
+      ticker: "NVDA"
 
 
 

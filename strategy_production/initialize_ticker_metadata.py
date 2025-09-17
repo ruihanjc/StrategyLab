@@ -10,7 +10,11 @@ def initialize_instrument_metadata():
 
     # Define instrument metadata
     metadata = [
-        # {'symbol': 'SPY', 'asset_type': 'STK', 'exchange': 'SMART', 'currency': 'USD', 'primary_exchange': 'ARCA'},
+        {'symbol': 'SPY', 'asset_type': 'STK', 'exchange': 'SMART', 'currency': 'USD', 'primary_exchange': 'ARCA'},
+        {'symbol': 'NVDA', 'asset_type': 'STK', 'exchange': 'SMART', 'currency': 'USD', 'primary_exchange': 'NASDAQ'},
+        {'symbol': 'TSLA', 'asset_type': 'STK', 'exchange': 'SMART', 'currency': 'USD', 'primary_exchange': 'NASDAQ'},
+        {'symbol': 'PLTR', 'asset_type': 'STK', 'exchange': 'SMART', 'currency': 'USD', 'primary_exchange': 'NASDAQ'},
+        {'symbol': 'AUDUSD', 'asset_type': 'CASH', 'exchange': 'SMART', 'currency': 'USD', 'primary_exchange': 'IDEALPRO'}
     ]
 
     df = pd.DataFrame(metadata)
