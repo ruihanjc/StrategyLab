@@ -22,6 +22,15 @@ api:
   retry_delay: 1
   
 update_services:
+  forex:
+    - source: "IBKR"
+      ticker: "AUDUSD"
+    - source: "IBKR"
+      ticker: "EURUSD"
+    - source: "IBKR"
+      ticker: "GBPUSD"
+    - source: "IBKR"
+      ticker: "JPYUSD"
   equity:
     - source: "IBKR"
       ticker: "TSLA"
@@ -34,9 +43,6 @@ update_services:
     - source: "IBKR"
       ticker: "NVDA"
 
-  forex:
-    - source: "YahooFinance"
-      ticker: "AUDUSD"
 
 data_sources:
   default: "market_stack"

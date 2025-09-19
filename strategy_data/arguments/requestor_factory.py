@@ -1,5 +1,6 @@
 from strategy_core.sysobjects import Instrument
 from ..extractors import *
+from ..extractors.client_extractor.ibkr_forex_extractor import IBKRForexExtractor
 from ..extractors.client_extractor.ibkr_equity_extractor import IBKREquityExtractor
 from ..extractors.rest_extractor.alphavantage_extractor import AlphaVantageExtractor
 from ..extractors.rest_extractor.marketstack_extractor import MarketStackExtractor
@@ -25,6 +26,8 @@ class RequesterFactory:
                 match instrument.source:
                     case "YahooFinance":
                         return YahooFinanceExtractor(instrument, api_config)
+                    case "IBKR":
+                        return IBKRForexExtractor(instrument)
                     case _:
                         raise RuntimeError("Failed to choose equity extractor")
             case _:

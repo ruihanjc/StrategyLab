@@ -124,4 +124,7 @@ def arctic_delete_ticker(source: str, ticker: str, asset_class: str):
 
 
 if __name__ == "__main__":
-    arctic_delete_ticker("", "AUDUSD", "equity")
+    arctic_delete_ticker("", "AUDUSD", "forex")
+    arctic_delete_ticker("", "EURUSD", "forex")
+    arctic_delete_ticker("", "GBPUSD", "forex")
+    arctic_delete_ticker("", "JPYUSD", "forex")
