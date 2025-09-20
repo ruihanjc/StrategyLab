@@ -1,4 +1,4 @@
-from abc import abstractmethod, ABC
+from abc import abstractmethod
 from strategy_broker.ib_connection import IBConnection
 from ib_insync import Contract
 
