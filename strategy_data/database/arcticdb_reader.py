@@ -21,9 +21,9 @@ class ArcticReader:
         lib = self.arctic.get_library(library)
         return lib.list_symbols()
 
-    def has_historical_range(self, library, symbol):
+    def has_historical_range(self, service, symbol):
         """Read data from a symbol"""
-        lib = self.arctic.get_library(library)
+        lib = self.arctic.get_library(service)
         if lib.has_symbol(symbol):
             data = lib.read(symbol).data
             if 'date' in data.columns:
@@ -32,6 +32,9 @@ class ArcticReader:
         else:
             return datetime.date.today(), False
         return None
+
+    def get_latest_date_for_ticker(self, service, symbol):
+        pass
 
     def read_data(self, library, symbol, head):
         """Read data from a symbol"""
@@ -48,6 +51,13 @@ class ArcticReader:
             'columns': list(data.columns),
             'date_range': f"{data['date'].min()} to {data['date'].max()}" if 'date' in data.columns else 'N/A'
         }
+
+    def get_metadata_info(self, symbol):
+        """Get information about a symbol"""
+        lib = self.arctic.get_library("metadata")
+        data = lib.read("instrument_contracts").data
+        df = pd.DataFrame(data)
+        return df.loc[symbol]
 
     def load_from_arcticdb(self, service, ticker, start_date, end_date):
         try:

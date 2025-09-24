@@ -40,7 +40,7 @@ def generate_daily_signals():
         # Use default configuration
         project_dir = os.path.abspath(__file__ + "/../../")
         config_path = os.path.join(project_dir, "strategy_backtest/config/backtest_config.yaml")
-        end_date = datetime.now().strftime('%Y-%m-%d')
+
 
         # Initialize configuration
         logger.info(f"Initializing configuration from {config_path}...")
@@ -49,7 +49,7 @@ def generate_daily_signals():
 
         # Use config start_date and override end_date
         start_date = backtest_config.get('start_date')
-        backtest_config['end_date'] = end_date
+        end_date = datetime.now().strftime('%Y-%m-%d')
 
         logger.info(f"Generating signals for period: {start_date} to {end_date}")
 
@@ -60,12 +60,12 @@ def generate_daily_signals():
 
         # Load price data for instruments
         logger.info("Loading price data...")
-        price_data = load_price_data(instruments, backtest_config)
+        price_data = load_price_data(instruments, start_date, end_date)
         logger.info(f"Loaded price data for {len(price_data)} instruments")
 
         # Create strategy
         logger.info("Creating strategy...")
-        strategy = create_strategy_from_config(instruments, backtest_config)
+        strategy = create_strategy_from_config(instruments, backtest_config, price_data)
 
         # Validate strategy
         if not strategy.validate_strategy(price_data):
@@ -74,10 +74,8 @@ def generate_daily_signals():
 
         # Create portfolio
         logger.info("Creating portfolio...")
-        initial_capital = backtest_config.get("initial_capital")
         position_sizing_config = backtest_config.get("position_sizing", {})
         portfolio = Portfolio(instruments,
-                              initial_capital=initial_capital,
                               position_sizing_config=position_sizing_config)
 
         logger.info(f"Signal generation period: {start_date} to {end_date}")
@@ -106,7 +104,7 @@ def generate_daily_signals():
         # --- Save target positions to file for execution ---
         logger.info("Saving target positions for execution...")
         target_positions = results.daily_positions.iloc[-1].to_dict()
-        
+
         # Define the output path
         output_dir = os.path.join(project_dir, "strategy_production/order_signal")
         os.makedirs(output_dir, exist_ok=True)

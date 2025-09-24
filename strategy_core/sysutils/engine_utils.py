@@ -27,35 +27,34 @@ def create_instruments_from_config(instrument_settings):
     return InstrumentList(created_instruments)
 
 
-def create_strategy_from_config(instruments, config):
+def create_strategy_from_config(instruments, config, price_data):
     rules = []
     rule_weights = {}
 
-    price_datas = load_price_data(instruments, config)
     for rule_name, rule_config in config.get("strategy").items():
-        for ticker in price_datas:
+        for instrument in instruments:
             # Extract weight from rule config
             weight = rule_config.get("weight", 1.0)
-            rule_key = f"{rule_name}_{ticker}"
+            rule_key = f"{rule_name}_{instrument.ticker}"
             rule_weights[rule_key] = weight
             
             # Pass both price data and ticker information
-            rules.append(parse_rule((rule_name, rule_config), price_datas[ticker], ticker))
+            rules.append(parse_rule((rule_name, rule_config), price_data[instrument.ticker], instrument.ticker))
 
     strategy = Strategy(rules)
     strategy.rule_weights = rule_weights
     return strategy
 
 
-def load_price_data(instruments: InstrumentList, config):
+def load_price_data(instruments: InstrumentList, start_date, end_date):
     price_data = {}
 
     arcticdb = ArcticReader()
 
     raw_data = arcticdb.load_multiple_from_arcticdb(
         instruments=instruments,
-        start_date=config.get('start_date'),
-        end_date=config.get('end_date')
+        start_date=start_date,
+        end_date=end_date
     )
 
     for ticker, data in raw_data.items():

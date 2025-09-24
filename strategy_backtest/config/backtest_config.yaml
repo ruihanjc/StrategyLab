@@ -1,5 +1,5 @@
 # General backtest settings
-initial_capital: 100000
+initial_capital: 1000
 commission: 0.001  # 0.1%
 slippage: 0.0005   # 0.05%
 start_date: '2020-01-03'
@@ -17,8 +17,6 @@ instruments:
   equity:
     - source: "MarketStack"
       ticker: "PLTR"
-    - source: "IBKR"
-      ticker: "TSLA"
     - source: "IBKR"
       ticker: "NVDA"
 

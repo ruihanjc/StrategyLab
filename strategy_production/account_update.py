@@ -31,7 +31,7 @@ def account_update(config_arguments):
         account_summary = account_data['account_summary']
 
         # Get portfolio
-        portfolio = ib.ib.portfolio()
+        positions = ib.ib.positions()
 
         # Get orders
         trades = ib.ib.openTrades()
@@ -61,20 +61,16 @@ def account_update(config_arguments):
                 case _:
                     continue
 
-        if not portfolio:
+        if not positions:
             logger.info("No positions found in the account.")
         else:
-            for p in portfolio:
+            for p in positions:
                 summary_data['positions'].append({
                     'symbol': p.contract.symbol,
                     'secType': p.contract.secType,
                     'exchange': p.contract.exchange,
                     'position': p.position,
-                    'market_price': p.marketPrice,
-                    'market_value': p.marketValue,
-                    'average_cost': p.averageCost,
-                    'unrealized_pnl': p.unrealizedPNL,
-                    'realized_pnl': p.realizedPNL
+                    'average_cost': p.avgCost
                 })
 
         # Add trades to summary data

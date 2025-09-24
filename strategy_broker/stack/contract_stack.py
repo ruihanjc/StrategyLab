@@ -1,5 +1,5 @@
 from typing import Dict, List
-from .order import Order
+from strategy_broker.orders.order import Order
 
 
 class ContractStack:

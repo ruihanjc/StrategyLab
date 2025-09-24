@@ -1,8 +1,10 @@
 from typing import Dict
-from .order import Order, OrderStatus, OrderType
-from .ib_connection import IBConnection
-from .contract_factory import create_contract
-from ib_insync import Trade, Order as IBOrder
+from strategy_broker.orders.order import Order, OrderStatus, OrderType
+from strategy_broker.ib_connection import IBConnection
+from ib_insync import Trade, Order as IBOrder, Stock
+
+from strategy_data.database import ArcticReader
+
 
 class BrokerStack:
     """
@@ -12,13 +14,14 @@ class BrokerStack:
     def __init__(self, ib_connection: IBConnection):
         self.ib_conn = ib_connection
         self._live_orders: Dict[int, Order] = {}
+        self.arctic_reader = ArcticReader()
 
     def submit_order(self, order: Order):
         """Submits an order to the broker."""
         ib = self.ib_conn.connect()
         
         # --- Create IB Contract using the factory ---
-        contract = create_contract(order.instrument)
+         # contract = create_contract(order.instrument)
         
         # --- Create IB Order ---
         ib_order = IBOrder(
@@ -27,19 +30,15 @@ class BrokerStack:
             orderType=order.order_type.value,
             lmtPrice=order.limit_price if order.order_type == OrderType.LIMIT else 0
         )
+
+        metadata = self.arctic_reader.get_metadata_info(order.instrument)
+
+        contract = self.create_contract(order.instrument, metadata)
         
         # --- Place Order ---
         trade = ib.placeOrder(contract, ib_order)
         
         print(f"Placed order for {order.instrument}: {trade.orderStatus.status}")
-
-        order.order_id = trade.order.orderId
-        # Safely map status string to enum
-        order.status = OrderStatus[trade.orderStatus.status.upper()] if trade.orderStatus.status.upper() in OrderStatus.__members__ else order.status
-        self._live_orders[order.order_id] = order
-        
-        # Set up a callback for order status updates
-        trade.orderStatusEvent += self.on_order_status
 
     def on_order_status(self, trade: Trade):
         """Callback for handling order status updates from the broker."""
@@ -56,3 +55,11 @@ class BrokerStack:
 
     def get_live_orders(self):
         return self._live_orders.values()
+
+    @staticmethod
+    def create_contract(symbol, metadata):
+        match metadata.asset_type:
+            case "STK":
+                return Stock(symbol, metadata.exchange, metadata.currency)
+            case _:
+                raise Exception("No such contract.")

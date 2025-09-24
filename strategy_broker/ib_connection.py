@@ -1,4 +1,4 @@
-from ib_insync import IB
+from ib_insync import IB, Stock
 from dotenv import load_dotenv
 import yaml
 import os
@@ -49,3 +49,41 @@ class IBConnection():
         return {
             'account_summary': account_summary
         }
+
+    def get_current_price(self, symbol):
+        """Get current market price for a symbol."""
+        try:
+            if not self.ib.isConnected():
+                self.connect()
+
+            # Create a stock contract
+            contract = Stock(symbol, 'SMART', 'USD')
+
+            # Qualify the contract
+            self.ib.qualifyContracts(contract)
+
+            # Request market data
+            ticker = self.ib.reqMktData(contract, '', False, False)
+
+            # Wait for price data
+            self.ib.sleep(2)  # Give it time to get data
+
+            # Get the price (bid/ask midpoint or last price)
+            if ticker.bid and ticker.ask and ticker.bid > 0 and ticker.ask > 0:
+                price = (ticker.bid + ticker.ask) / 2
+            elif ticker.last and ticker.last > 0:
+                price = ticker.last
+            elif ticker.close and ticker.close > 0:
+                price = ticker.close
+            else:
+                print(f"No valid price data available for {symbol}")
+                return None
+
+            # Cancel the market data subscription
+            self.ib.cancelMktData(contract)
+
+            return price
+
+        except Exception as e:
+            print(f"Error getting price for {symbol}: {e}")
+            return None

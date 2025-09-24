@@ -22,8 +22,16 @@ strategy_backtest:
 strategy_brokers:
 - Package used to create clients that I can use to trade.
 
-strategy_trading:
+strategy_production:
 - Paper trading engine that uses IBKR's api and strategy_core's classes to identify signals, buy or sell when signal notified.
+
+- The normal workflow works like the following:
+    
+    - Standard update data
+    - Account update
+    - Daily signal
+    - Check signals and order
+    - Execution
 
 
 Additional materials:
