@@ -24,7 +24,7 @@ logging.basicConfig(
     ]
 )
 
-def check_signals_and_order():
+def calculate_positions():
     """
     Compares target position weights with current positions to generate a JSON file
     with a list of trades to be executed, using historical data for prices.
@@ -138,4 +138,4 @@ def check_signals_and_order():
     logging.info("Trade calculation finished.")
 
 if __name__ == "__main__":
-    check_signals_and_order()
+    calculate_positions()
