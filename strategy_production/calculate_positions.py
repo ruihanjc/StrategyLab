@@ -5,12 +5,11 @@ import math
 import yaml
 from collections import defaultdict
 from strategy_core.sysutils.engine_utils import create_instruments_from_config, load_price_data
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # --- Configuration ---
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ACCOUNT_DETAILS_PATH = os.path.join(PROJECT_ROOT, "strategy_production/account/account_details.json")
-TARGET_POSITIONS_PATH = os.path.join(PROJECT_ROOT, "strategy_production/order_signal/target_positions.json")
 OUTPUT_FILE_PATH = os.path.join(PROJECT_ROOT, "strategy_production/order_signal/next_orders.json")
 CONFIG_PATH = os.path.join(PROJECT_ROOT, "strategy_backtest/config/backtest_config.yaml")
 
@@ -24,7 +23,7 @@ logging.basicConfig(
     ]
 )
 
-def calculate_positions():
+def calculate_positions(target_positions):
     """
     Compares target position weights with current positions to generate a JSON file
     with a list of trades to be executed, using historical data for prices.
@@ -36,10 +35,6 @@ def calculate_positions():
         with open(ACCOUNT_DETAILS_PATH, 'r') as f:
             account_details = json.load(f)
         logging.info(f"Successfully loaded account details from {ACCOUNT_DETAILS_PATH}")
-
-        with open(TARGET_POSITIONS_PATH, 'r') as f:
-            target_positions = json.load(f)
-        logging.info(f"Successfully loaded target positions from {TARGET_POSITIONS_PATH}")
         
         with open(CONFIG_PATH, 'r') as file:
             backtest_config = yaml.safe_load(file)
@@ -124,18 +119,15 @@ def calculate_positions():
         logging.error(f"An error occurred during trade calculation: {e}", exc_info=True)
 
     # --- Write Output File ---
-    if not trades_to_make:
-        logging.info("No trades required. Target positions match current positions.")
-    else:
-        try:
-            with open(OUTPUT_FILE_PATH, 'w') as f:
-                json.dump(trades_to_make, f, indent=4)
+    try:
+        with open(OUTPUT_FILE_PATH, 'w') as f:
+            json.dump(trades_to_make, f, indent=4)
+        if not trades_to_make:
+            logging.info("No trades required. Target positions match current positions.")
+        else:
             logging.info(f"Successfully wrote {len(trades_to_make)} trades to {OUTPUT_FILE_PATH}")
-        except IOError as e:
-            logging.error(f"Error writing output file. {e}")
-            return
+    except IOError as e:
+        logging.error(f"Error writing output file. {e}")
+        return
 
     logging.info("Trade calculation finished.")
-
-if __name__ == "__main__":
-    calculate_positions()

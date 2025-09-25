@@ -1,10 +1,10 @@
 {
     "original_cash": 1000,
     "account_number": "U14921259",
-    "last_checked_date": "2025-09-24 20:11:27",
-    "net_liquidation": 996.81,
-    "available_funds": 865.08,
-    "total_cash_value": 865.08,
+    "last_checked_date": "2025-09-24 21:35:00",
+    "net_liquidation": 996.4,
+    "available_funds": 865.04,
+    "total_cash_value": 865.04,
     "positions": [
         {
             "symbol": "NVDA",

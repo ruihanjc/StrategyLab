@@ -14,6 +14,7 @@ import json
 from strategy_core.sysobjects import Portfolio
 from strategy_core.sysobjects.engine import ProductionEngine
 from strategy_core.sysutils.engine_utils import *
+from strategy_production.calculate_positions import calculate_positions
 
 # Add project root to Python path
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -104,6 +105,8 @@ def generate_daily_signals():
         # --- Save target positions to file for execution ---
         logger.info("Saving target positions for execution...")
         target_positions = results.daily_positions.iloc[-1].to_dict()
+
+        calculate_positions(target_positions)
 
         # Define the output path
         output_dir = os.path.join(project_dir, "strategy_production/order_signal")
