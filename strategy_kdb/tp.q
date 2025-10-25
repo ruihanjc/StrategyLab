@@ -1,6 +1,6 @@
 // Personal tick system
 
-if[not system"p"; system"p 6010"]
+if[not system"p"; system"p 5010"]
 system "l strategy_kdb/tick/",(src:first .z.x, enlist "sym"),".q"
 
 system "l strategy_kdb/tick/u.q"
