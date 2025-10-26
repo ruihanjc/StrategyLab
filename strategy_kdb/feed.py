@@ -22,13 +22,15 @@ class QTickerFeed:
                 ticker = yf.Tickers(symbols)
 
                 new_data = None
-                timestamp = datetime.now().isoformat()
+                timestamp = datetime.now()
 
                 try:
                         # Get fast quote data (lighter than .info)
-                    fast_info = ticker.tickers[symbols].fast_info
+                    ticker_info = ticker.tickers[symbols].info
 
-                    new_data = kx.toq([symbols, fast_info.last_price, "B"])
+                    new_data = kx.toq([symbols, ticker_info["currentPrice"], ticker_info["bid"],
+                                       ticker_info["ask"], ticker_info["bidSize"], ticker_info["askSize"],ticker_info["open"],
+                                       ticker_info["dayLow"], ticker_info["dayHigh"], ticker_info["volume"]])
 
 
                 except Exception as e:
@@ -38,16 +40,16 @@ class QTickerFeed:
                 with self.data_lock:
                     latest_data = new_data
 
-                print(latest_data)
-                self.q.upd("trade", latest_data)
-
-                print(f"Updated {len(new_data)} tickers at {timestamp}")
+                self.q.upd("tickerData", latest_data)
 
             except Exception as e:
                 print(f"Error in fetch loop: {e}")
 
-            time.sleep(5)
+            time.sleep(600)
 
 
-
-QTickerFeed("AAPL")
+    def cleanup(self):
+        """Clean up resources"""
+        self.running = False
+        if hasattr(self, 'q'):
+            self.q.close()

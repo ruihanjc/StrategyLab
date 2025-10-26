@@ -1,2 +1,2 @@
-table: ([] time:0#.z.N;date:0#.z.d;sym:`g#(0#`); price:0#0.0; bid:0#0.0;ask:0#0.0; bidSize:0#0; askSize:0#0;open:0#0.0;close:0#0.0;low:0#0.0;high:0#0.0;volume:0#0);
+tickerData: ([] time:0#.z.N;sym:`g#(0#`); price:0#0.0; bid:0#0.0;ask:0#0.0; bidSize:0#0; askSize:0#0;open:0#0.0;low:0#0.0;high:0#0.0;volume:0#0);
 trade:([]time:`timespan$();sym:`g#`symbol$();price:`float$();side:`symbol$());
