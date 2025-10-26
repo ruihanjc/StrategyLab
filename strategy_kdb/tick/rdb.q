@@ -10,7 +10,7 @@ upd:insert
     .Q.hdpf[`$"::5012"; `:.; date; `sym];
     @[;`sym;`g#] each t;};
 
-.u.rep:{[x;y](.[;();:;].)each x; system "cd ",1_-10_string first reverse y};
+.u.rep:{[x;y](.[;();:;].)each x; system "cd ",1_-10_string last y};
 
 
 .u.rep . (hopen first .u.x)"(.u.sub[`;`];`.u `i`L)"
