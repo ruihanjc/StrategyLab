@@ -6,5 +6,7 @@ dir: "strategy_kdb/"
 
 
 selectFunc:{[tbl;st;et;syms]
-     select from tbl where date within st et, sym in syms
+     $[syms~`;
+       select from tbl where date within (st;et);
+       select from tbl where date within (st;et), sym in syms]
  }

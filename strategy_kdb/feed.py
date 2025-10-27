@@ -53,3 +53,5 @@ class QTickerFeed:
         self.running = False
         if hasattr(self, 'q'):
             self.q.close()
+
+QTickerFeed("AAPL")
